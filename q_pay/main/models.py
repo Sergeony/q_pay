@@ -1,8 +1,9 @@
+import uuid
+
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-import uuid
 
 
 class UserTypes:
@@ -21,12 +22,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_trader(self, email, password, **extra_fields):
-        extra_fields.setdefault('user_type', UserTypes.TRADER)
-        return self._create_user(email, password, **extra_fields)
-
-    def create_merchant(self, email, password, **extra_fields):
-        extra_fields.setdefault('user_type', UserTypes.MERCHANT)
+    def create_user(self, email, password, **extra_fields):
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
@@ -50,20 +46,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, editable=False)
     email = models.EmailField(max_length=150, unique=True)
-    is_active = models.BooleanField(default=True)
+    is_activated = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     tz_offset_minutes = models.SmallIntegerField(default=0)
-    last_seen = models.DateTimeField(auto_now=True)
+    last_seen = models.DateTimeField(default=None, null=True, blank=True)
     is_light_theme = models.BooleanField(default=True)
     language = models.ForeignKey(Language, on_delete=models.SET_DEFAULT, default=0)
     is_deleted = models.BooleanField(default=False)
+    otp_base32 = models.CharField(max_length=255)
 
     is_staff = models.BooleanField(default=False, editable=False)
 
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = [user_type, otp_base32]
 
 
 class Bank(models.Model):
@@ -77,7 +74,7 @@ class Requisites(models.Model):
     card_number = models.CharField(max_length=19, unique=True)
     cardholder_name = models.CharField(max_length=100)
     bank_id = models.ForeignKey(Bank, on_delete=models.PROTECT, null=True, blank=True)
-    is_active = models.BooleanField(default=False)
+    is_activated = models.BooleanField(default=False)
     automation_used = models.BooleanField(default=False)
     daily_limit = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     weekly_limit = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
@@ -152,7 +149,7 @@ class Advertisement(models.Model):
     trader_usdt_rate = models.DecimalField(max_digits=5, decimal_places=2)
     exchange_usdt_rate = models.DecimalField(max_digits=5, decimal_places=2)
     requisites_id = models.ForeignKey(Requisites, on_delete=models.PROTECT)
-    is_active = models.BooleanField(default=False)
+    is_activated = models.BooleanField(default=False)
 
 
 class Deposit(models.Model):
