@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'channels',
 
     'user_auth',
     'main',
@@ -81,8 +82,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'q_pay.wsgi.application'
-# ASGI_APPLICATION = 'q_pay.asgi.application'
+# WSGI_APPLICATION = 'q_pay.wsgi.application'
+ASGI_APPLICATION = 'q_pay.asgi.application'
 
 
 # Database
@@ -201,4 +202,14 @@ SIMPLE_JWT = {
     "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+}
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
 }
