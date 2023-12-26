@@ -1,4 +1,3 @@
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -28,7 +27,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "user_type": user_type,
             "otp_base32": otp_base32,
         }
-        print("REG PASSWORD:", password, make_password(password))
         user = User.objects.create(**user_info)
         user.save()
 
@@ -73,6 +71,7 @@ class UserVerifyOTPSerializer(serializers.Serializer):
     def create(self, validated_data: dict):
         user = validated_data.get("user")
         refresh = RefreshToken.for_user(user)
+        refresh['user_type'] = user.user_type
         return {
             "refresh": str(refresh),
             "access": str(refresh.access_token),
