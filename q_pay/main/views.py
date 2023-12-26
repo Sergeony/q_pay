@@ -5,11 +5,13 @@ from rest_framework import status, viewsets
 
 from .models import (
     Bank,
-    Requisites
+    Requisites,
+    Advertisement
 )
 from .serializers import (
     BanksSerializer,
-    RequisitesSerializer
+    RequisitesSerializer,
+    AdvertisementsSerializer
 )
 from .permissions import IsTrader
 
@@ -46,5 +48,27 @@ class RequisitesViewSet(viewsets.ModelViewSet):
         instance.save()
         return Response(
             data={"detail": "Requisites successfully deleted."},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+
+class AdvertisementsViewSet(viewsets.ModelViewSet):
+    serializer_class = AdvertisementsSerializer
+    permission_classes = [IsAuthenticated, IsTrader]
+
+    def get_queryset(self):
+        return Advertisement.objects.filter(trader_id=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(trader_id=self.request.user)
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(self, request, *args, **kwargs)
+        return Response(
+            data={"detail": "Advertisement successfully deleted."},
             status=status.HTTP_204_NO_CONTENT
         )
