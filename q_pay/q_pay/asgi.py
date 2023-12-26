@@ -10,7 +10,21 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
 import os
 
 from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'q_pay.settings')
 
-application = get_asgi_application()
+asgi_application = get_asgi_application()
+
+from main.middlewares import JwtAuthMiddlewareStack
+import main.routing
+
+application = ProtocolTypeRouter({
+    "http": asgi_application,
+    "websocket": JwtAuthMiddlewareStack(
+        URLRouter(
+            main.routing.websocket_urlpatterns
+        )
+    ),
+})
