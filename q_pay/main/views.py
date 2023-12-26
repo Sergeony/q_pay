@@ -6,28 +6,25 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_framework import status, viewsets
-from .services import create_transactions_excel
 
 from .models import (
     Bank,
     Requisites,
     Advertisement,
     InputTransaction,
-    OutputTransaction
+    OutputTransaction,
+    Transfer
 )
 from .serializers import (
     BanksSerializer,
     RequisitesSerializer,
     AdvertisementsSerializer,
     InputTransactionSerializer,
-    OutputTransactionSerializer
+    OutputTransactionSerializer,
+    TransferSerializer
 )
-<<<<<<< Updated upstream
-from .permissions import IsTrader
-=======
 from .permissions import IsTrader, IsMerchant
 from .services import create_transactions_excel
->>>>>>> Stashed changes
 
 
 class BankListView(APIView):
@@ -215,3 +212,14 @@ class MerchantInputTransactionsView(BaseMerchantTransactionsView):
 class MerchantOutputTransactionsView(BaseMerchantTransactionsView):
     transaction_model = OutputTransaction
     transaction_serializer = OutputTransactionSerializer
+
+
+class MerchantTransferViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, IsMerchant]
+    serializer_class = TransferSerializer
+
+    def get_queryset(self):
+        return Transfer.objects.filter(merchant_id=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(merchant_id=self.request.user)
