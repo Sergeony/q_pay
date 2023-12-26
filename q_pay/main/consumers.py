@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from main.models import InputTransaction
+from main.models import InputTransaction, OutputTransaction
 
 
 class BaseTransactionConsumer(AsyncWebsocketConsumer):
@@ -79,3 +79,8 @@ class BaseTransactionConsumer(AsyncWebsocketConsumer):
 class ActiveInputTransactionConsumer(BaseTransactionConsumer):
     transaction_model = InputTransaction
     group_name_prefix = 'active_input'
+
+
+class ActiveOutputTransactionConsumer(BaseTransactionConsumer):
+    transaction_model = OutputTransaction
+    group_name_prefix = 'active_output'

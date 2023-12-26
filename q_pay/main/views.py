@@ -7,13 +7,15 @@ from .models import (
     Bank,
     Requisites,
     Advertisement,
-    InputTransaction
+    InputTransaction,
+    OutputTransaction
 )
 from .serializers import (
     BanksSerializer,
     RequisitesSerializer,
     AdvertisementsSerializer,
-    InputTransactionSerializer
+    InputTransactionSerializer,
+    OutputTransactionSerializer
 )
 from .permissions import IsTrader
 
@@ -103,4 +105,36 @@ class InputTransactionsView(APIView):
             status__in=valid_statuses[status_group]
         )
         serializer = InputTransactionSerializer(transactions, many=True)
+        return Response(serializer.data)
+
+
+class OutputTransactionsView(APIView):
+    permission_classes = [IsAuthenticated, IsTrader]
+
+    def get(self, request, status_group=None):
+        valid_statuses = {
+            'completed': [
+                OutputTransaction.Status.MANUALLY_COMPLETED,
+                OutputTransaction.Status.EXPIRED,
+                OutputTransaction.Status.CANCELLED,
+            ],
+            'checking': [
+                OutputTransaction.Status.CONFIRMED
+            ],
+            'disputed': [
+                InputTransaction.Status.DISPUTED
+            ]
+        }
+
+        if status_group not in valid_statuses:
+            return Response(
+                data={"error": "Invalid status"},
+                status=400
+            )
+
+        transactions = OutputTransaction.objects.filter(
+            trader_id=request.user.id,
+            status__in=valid_statuses[status_group]
+        )
+        serializer = OutputTransactionSerializer(transactions, many=True)
         return Response(serializer.data)
