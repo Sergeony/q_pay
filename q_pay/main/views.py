@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -18,6 +19,7 @@ from .serializers import (
     OutputTransactionSerializer
 )
 from .permissions import IsTrader
+from .services import create_transactions_excel
 
 
 class BankListView(APIView):
@@ -138,3 +140,44 @@ class OutputTransactionsView(APIView):
         )
         serializer = OutputTransactionSerializer(transactions, many=True)
         return Response(serializer.data)
+
+
+class BaseExportTransactionsView(APIView):
+    permission_classes = [IsAuthenticated, IsTrader]
+    transaction_model: InputTransaction | OutputTransaction = None
+    transaction_type: str = None
+
+    def get(self, request):
+        bank_id = request.query_params.get('bank')
+        requisites_id = request.query_params.get('requisites')
+        date_from = request.query_params.get('from')
+        date_to = request.query_params.get('to')
+
+        transactions = self.transaction_model.objects.all()
+        if bank_id:
+            transactions = transactions.filter(requisites_id__bank_id=bank_id)
+        if requisites_id:
+            transactions = transactions.filter(requisites_id=requisites_id)
+        if date_from:
+            transactions = transactions.filter(created_at__gte=date_from)
+        if date_to:
+            transactions = transactions.filter(created_at__lte=date_to)
+
+        workbook = create_transactions_excel(transactions, self.transaction_type)
+
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="transactions.xlsx"'
+
+        workbook.save(response)
+
+        return response
+
+
+class ExportInputTransactionsView(BaseExportTransactionsView):
+    transaction_model = InputTransaction
+    transaction_type = 'input'
+
+
+class ExportOutputTransactionsView(BaseExportTransactionsView):
+    transaction_model = OutputTransaction
+    transaction_type = 'output'
