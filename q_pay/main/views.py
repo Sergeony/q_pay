@@ -1,6 +1,9 @@
+from typing import Type
+
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_framework import status, viewsets
 
@@ -18,7 +21,7 @@ from .serializers import (
     InputTransactionSerializer,
     OutputTransactionSerializer
 )
-from .permissions import IsTrader
+from .permissions import IsTrader, IsMerchant
 from .services import create_transactions_excel
 
 
@@ -181,3 +184,29 @@ class ExportInputTransactionsView(BaseExportTransactionsView):
 class ExportOutputTransactionsView(BaseExportTransactionsView):
     transaction_model = OutputTransaction
     transaction_type = 'output'
+
+
+class BaseMerchantTransactionsView(APIView):
+    permission_classes = [IsAuthenticated, IsMerchant]
+    transaction_model: InputTransaction | OutputTransaction = None
+    transaction_serializer: Type[Serializer] = None
+
+    def get(self, request):
+        merchant_id = request.user.id
+        transactions = self.transaction_model.objects.filter(merchant_id=merchant_id)
+        serializer = self.transaction_serializer(transactions, many=True)
+
+        return Response(
+            data=serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+
+class MerchantInputTransactionsView(BaseMerchantTransactionsView):
+    transaction_model = InputTransaction
+    transaction_serializer = InputTransactionSerializer
+
+
+class MerchantOutputTransactionsView(BaseMerchantTransactionsView):
+    transaction_model = OutputTransaction
+    transaction_serializer = OutputTransactionSerializer
