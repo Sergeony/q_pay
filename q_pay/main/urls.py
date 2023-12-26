@@ -12,4 +12,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('transactions/input/<str:status_group>/', InputTransactionsView.as_view()),
     path('transactions/output/<str:status_group>/', OutputTransactionsView.as_view()),
+    path('transactions/export/input/', ExportInputTransactionsView.as_view()),
+    path('transactions/export/output/', ExportOutputTransactionsView.as_view()),
 ]
