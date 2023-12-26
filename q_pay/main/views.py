@@ -6,12 +6,14 @@ from rest_framework import status, viewsets
 from .models import (
     Bank,
     Requisites,
-    Advertisement
+    Advertisement,
+    InputTransaction
 )
 from .serializers import (
     BanksSerializer,
     RequisitesSerializer,
-    AdvertisementsSerializer
+    AdvertisementsSerializer,
+    InputTransactionSerializer
 )
 from .permissions import IsTrader
 
@@ -72,3 +74,33 @@ class AdvertisementsViewSet(viewsets.ModelViewSet):
             data={"detail": "Advertisement successfully deleted."},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+class InputTransactionsView(APIView):
+    permission_classes = [IsAuthenticated, IsTrader]
+
+    def get(self, request, status_group=None):
+        valid_statuses = {
+            'completed': [
+                InputTransaction.Status.CANCELLED,
+                InputTransaction.Status.EXPIRED,
+                InputTransaction.Status.MANUALLY_COMPLETED,
+                InputTransaction.Status.AUTO_COMPLETED
+            ],
+            'disputed': [
+                InputTransaction.Status.DISPUTED
+            ]
+        }
+
+        if status_group not in valid_statuses:
+            return Response(
+                data={"error": "Invalid status"},
+                status=400
+            )
+
+        transactions = InputTransaction.objects.filter(
+            trader_id=request.user.id,
+            status__in=valid_statuses[status_group]
+        )
+        serializer = InputTransactionSerializer(transactions, many=True)
+        return Response(serializer.data)

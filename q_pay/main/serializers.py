@@ -3,7 +3,8 @@ from rest_framework import serializers
 from .models import (
     Bank,
     Requisites,
-    Advertisement
+    Advertisement,
+    InputTransaction
 )
 
 
@@ -83,3 +84,13 @@ class AdvertisementsSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class InputTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InputTransaction
+        fields = ['transaction_id', 'status', 'trader_id', 'merchant_id', 'created_at',
+                  'confirmed_at', 'finished_at', 'requisites_id', 'trader_usdt_rate',
+                  'exchange_usdt_rate', 'automation_used', 'claimed_amount', 'actual_amount']
+        read_only_fields = ['transaction_id', 'created_at', 'confirmed_at', 'finished_at',
+                            'trader_usdt_rate', 'exchange_usdt_rate', 'automation_used']

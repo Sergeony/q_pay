@@ -10,4 +10,5 @@ router.register(r'advertisements', AdvertisementsViewSet, 'advertisements')
 urlpatterns = [
     path('banks/', BankListView.as_view()),
     path('', include(router.urls)),
+    path('transactions/input/<str:status_group>/', InputTransactionsView.as_view()),
 ]
