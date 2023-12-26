@@ -6,12 +6,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class UserTypes:
-    TRADER = 1
-    MERCHANT = 2
-    ADMIN = 3
-
-
 class UserManager(BaseUserManager):
     def _create_user(self, email, password, **extra_fields):
         if not email:
@@ -26,7 +20,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('user_type', UserTypes.ADMIN)
+        extra_fields.setdefault('user_type', User.UserTypes.ADMIN)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self._create_user(email, password, **extra_fields)
@@ -38,13 +32,12 @@ class Language(models.Model):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    USER_TYPE_CHOICES = [
-        (UserTypes.TRADER, _("TRADER")),
-        (UserTypes.MERCHANT, _("MERCHANT")),
-        (UserTypes.ADMIN, _("ADMIN"))
-    ]
+    class UserTypes(models.IntegerChoices):
+        TRADER = 1, _("TRADER")
+        MERCHANT = 2, _("MERCHANT")
+        ADMIN = 3, _("ADMIN")
 
-    user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, editable=False)
+    user_type = models.PositiveSmallIntegerField(choices=UserTypes.choices, editable=False)
     email = models.EmailField(max_length=150, unique=True)
     is_activated = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -65,7 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Bank(models.Model):
     title = models.CharField(max_length=100, unique=True)
-    icon_url = models.CharField(max_length=255, unique=True)
+    icon_url = models.ImageField(upload_to='bank_icons/', unique=True)
 
 
 class Requisites(models.Model):
@@ -121,7 +114,7 @@ class OutputTransaction(BaseTransaction):
     class Status(models.IntegerChoices):
         PENDING_TRADER_CONFIRMATION = 1, _("PENDING_TRADER_CONFIRMATION")
         CONFIRMED = 2, _("CONFIRMED")
-        FINISHED = 3, _("FINISHED")
+        MANUALLY_COMPLETED = 3, _("MANUALLY_COMPLETED")
         EXPIRED = 4, _("EXPIRED")
         CANCELLED = 5, _("CANCELLED")
         DISPUTED = 6, _("DISPUTED")
