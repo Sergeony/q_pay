@@ -5,7 +5,8 @@ from .models import (
     Requisites,
     Advertisement,
     InputTransaction,
-    OutputTransaction
+    OutputTransaction,
+    Transfer
 )
 
 
@@ -105,3 +106,10 @@ class OutputTransactionSerializer(serializers.ModelSerializer):
                   'exchange_usdt_rate', 'automation_used', 'amount', 'bank_id', 'card_number', 'receipt_url']
         read_only_fields = ['transaction_id', 'created_at', 'confirmed_at', 'finished_at',
                             'trader_usdt_rate', 'exchange_usdt_rate', 'automation_used']
+
+
+class TransferSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transfer
+        fields = ['id', 'status', 'wallet_address', 'amount', 'merchant_id', 'admin_id', 'created_at', 'finished_at']
+        read_only_fields = ['id', 'status', 'merchant_id', 'admin_id', 'created_at', 'finished_at']

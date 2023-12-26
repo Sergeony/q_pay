@@ -161,7 +161,7 @@ class Transfer(models.Model):
     wallet_address = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     merchant_id = models.ForeignKey(User, on_delete=models.PROTECT, related_name="%(app_label)s_%(class)s_related")
-    admin_id = models.ForeignKey(User, on_delete=models.PROTECT)
+    admin_id = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
 
