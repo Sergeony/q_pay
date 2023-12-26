@@ -7,3 +7,9 @@ class IsTrader(permissions.BasePermission):
     def has_permission(self, request, view):
         user_type = request.auth.payload.get('user_type')
         return user_type == User.UserTypes.TRADER
+
+
+class IsMerchant(permissions.BasePermission):
+    def has_permission(self, request, view):
+        user_type = request.auth.payload.get('user_type')
+        return user_type == User.UserTypes.MERCHANT
