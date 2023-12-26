@@ -2,7 +2,8 @@ from rest_framework import serializers
 
 from .models import (
     Bank,
-    Requisites
+    Requisites,
+    Advertisement
 )
 
 
@@ -32,6 +33,48 @@ class RequisitesSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         updatable_fields = [
             'is_activated', 'automation_used', 'title'
+        ]
+
+        for field in updatable_fields:
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        instance.save()
+        return instance
+
+
+class RequisitesForAdvertisementsSerializer(serializers.ModelSerializer):
+    bank = BanksSerializer(source='bank_id')
+    last_four_card_number = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_last_four_card_number(obj):
+        return obj.card_number[-4:]
+
+    class Meta:
+        model = Requisites
+        fields = [
+            'id', 'title', 'automation_used', 'last_four_card_number', 'bank',
+        ]
+
+
+class AdvertisementsSerializer(serializers.ModelSerializer):
+    requisites = RequisitesForAdvertisementsSerializer(read_only=True, source='requisites_id')
+    requisites_id = serializers.PrimaryKeyRelatedField(queryset=Requisites.objects.all(), write_only=True)
+
+    class Meta:
+        model = Advertisement
+        fields = [
+            'id', 'created_at', 'trader_usdt_rate', 'exchange_usdt_rate',
+            'requisites', 'requisites_id', 'is_activated',
+        ]
+        read_only_fields = [
+            'id', 'created_at', 'requisites', 'requisites_id',
+        ]
+
+    def update(self, instance, validated_data):
+        updatable_fields = [
+            'is_activated',
         ]
 
         for field in updatable_fields:
