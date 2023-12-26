@@ -6,7 +6,8 @@ from .models import (
     Advertisement,
     InputTransaction,
     OutputTransaction,
-    Transfer
+    Transfer,
+    MerchantIntegrations
 )
 
 
@@ -113,3 +114,10 @@ class TransferSerializer(serializers.ModelSerializer):
         model = Transfer
         fields = ['id', 'status', 'wallet_address', 'amount', 'merchant_id', 'admin_id', 'created_at', 'finished_at']
         read_only_fields = ['id', 'status', 'merchant_id', 'admin_id', 'created_at', 'finished_at']
+
+
+class MerchantIntegrationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MerchantIntegrations
+        fields = ['id', 'merchant_id', 'site_url', 'success_url', 'failed_url', 'callback_url']
+        read_only_fields = ['id', 'merchant_id']

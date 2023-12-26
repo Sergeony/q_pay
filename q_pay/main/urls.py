@@ -10,6 +10,7 @@ trader_router.register(r'transfers', MerchantTransferViewSet, 'transfers')
 
 merchant_router = DefaultRouter()
 merchant_router.register(r'transfers', MerchantTransferViewSet, 'transfers')
+merchant_router.register(r'integrations', MerchantIntegrationsViewSet, 'integrations')
 
 urlpatterns = [
     path('banks/', BankListView.as_view()),

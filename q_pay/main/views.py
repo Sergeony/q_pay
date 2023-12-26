@@ -13,7 +13,8 @@ from .models import (
     Advertisement,
     InputTransaction,
     OutputTransaction,
-    Transfer
+    Transfer,
+    MerchantIntegrations
 )
 from .serializers import (
     BanksSerializer,
@@ -21,7 +22,8 @@ from .serializers import (
     AdvertisementsSerializer,
     InputTransactionSerializer,
     OutputTransactionSerializer,
-    TransferSerializer
+    TransferSerializer,
+    MerchantIntegrationsSerializer
 )
 from .permissions import IsTrader, IsMerchant
 from .services import create_transactions_excel
@@ -220,6 +222,17 @@ class MerchantTransferViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Transfer.objects.filter(merchant_id=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(merchant_id=self.request.user)
+
+
+class MerchantIntegrationsViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, IsMerchant]
+    serializer_class = MerchantIntegrationsSerializer
+
+    def get_queryset(self):
+        return MerchantIntegrations.objects.filter(merchant_id=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(merchant_id=self.request.user)

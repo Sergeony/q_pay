@@ -174,7 +174,7 @@ class Withdraw(models.Model):
     note = models.TextField()
 
 
-class MerchantIntegration(models.Model):
+class MerchantIntegrations(models.Model):
     merchant_id = models.ForeignKey(User, on_delete=models.PROTECT)
     site_url = models.CharField(max_length=255, unique=True)
     success_url = models.CharField(max_length=255, unique=True)
