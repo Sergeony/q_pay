@@ -3,6 +3,7 @@ from typing import Type
 
 from django.conf import settings
 from django.db.models import Count, F
+from django.db import transaction as db_transaction
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -18,7 +19,7 @@ from .models import (
     OutputTransaction,
     Transfer,
     MerchantIntegrations,
-    User
+    User, PrevInputTransactionTrader, PrevOutputTransactionTrader
 )
 from .serializers import (
     BanksSerializer,
@@ -30,10 +31,14 @@ from .serializers import (
     MerchantIntegrationsSerializer,
     UserInfoSerializer,
     UserUpdateSerializer,
-    InviteCodeSerializer
+    InviteCodeSerializer,
+    TransactionRedirectSerializer
+)
+from .services import (
+    create_transactions_excel,
+    get_eligible_trader_ids_for_transactions
 )
 from .permissions import IsTrader, IsMerchant
-from .services import create_transactions_excel
 from q_pay.redis_client import get_redis_client
 
 
@@ -304,3 +309,69 @@ class CreateInviteCodeView(APIView):
             data={'invite_code': invite_code},
             status=status.HTTP_201_CREATED
         )
+
+
+class ActiveTradersListView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, *args, **kwargs):
+        active_traders = User.objects.filter(
+            is_activated=True,
+            user_type=User.UserTypes.TRADER
+        ).values('id', 'email')
+
+        return Response(
+            data=active_traders,
+            status=status.HTTP_200_OK
+        )
+
+
+class BaseTransactionRedirectView(APIView):
+    queryset = None
+    transaction_status = None
+    prev_transaction_trader_model: PrevInputTransactionTrader | PrevOutputTransactionTrader = None
+
+    def patch(self, request, *args, **kwargs):
+        serializer = TransactionRedirectSerializer(data=request.data, context={'transaction_type': 'input'})
+        serializer.is_valid(raise_exception=True)
+
+        transaction_ids = serializer.validated_data['transaction_ids']
+        new_trader_id = serializer.validated_data['new_trader_id']
+
+        transactions = self.queryset.filter(
+            pk__in=transaction_ids,
+            status=self.transaction_status
+        )
+        eligible_trader_ids = get_eligible_trader_ids_for_transactions(transactions)
+
+        if new_trader_id not in eligible_trader_ids:
+            return Response(
+                data={'error': 'Trader is not eligible for specified transactions'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        with db_transaction.atomic():
+            for transaction in transactions:
+                self.prev_transaction_trader_model.objects.create(
+                    trader_id=transaction.trader_id,
+                    transaction_id=transaction.transaction_id
+                )
+                transaction.trader_id = new_trader_id
+                transaction.save()
+
+        return Response(
+            data={'message': f'Transactions were successfully redirected to trader {new_trader_id}'},
+            status=status.HTTP_200_OK
+        )
+
+
+class InputTransactionsRedirectView(BaseTransactionRedirectView):
+    queryset = InputTransaction.objects.all()
+    transaction_status = InputTransaction.Status.PENDING_CLIENT_CONFIRMATION
+    prev_transaction_trader_model = PrevInputTransactionTrader
+
+
+class OutputTransactionsRedirectView(BaseTransactionRedirectView):
+    queryset = OutputTransaction.objects.all()
+    transaction_status = OutputTransaction.Status.PENDING_TRADER_CONFIRMATION
+    prev_transaction_trader_model = PrevOutputTransactionTrader

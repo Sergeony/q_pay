@@ -26,6 +26,9 @@ urlpatterns = [
     path('merchant/transactions/input/', MerchantInputTransactionsView.as_view()),
     path('merchant/transactions/output/', MerchantOutputTransactionsView.as_view()),
     path('merchant/', include(merchant_router.urls)),
+    path('admin/traders/active/', ActiveTradersListView.as_view()),
     path('admin/', include(admin_router.urls)),
     path('admin/invite/', CreateInviteCodeView.as_view()),
+    path('admin/transactions/input/redirect/', InputTransactionsRedirectView.as_view()),
+    path('admin/transactions/output/redirect/', OutputTransactionsRedirectView.as_view()),
 ]
