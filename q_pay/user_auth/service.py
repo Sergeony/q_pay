@@ -1,7 +1,9 @@
-def get_user_type_by_invite_code(invite_code: str) -> int | None:
-    """
-    Get user type from redis using invite code
-    """
-    # TODO: implement request to redis
+from q_pay.redis_client import get_redis_client
 
-    return 1
+
+def get_user_type_by_invite_code(invite_code: str) -> str | None:
+    """
+    Get user type from redis using invite code and
+    delete from redis it if it exists.
+    """
+    return get_redis_client().getdel(invite_code)

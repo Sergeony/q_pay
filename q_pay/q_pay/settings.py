@@ -14,6 +14,7 @@ import os
 from datetime import timedelta
 
 import environ
+import redis
 
 
 env = environ.Env()
@@ -209,10 +210,17 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [(env("REDIS_HOST"), env("REDIS_PORT"))],
         },
     },
 }
 
 
-USER_ONLINE_TIMEOUT = 1
+USER_ONLINE_TIMEOUT = timedelta(seconds=5)
+
+
+INVITE_CODE_LIFETIME = timedelta(minutes=30)
+
+REDIS_HOST = env("REDIS_HOST")
+REDIS_PORT = env("REDIS_PORT")
+REDIS_DB = env("REDIS_DB")
