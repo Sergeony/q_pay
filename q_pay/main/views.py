@@ -1,10 +1,13 @@
 import uuid
+from datetime import timedelta
 from typing import Type
 
 from django.conf import settings
-from django.db.models import Count, F
+from django.db.models import Count, F, Sum, Q
 from django.db import transaction as db_transaction
+from django.db.models.functions import TruncDay
 from django.http import HttpResponse
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.serializers import Serializer
@@ -375,3 +378,74 @@ class OutputTransactionsRedirectView(BaseTransactionRedirectView):
     queryset = OutputTransaction.objects.all()
     transaction_status = OutputTransaction.Status.PENDING_TRADER_CONFIRMATION
     prev_transaction_trader_model = PrevOutputTransactionTrader
+
+
+class BaseUserStatsView(APIView):
+    permission_classes = [IsAdminUser]
+    user_id_field = None
+
+    def get(self, request, user_id):
+        period = request.query_params.get('period', 'all')
+
+        if period == 'week':
+            time_filter = timezone.now() - timedelta(days=7)
+        elif period == 'month':
+            time_filter = timezone.now() - timedelta(days=30)
+        else:
+            time_filter = None
+
+        input_transactions = InputTransaction.objects.filter(**{self.user_id_field: user_id})
+        output_transactions = OutputTransaction.objects.filter(**{self.user_id_field: user_id})
+
+        if time_filter:
+            input_transactions = input_transactions.filter(created_at__gte=time_filter)
+            output_transactions = output_transactions.filter(created_at__gte=time_filter)
+
+        input_summary = input_transactions.aggregate(
+            total_successful=Count('id', filter=Q(
+                status__in=[InputTransaction.Status.MANUALLY_COMPLETED, InputTransaction.Status.AUTO_COMPLETED])),
+            total_unsuccessful=Count('id', filter=Q(
+                status__in=[InputTransaction.Status.CANCELLED, InputTransaction.Status.DISPUTED])),
+            total_amount=Sum('claimed_amount', filter=Q(status=InputTransaction.Status.MANUALLY_COMPLETED))
+        )
+
+        output_summary = output_transactions.aggregate(
+            total_successful=Count('id', filter=Q(
+                status=OutputTransaction.Status.MANUALLY_COMPLETED)),
+            total_unsuccessful=Count('id', filter=Q(
+                status__in=[OutputTransaction.Status.CANCELLED, OutputTransaction.Status.DISPUTED])),
+            total_amount=Sum('amount', filter=Q(status=OutputTransaction.Status.MANUALLY_COMPLETED))
+        )
+
+        daily_input_stats = input_transactions.annotate(date=TruncDay('created_at')).values('date').annotate(
+            count=Count('id')).order_by('date')
+        daily_output_stats = output_transactions.annotate(date=TruncDay('created_at')).values('date').annotate(
+            count=Count('id')).order_by('date')
+
+        combined_daily_stats = {}
+        for stat in daily_input_stats:
+            combined_daily_stats[stat['date']] = combined_daily_stats.get(stat['date'], 0) + stat['count']
+        for stat in daily_output_stats:
+            combined_daily_stats[stat['date']] = combined_daily_stats.get(stat['date'], 0) + stat['count']
+
+        final_stats = {
+            'total_successful': input_summary['total_successful'] + output_summary['total_successful'],
+            'total_unsuccessful': input_summary['total_unsuccessful'] + output_summary['total_unsuccessful'],
+            'total_input_amount': input_summary['total_amount'] or 0,
+            'total_output_amount': output_summary['total_amount'] or 0,
+            'daily_transaction_counts': [{'date': date, 'count': count} for date, count in combined_daily_stats.items()]
+        }
+
+        return Response(
+            data=final_stats,
+            status=status.HTTP_200_OK
+        )
+
+
+class TraderStatsView(BaseUserStatsView):
+    user_id_field = 'trader_id'
+
+
+class MerchantStatsView(BaseUserStatsView):
+    user_id_field = 'merchant_id'
+
