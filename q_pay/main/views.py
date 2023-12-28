@@ -1,8 +1,9 @@
 from typing import Type
 
+from django.db.models import Count, F
 from django.http import HttpResponse
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_framework import status, viewsets
@@ -14,7 +15,8 @@ from .models import (
     InputTransaction,
     OutputTransaction,
     Transfer,
-    MerchantIntegrations
+    MerchantIntegrations,
+    User
 )
 from .serializers import (
     BanksSerializer,
@@ -23,7 +25,9 @@ from .serializers import (
     InputTransactionSerializer,
     OutputTransactionSerializer,
     TransferSerializer,
-    MerchantIntegrationsSerializer
+    MerchantIntegrationsSerializer,
+    UserInfoSerializer,
+    UserUpdateSerializer
 )
 from .permissions import IsTrader, IsMerchant
 from .services import create_transactions_excel
@@ -236,3 +240,40 @@ class MerchantIntegrationsViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(merchant_id=self.request.user)
+
+
+class BaseUsersViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    user_type = None
+
+    def get_queryset(self):
+        return User.objects.filter(
+            user_type=self.user_type, is_deleted=False
+        ).annotate(
+            total_input_transactions=Count('inputtransaction'),
+            total_output_transactions=Count('outputtransaction')
+        ).annotate(
+            total_transactions=F('total_input_transactions') + F('total_output_transactions')
+        )
+
+    def get_serializer_class(self):
+        if self.action in ['update', 'partial_update']:
+            return UserUpdateSerializer
+        return UserInfoSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.is_deleted = True
+        user.save()
+        return Response(
+            data={"detail": f"{user.get_user_type_display().capitalize()} successfully deleted."},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+
+class TradersViewSet(BaseUsersViewSet):
+    user_type = User.UserTypes.TRADER
+
+
+class MerchantsViewSet(BaseUsersViewSet):
+    user_type = User.UserTypes.MERCHANT
