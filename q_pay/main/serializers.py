@@ -93,35 +93,35 @@ class AdvertisementsSerializer(serializers.ModelSerializer):
 class InputTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = InputTransaction
-        fields = ['transaction_id', 'status', 'trader_id', 'merchant_id', 'created_at',
-                  'confirmed_at', 'finished_at', 'requisites_id', 'trader_usdt_rate',
+        fields = ['id', 'status', 'trader', 'merchant', 'created_at',
+                  'confirmed_at', 'finished_at', 'requisites', 'trader_usdt_rate',
                   'exchange_usdt_rate', 'automation_used', 'claimed_amount', 'actual_amount']
-        read_only_fields = ['transaction_id', 'created_at', 'confirmed_at', 'finished_at',
+        read_only_fields = ['id', 'created_at', 'confirmed_at', 'finished_at',
                             'trader_usdt_rate', 'exchange_usdt_rate', 'automation_used']
 
 
 class OutputTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = OutputTransaction
-        fields = ['transaction_id', 'status', 'trader_id', 'merchant_id', 'created_at',
-                  'confirmed_at', 'finished_at', 'requisites_id', 'trader_usdt_rate',
-                  'exchange_usdt_rate', 'automation_used', 'amount', 'bank_id', 'card_number', 'receipt_url']
-        read_only_fields = ['transaction_id', 'created_at', 'confirmed_at', 'finished_at',
+        fields = ['id', 'status', 'trader', 'merchant', 'created_at',
+                  'confirmed_at', 'finished_at', 'requisites', 'trader_usdt_rate',
+                  'exchange_usdt_rate', 'automation_used', 'amount', 'bank', 'card_number', 'receipt_url']
+        read_only_fields = ['id', 'created_at', 'confirmed_at', 'finished_at',
                             'trader_usdt_rate', 'exchange_usdt_rate', 'automation_used']
 
 
 class TransferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transfer
-        fields = ['id', 'status', 'wallet_address', 'amount', 'merchant_id', 'admin_id', 'created_at', 'finished_at']
-        read_only_fields = ['id', 'status', 'merchant_id', 'admin_id', 'created_at', 'finished_at']
+        fields = ['id', 'status', 'wallet_address', 'amount', 'merchant', 'admin', 'created_at', 'finished_at']
+        read_only_fields = ['id', 'status', 'merchant', 'admin', 'created_at', 'finished_at']
 
 
 class MerchantIntegrationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = MerchantIntegrations
-        fields = ['id', 'merchant_id', 'site_url', 'success_url', 'failed_url', 'callback_url']
-        read_only_fields = ['id', 'merchant_id']
+        fields = ['id', 'merchant', 'site_url', 'success_url', 'failed_url', 'callback_url']
+        read_only_fields = ['id', 'merchant']
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
