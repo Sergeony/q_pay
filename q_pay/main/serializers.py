@@ -180,3 +180,14 @@ class TransactionRedirectSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Some of the specified output transactions were not found.")
 
         return values
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+
+class UserSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['language', 'tz_offset_minutes', 'is_light_theme']

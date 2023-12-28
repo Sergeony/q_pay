@@ -35,7 +35,9 @@ from .serializers import (
     UserInfoSerializer,
     UserUpdateSerializer,
     InviteCodeSerializer,
-    TransactionRedirectSerializer
+    TransactionRedirectSerializer,
+    ChangePasswordSerializer,
+    UserSettingsSerializer
 )
 from .services import (
     create_transactions_excel,
@@ -449,3 +451,42 @@ class TraderStatsView(BaseUserStatsView):
 class MerchantStatsView(BaseUserStatsView):
     user_id_field = 'merchant_id'
 
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        old_password = serializer.validated_data.get('old_password')
+        new_password = serializer.validated_data.get('new_password')
+
+        if not user.check_password(old_password):
+            return Response(
+                data={"old_password": ["Wrong password."]},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response(
+            data={"message": "Password updated successfully."},
+            status=status.HTTP_200_OK
+        )
+
+
+class UpdateUserSettingsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        serializer = UserSettingsSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            data={"message": "User settings updated successfully."},
+            status=status.HTTP_200_OK
+        )

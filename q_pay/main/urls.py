@@ -33,4 +33,6 @@ urlpatterns = [
     path('admin/invite/', CreateInviteCodeView.as_view()),
     path('admin/transactions/input/redirect/', InputTransactionsRedirectView.as_view()),
     path('admin/transactions/output/redirect/', OutputTransactionsRedirectView.as_view()),
+    path('user/settings/', UpdateUserSettingsView.as_view()),
+    path('user/change-password/', ChangePasswordView.as_view()),
 ]
