@@ -1,4 +1,8 @@
+from typing import List
+
 import openpyxl
+
+from .models import BaseTransaction, User
 
 
 def create_transactions_excel(transactions, transaction_type='input'):
@@ -36,3 +40,21 @@ def create_transactions_excel(transactions, transaction_type='input'):
         worksheet.cell(row=row_num, column=8).value = transaction.created_at.strftime('%Y-%m-%d %H:%M:%S')
 
     return workbook
+
+
+def get_eligible_trader_ids_for_transactions(transactions: List[BaseTransaction]) -> List[str]:
+    eligible_trader_ids = User.objects.filter(
+        user_type=User.UserTypes.TRADER,
+        is_activated=True
+    ).values_list('id', flat=True)
+
+    for transaction in transactions:
+        eligible_trader_ids = eligible_trader_ids.filter(
+            advertisements__is_activated=True,
+            advertisements__requisites_id__bank_id=transaction.requisites_id.bank_id,
+        ).values_list('id', flat=True)
+
+        if not eligible_trader_ids:
+            break
+
+    return list(eligible_trader_ids)

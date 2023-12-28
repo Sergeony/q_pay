@@ -156,3 +156,27 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 class InviteCodeSerializer(serializers.Serializer):
     user_type = serializers.ChoiceField(choices=User.UserTypes.choices)
+
+
+class TransactionRedirectSerializer(serializers.Serializer):
+    transaction_ids = serializers.ListField(child=serializers.UUIDField(), allow_empty=False)
+    new_trader_id = serializers.IntegerField(min_value=1)
+    transaction_type = serializers.ChoiceField(choices=['input', 'output'])
+
+    @staticmethod
+    def validate_new_trader_id(value):
+        if not User.objects.filter(id=value, user_type=User.UserTypes.TRADER, is_deleted=False).exists():
+            raise serializers.ValidationError("Trader with the specified ID was not found.")
+        return value
+
+    def validate_transaction_ids(self, values):
+        transaction_type = self.initial_data.get('transaction_type')
+
+        if transaction_type == 'input':
+            if not InputTransaction.objects.filter(id__in=values).exists():
+                raise serializers.ValidationError("Some of the specified input transactions were not found.")
+        elif transaction_type == 'output':
+            if not OutputTransaction.objects.filter(id__in=values).exists():
+                raise serializers.ValidationError("Some of the specified output transactions were not found.")
+
+        return values
