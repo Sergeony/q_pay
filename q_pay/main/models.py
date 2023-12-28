@@ -3,7 +3,9 @@ import uuid
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -55,6 +57,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = [user_type, otp_base32]
 
+    @property
+    def is_online(self):
+        if self.last_seen is None:
+            return False
+        return (timezone.now() - self.last_seen).total_seconds() < settings.USER_ONLINE_TIMEOUT
+
 
 class Bank(models.Model):
     title = models.CharField(max_length=100, unique=True)
@@ -81,7 +89,7 @@ class Requisites(models.Model):
 class BaseTransaction(models.Model):
     transaction_id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     status = models.PositiveSmallIntegerField()
-    trader_id = models.ForeignKey(User, on_delete=models.PROTECT, related_name="%(app_label)s_%(class)s_related")
+    trader_id = models.ForeignKey(User, on_delete=models.PROTECT, related_name="%(class)s")
     merchant_id = models.ForeignKey(User, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     confirmed_at = models.DateTimeField(null=True, blank=True)

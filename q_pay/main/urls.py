@@ -12,6 +12,10 @@ merchant_router = DefaultRouter()
 merchant_router.register(r'transfers', MerchantTransferViewSet, 'transfers')
 merchant_router.register(r'integrations', MerchantIntegrationsViewSet, 'integrations')
 
+admin_router = DefaultRouter()
+admin_router.register(r'traders', TradersViewSet, 'traders')
+admin_router.register(r'merchants', MerchantsViewSet, 'merchants')
+
 urlpatterns = [
     path('banks/', BankListView.as_view()),
     path('trader/', include(trader_router.urls)),
@@ -22,4 +26,5 @@ urlpatterns = [
     path('merchant/transactions/input/', MerchantInputTransactionsView.as_view()),
     path('merchant/transactions/output/', MerchantOutputTransactionsView.as_view()),
     path('merchant/', include(merchant_router.urls)),
+    path('admin/', include(admin_router.urls)),
 ]

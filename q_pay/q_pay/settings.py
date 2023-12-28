@@ -213,3 +213,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+USER_ONLINE_TIMEOUT = 1

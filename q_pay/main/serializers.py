@@ -7,7 +7,8 @@ from .models import (
     InputTransaction,
     OutputTransaction,
     Transfer,
-    MerchantIntegrations
+    MerchantIntegrations,
+    User
 )
 
 
@@ -121,3 +122,33 @@ class MerchantIntegrationsSerializer(serializers.ModelSerializer):
         model = MerchantIntegrations
         fields = ['id', 'merchant_id', 'site_url', 'success_url', 'failed_url', 'callback_url']
         read_only_fields = ['id', 'merchant_id']
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    is_online = serializers.SerializerMethodField()
+    total_transactions = serializers.IntegerField()
+    balance = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'is_online', 'total_transactions', 'balance', 'is_activated']
+
+    @staticmethod
+    def get_is_online(obj):
+        return obj.is_online
+
+    @staticmethod
+    def get_balance(obj):
+        # TODO: implement
+        return 1000
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['is_activated']
+
+    def update(self, instance, validated_data):
+        instance.is_activated = validated_data.get('is_activated', instance.is_active)
+        instance.save()
+        return instance
