@@ -23,11 +23,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         otp_base32 = pyotp.random_base32()
         user_info = {
             "email": email,
-            "password": password,
             "user_type": user_type,
             "otp_base32": otp_base32,
         }
         user = User.objects.create(**user_info)
+        user.set_password(password)
         user.save()
 
         return user
@@ -38,6 +38,7 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, attrs: dict):
+
         user = authenticate(
             request=self.context.get("request"),
             email=attrs.get("email").lower().strip(),

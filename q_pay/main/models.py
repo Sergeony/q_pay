@@ -29,7 +29,6 @@ class UserManager(BaseUserManager):
 
 
 class Language(models.Model):
-    language_id = models.SmallIntegerField(primary_key=True, editable=False, unique=True, db_column="id")
     title = models.CharField(max_length=50, unique=True)
 
 
@@ -46,7 +45,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     tz_offset_minutes = models.SmallIntegerField(default=0)
     last_seen = models.DateTimeField(default=None, null=True, blank=True)
     is_light_theme = models.BooleanField(default=True)
-    language = models.ForeignKey(Language, on_delete=models.SET_DEFAULT, default=0)
+    language = models.ForeignKey(Language, on_delete=models.SET_DEFAULT, default=1)
     is_deleted = models.BooleanField(default=False)
     otp_base32 = models.CharField(max_length=255)
 
@@ -55,7 +54,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = [user_type, otp_base32]
 
     @property
     def is_online(self):
@@ -70,11 +68,11 @@ class Bank(models.Model):
 
 
 class Requisites(models.Model):
-    trader_id = models.ForeignKey(User, on_delete=models.PROTECT)
+    trader = models.ForeignKey(User, on_delete=models.PROTECT)
     title = models.CharField(max_length=50, default="")
     card_number = models.CharField(max_length=19, unique=True)
     cardholder_name = models.CharField(max_length=100)
-    bank_id = models.ForeignKey(Bank, on_delete=models.PROTECT, null=True, blank=True)
+    bank = models.ForeignKey(Bank, on_delete=models.PROTECT, null=True, blank=True)
     is_activated = models.BooleanField(default=False)
     automation_used = models.BooleanField(default=False)
     daily_limit = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
@@ -87,14 +85,14 @@ class Requisites(models.Model):
 
 
 class BaseTransaction(models.Model):
-    transaction_id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     status = models.PositiveSmallIntegerField()
-    trader_id = models.ForeignKey(User, on_delete=models.PROTECT, related_name="%(class)s")
-    merchant_id = models.ForeignKey(User, on_delete=models.PROTECT)
+    trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name="%(class)s")
+    merchant = models.ForeignKey(User, on_delete=models.PROTECT, related_name="merchant_%(class)s")
     created_at = models.DateTimeField(auto_now_add=True)
     confirmed_at = models.DateTimeField(null=True, blank=True)
     finished_at = models.DateTimeField(null=True, blank=True)
-    requisites_id = models.ForeignKey(Requisites, on_delete=models.PROTECT)
+    requisites = models.ForeignKey(Requisites, on_delete=models.PROTECT)
     trader_usdt_rate = models.DecimalField(max_digits=5, decimal_places=2)
     exchange_usdt_rate = models.DecimalField(max_digits=5, decimal_places=2)
     automation_used = models.BooleanField(default=False)
@@ -129,32 +127,32 @@ class OutputTransaction(BaseTransaction):
 
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.PENDING_TRADER_CONFIRMATION)
     amount = models.DecimalField(max_digits=9, decimal_places=2, editable=False)
-    bank_id = models.ForeignKey(Bank, on_delete=models.PROTECT, null=True, blank=True, editable=False)
+    bank = models.ForeignKey(Bank, on_delete=models.PROTECT, null=True, blank=True, editable=False)
     card_number = models.CharField(max_length=19, editable=False)
     receipt_url = models.CharField(max_length=255, unique=True, default="")
 
 
 class PrevInputTransactionTrader(models.Model):
-    trader_id = models.ForeignKey(User, on_delete=models.PROTECT)
-    transaction_id = models.ForeignKey(InputTransaction, on_delete=models.PROTECT)
+    trader = models.ForeignKey(User, on_delete=models.PROTECT)
+    transaction = models.ForeignKey(InputTransaction, on_delete=models.PROTECT)
 
 
 class PrevOutputTransactionTrader(models.Model):
-    trader_id = models.ForeignKey(User, on_delete=models.PROTECT)
-    transaction_id = models.ForeignKey(OutputTransaction, on_delete=models.PROTECT)
+    trader = models.ForeignKey(User, on_delete=models.PROTECT)
+    transaction = models.ForeignKey(OutputTransaction, on_delete=models.PROTECT)
 
 
 class Advertisement(models.Model):
-    trader_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    trader = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     trader_usdt_rate = models.DecimalField(max_digits=5, decimal_places=2)
     exchange_usdt_rate = models.DecimalField(max_digits=5, decimal_places=2)
-    requisites_id = models.ForeignKey(Requisites, on_delete=models.PROTECT)
+    requisites = models.ForeignKey(Requisites, on_delete=models.PROTECT)
     is_activated = models.BooleanField(default=False)
 
 
 class Deposit(models.Model):
-    trader_id = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    trader = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     note = models.TextField(null=True, blank=True)
 
@@ -168,14 +166,14 @@ class Transfer(models.Model):
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.PENDING)
     wallet_address = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-    merchant_id = models.ForeignKey(User, on_delete=models.PROTECT, related_name="%(app_label)s_%(class)s_related")
-    admin_id = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+    merchant = models.ForeignKey(User, on_delete=models.PROTECT, related_name="%(app_label)s_%(class)s_related")
+    admin = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
 
 
 class Withdraw(models.Model):
-    admin_id = models.ForeignKey(User, on_delete=models.PROTECT)
+    admin = models.ForeignKey(User, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     wallet_address = models.CharField(max_length=255)
@@ -183,7 +181,7 @@ class Withdraw(models.Model):
 
 
 class MerchantIntegrations(models.Model):
-    merchant_id = models.ForeignKey(User, on_delete=models.PROTECT)
+    merchant = models.ForeignKey(User, on_delete=models.PROTECT)
     site_url = models.CharField(max_length=255, unique=True)
     success_url = models.CharField(max_length=255, unique=True)
     failed_url = models.CharField(max_length=255, unique=True)
