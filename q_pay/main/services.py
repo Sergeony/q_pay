@@ -51,7 +51,7 @@ def get_eligible_trader_ids_for_transactions(transactions: List[BaseTransaction]
     for transaction in transactions:
         eligible_trader_ids = eligible_trader_ids.filter(
             advertisements__is_activated=True,
-            advertisements__requisites_id__bank_id=transaction.requisites_id.bank_id,
+            advertisements__requisites_id__bank_id=transaction.requisites.bank,
         ).values_list('id', flat=True)
 
         if not eligible_trader_ids:
