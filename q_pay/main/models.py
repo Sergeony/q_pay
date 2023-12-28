@@ -61,7 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_online(self):
         if self.last_seen is None:
             return False
-        return (timezone.now() - self.last_seen).total_seconds() < settings.USER_ONLINE_TIMEOUT
+        return (timezone.now() - self.last_seen) < settings.USER_ONLINE_TIMEOUT
 
 
 class Bank(models.Model):

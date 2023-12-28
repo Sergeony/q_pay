@@ -152,3 +152,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.is_activated = validated_data.get('is_activated', instance.is_active)
         instance.save()
         return instance
+
+
+class InviteCodeSerializer(serializers.Serializer):
+    user_type = serializers.ChoiceField(choices=User.UserTypes.choices)

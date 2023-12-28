@@ -1,5 +1,7 @@
+import uuid
 from typing import Type
 
+from django.conf import settings
 from django.db.models import Count, F
 from django.http import HttpResponse
 from rest_framework.response import Response
@@ -27,10 +29,12 @@ from .serializers import (
     TransferSerializer,
     MerchantIntegrationsSerializer,
     UserInfoSerializer,
-    UserUpdateSerializer
+    UserUpdateSerializer,
+    InviteCodeSerializer
 )
 from .permissions import IsTrader, IsMerchant
 from .services import create_transactions_excel
+from q_pay.redis_client import get_redis_client
 
 
 class BankListView(APIView):
@@ -277,3 +281,26 @@ class TradersViewSet(BaseUsersViewSet):
 
 class MerchantsViewSet(BaseUsersViewSet):
     user_type = User.UserTypes.MERCHANT
+
+
+class CreateInviteCodeView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, *args, **kwargs):
+        serializer = InviteCodeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user_type = serializer.validated_data['user_type']
+        invite_code = str(uuid.uuid4())
+
+        redis_client = get_redis_client()
+        redis_client.setex(
+            name=invite_code,
+            time=settings.INVITE_CODE_LIFETIME,
+            value=f"{user_type}"
+        )
+
+        return Response(
+            data={'invite_code': invite_code},
+            status=status.HTTP_201_CREATED
+        )
