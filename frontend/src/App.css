@@ -36,3 +36,24 @@
     transform: rotate(360deg);
   }
 }
+
+@font-face {
+  font-family: 'AKONY';
+  src: local('AKONY'), url(assets/fonts/AKONY/AKONY.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'COMMIT-MONO';
+  src: local('COMMIT-MONO'), url(assets/fonts/COMMIT-MONO/CommitMono-Italic.otf) format('opentype');
+}
+
+@font-face {
+font-family: 'Mulish';
+src: local('Mulish'), url(assets/fonts/Mulish/static/Mulish-Regular.ttf) format('truetype');
+font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  src: local('Helvetica Neue'), url(assets/fonts/HelveticaNeueCyr/HelveticaNeueCyr-Medium.otf) format('truetype');
+}
