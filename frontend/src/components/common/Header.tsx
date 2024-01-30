@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import {MoonIcon, SunIcon, ChevronIcon} from "../UI/SVG";
-import {useAppDispatch} from "../hooks/useAppDispatch";
-import {toggleTheme} from "../reducers/setThemeReducer";
+import {MoonIcon, SunIcon, ChevronIcon} from "../../UI/SVG";
+import {useAppDispatch} from "../../hooks/useAppDispatch";
+import {toggleTheme} from "../../reducers/setThemeReducer";
 import {useDispatch} from "react-redux";
 import {Dispatch} from "redux";
-import {AppThunk} from "../store/store";
+import {AppThunk} from "../../store/store";
 import {Action} from "@reduxjs/toolkit";
+import DropDown from "./DropDown";
 
 
 const HeaderContainer = styled.header`
@@ -21,7 +22,7 @@ const HeaderContainer = styled.header`
 const LogoWrapper = styled.div`
     margin-left: 210px;
     display: flex;
-    font-family: 'AKONY', serif;
+    font-family: 'Akony', serif;
     align-items: center;
 `;
 
@@ -98,6 +99,10 @@ const LangSelect = styled.select`
     line-height: 18px;
 `;
 
+const StyledChevronIcon = styled(ChevronIcon)`
+    stroke: ${({theme}) => theme.lang_select_color};
+`;
+
 const LangChevronIconWrapper = styled.div`
     display: flex;
     position: absolute;
@@ -107,7 +112,15 @@ const LangChevronIconWrapper = styled.div`
     pointer-events: none;
 `;
 
-const Header = () => {
+interface IProps {
+  children?: React.ReactNode;
+}
+
+const defaultProps: IProps = {
+  children: null
+};
+
+const Header = ({ children }: IProps) => {
   const dispatch = useAppDispatch();
 
 
@@ -130,18 +143,18 @@ const Header = () => {
         </ToggleCircle>
       </ThemeToggleWrapper>
 
-      <LangWrapper>
-        <LangSelect>
-          <option value="en">English</option>
-          <option value="ru">Русский</option>
-        </LangSelect>
-        <LangChevronIconWrapper>
-          <ChevronIcon/>
-        </LangChevronIconWrapper>
-      </LangWrapper>
+      {children}
 
+      <DropDown width={'132px'}
+                options={[
+        {value: "en", label: "English"},
+        {value: "ru", label: "Русский"},
+      ]}/>
     </HeaderContainer>
   );
 };
+
+Header.defaultProps = defaultProps;
+
 
 export default Header;

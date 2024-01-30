@@ -1,18 +1,19 @@
 import React, {useState} from 'react';
-import Header from '../components/Header';
+import Header from '../../components/common/Header';
 import styled from "styled-components";
 import {
   BackArrow,
-  RegisterButton,
+  Button,
   Container,
   PageWrapper,
-  RegistrationH2, FieldWrapper, StyledContainer, StyledField, StyledLabel, StyledPasteIcon,
-} from "../UI/CommonUI";
-import googleAuthenticatorLogo from "../assets/img/google_authenticator_logo.png";
-import {registerUser} from "../actions/registrationActions";
+  RegistrationH2, LoginFieldWrapper, StyledContainer, StyledField, StyledLabel, StyledPasteIcon,
+} from "../../UI/CommonUI";
+import googleAuthenticatorLogo from "../../assets/img/google_authenticator_logo.png";
+import {registerUser} from "../../actions/registrationActions";
 import {Form, Formik} from "formik";
 import * as Yup from "yup";
-import {PasteIcon} from "../UI/SVG";
+import {PasteIcon} from "../../UI/SVG";
+import {useNavigate} from "react-router-dom";
 
 const RegistrationSchema = Yup.object().shape({
   code: Yup.string().required('Required'),
@@ -24,7 +25,7 @@ const LoginA = styled.a`
     justify-content: center;
     margin-top: 16px;
     color: ${({theme}) => theme.back_text_color};
-    font-family: "Helvetica Neue", serif;
+    font-family: "Helvetica", serif;
     font-size: 18px;
     font-weight: 400;
     line-height: 18px;
@@ -76,10 +77,13 @@ const LoginStep2 = () => {
     setCode(input);
   };
 
+  const navigate = useNavigate();
+  const handleNextStep = () => {
+    navigate("/advertisements/");
+  };
+
   return (
-    <PageWrapper>
-      <Header/>
-      <Container>
+      <>
         <FirstBlock>
           <BackArrow/>
         </FirstBlock>
@@ -110,12 +114,11 @@ const LoginStep2 = () => {
                 </CodeContainer>
             </Form>
           </Formik>
-          <RegisterButton type="submit">Завершить</RegisterButton>
+          <Button type="submit" onClick={handleNextStep}>Завершить</Button>
 
           <LoginA href="/login">Назад</LoginA>
         </ThirdBlock>
-      </Container>
-    </PageWrapper>
+      </>
   );
 };
 

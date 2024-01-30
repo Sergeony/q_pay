@@ -30,16 +30,13 @@ export const RegistrationH2 = styled.h2`
     color: ${({theme}) => theme.form_title};
 `;
 
-export const FieldWrapper = styled.div`
+export const LoginFieldWrapper = styled.div`
     margin-top: 32px;
 `;
 
-export const RegisterButton = styled.button`
-    margin-top: 32px;
+export const Button = styled.button`
     width: 436px;
     height: 44px;
-    top: 858px;
-    left: 742px;
     padding: 12px 0;
     border-radius: 16px;
     border: none;
@@ -53,6 +50,7 @@ export const RegisterButton = styled.button`
     letter-spacing: 0;
     text-align: center;
 
+    cursor: pointer;
 `;
 
 export const StyledCopyIcon = styled(CopyIcon)`
@@ -112,7 +110,7 @@ export const StyledField = styled(Field)`
 `;
 
 export const StyledLabel = styled.div`
-    font-family: "Helvetica Neue", serif;
+    font-family: "Helvetica", serif;
     font-size: 18px;
     font-weight: 400;
     line-height: 18px;
@@ -122,3 +120,74 @@ export const StyledLabel = styled.div`
     margin-bottom: 8px;
 
 `;
+
+export const FieldWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 7px 16px 7px 16px;
+    border-radius: 8px;
+    border: 1px solid #AFAAB6;
+    gap: 8px;
+    width: fit-content;
+
+    color: #AFAAB6;
+    font-family: 'Mulish', serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+`;
+
+
+export const BackButton = styled.a`
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+    color: ${({theme}) => theme.back_text_color};
+    font-family: "Helvetica", serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0;
+    text-align: left;
+    text-underline-position: under;
+`;
+
+// <StyledRow>
+//   <HeadCell>Банк</HeadCell>
+//   <HeadCell>Курс биржи</HeadCell>
+//   <HeadCell>Мой курс</HeadCell>
+//   <HeadCell>Активность</HeadCell>
+// </StyledRow>
+//
+// <StyledBodyRow>
+//   <StyledCell>
+//     <ReqsWrapper>
+//       <Bank>
+//         <BankIcon/>
+//         ПриватБанк
+//         <UAH>UAH</UAH>
+//       </Bank>
+//       <Reqs>
+//         <AutomationIcon/>
+//         <CardIcon/>
+//         <span>Туда 1234</span>
+//       </Reqs>
+//     </ReqsWrapper>
+//   </StyledCell>
+//   <StyledCell>
+//     <Rate>38,74₴</Rate>
+//   </StyledCell>
+//   <StyledCell>
+//     <RateWrapper>
+//       <MyRate>38,74₴</MyRate>
+//       <InterestRate>3.25%</InterestRate>
+//     </RateWrapper>
+//   </StyledCell>
+//   <ActivityButtonCell>
+//     <Switch size={"small"} />
+//   </ActivityButtonCell>
+//   <KebabMenuIconCell>
+//     <KebabMenuIcon/>
+//   </KebabMenuIconCell>
+// </StyledBodyRow>

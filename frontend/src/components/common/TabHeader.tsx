@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import {MoonIcon, SunIcon, ChevronIcon, NotificationBellIcon, SnowFlakeIcon, TetherIcon} from "../UI/SVG";
-import {useAppDispatch} from "../hooks/useAppDispatch";
-import {toggleTheme} from "../reducers/setThemeReducer";
+import {MoonIcon, SunIcon, ChevronIcon, NotificationBellIcon, SnowFlakeIcon, TetherIcon} from "../../UI/SVG";
+import {useAppDispatch} from "../../hooks/useAppDispatch";
+import {toggleTheme} from "../../reducers/setThemeReducer";
 import {useDispatch} from "react-redux";
 import {Dispatch} from "redux";
-import {AppThunk} from "../store/store";
+import {AppThunk} from "../../store/store";
 import {Action} from "@reduxjs/toolkit";
+import Switch from "./Switch";
 
 
 const HeaderContainer = styled.header`
@@ -14,10 +15,10 @@ const HeaderContainer = styled.header`
     display: flex;
     align-items: center;
 
-    background-color: ${({theme}) => theme.header_background_color};
-    border-bottom: ${({theme}) => theme.header_border};
+    background: linear-gradient(180deg, rgba(149, 147, 147, 0.15) 0%, rgba(149, 147, 147, 0.00) 128%);
+    // border-bottom: ${({theme}) => theme.header_border};
 
-    justify-content: center;
+    justify-content: space-evenly;
     
 `;
 
@@ -42,7 +43,6 @@ const RateLabel = styled.span`
     line-height: 20px;
     letter-spacing: 0;
     text-align: left;
-
 `;
 
 const RateValue = styled.span`
@@ -58,25 +58,6 @@ const RateValue = styled.span`
 
 `;
 
-const ToggleWrapper = styled.button`
-    width: 53px;
-    height: 30px;
-    border-radius: 15px;
-    background-color: ${({theme}) => theme.theme_accent};
-    border: none;
-    padding: 3.5px;
-
-    margin: 0 25px;
-`;
-
-const ToggleSpan = styled.span`
-    display: flex;
-    width: 23px;
-    height: 23px;
-    border-radius: 50%;
-    background-color: ${({theme}) => theme.toggle_span_background_color};
-`;
-
 
 const TabHeader = () => {
   const dispatch = useAppDispatch();
@@ -85,7 +66,7 @@ const TabHeader = () => {
   return (
     <HeaderContainer>
       {/*<RatesWrapper>*/}
-        <RateWrapper>
+        <RateWrapper style={{ margin: "0 0 0 300px" }}>
           <RateLabel>Мой курс</RateLabel>
           <RateValue>38.74 / 48.52</RateValue>
         </RateWrapper>
@@ -94,9 +75,7 @@ const TabHeader = () => {
           <RateValue>38.74 / 48.52</RateValue>
         </RateWrapper>
       {/*</RatesWrapper>*/}
-      <ToggleWrapper>
-        <ToggleSpan/>
-      </ToggleWrapper>
+      <Switch size={"large"} />
     </HeaderContainer>
   );
 };

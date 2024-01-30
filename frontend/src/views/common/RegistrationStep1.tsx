@@ -2,21 +2,20 @@ import React from 'react';
 import {Formik, Form, Field} from 'formik';
 import * as Yup from 'yup';
 import {useDispatch} from 'react-redux';
-import {registerUser} from '../actions/registrationActions';
-import Header from '../components/Header';
-import {AppDispatch} from "../store/store";
+import {registerUser} from '../../actions/registrationActions';
+import {AppDispatch} from "../../store/store";
 import styled from "styled-components";
-import CheckIcon from "../UI/SVG/icons/CheckIcon";
-import {CrossIcon} from "../UI/SVG";
+import CheckIcon from "../../UI/SVG/icons/CheckIcon";
+import {CrossIcon} from "../../UI/SVG";
 import {
-  RegisterButton,
-  Container,
-  PageWrapper,
-  FieldWrapper,
+  Button,
+  LoginFieldWrapper,
   RegistrationH2,
   StyledContainer,
   StyledField, StyledLabel
-} from "../UI/CommonUI";
+} from "../../UI/CommonUI";
+import RegistrationPage from "../../pages/common/RegistrationPage";
+import {useNavigate} from "react-router-dom";
 
 
 const RegistrationSchema = Yup.object().shape({
@@ -26,9 +25,6 @@ const RegistrationSchema = Yup.object().shape({
 });
 
 
-const StyledGird = styled(Container)`
-    row-gap: 0;
-`;
 
 const DefaultField = styled(StyledField)`
     color: ${({theme}) => theme.field_text_color};
@@ -64,7 +60,7 @@ const LoginWrapper = styled.div`
     gap: 8px;
     justify-content: center;
 
-    font-family: "Helvetica Neue", serif;
+    font-family: "Helvetica", serif;
     font-size: 18px;
     font-weight: 400;
     line-height: 18px;
@@ -114,13 +110,16 @@ const Block = styled.div`
     grid-column: 2/3;
 `;
 
-const RegistrationPage = () => {
+const RegistrationStep1 = () => {
   const dispatch = useDispatch<AppDispatch>();
 
+  const navigate = useNavigate();
+  const handleNextStep = () => {
+    navigate("/sign-up/2/");
+  }
+
   return (
-    <PageWrapper>
-      <Header/>
-      <StyledGird>
+    <>
         <Block>
           <RegistrationH2>Регистрация</RegistrationH2>
         </Block>
@@ -133,14 +132,14 @@ const RegistrationPage = () => {
             }}
           >
             <Form>
-              <FieldWrapper>
+              <LoginFieldWrapper>
                 <StyledLabel>Адрес электронной почты</StyledLabel>
                 <StyledContainer>
                   <DefaultField name="email" type="email" placeholder="Адрес электронной почты"/>
                 </StyledContainer>
-              </FieldWrapper>
+              </LoginFieldWrapper>
 
-              <FieldWrapper>
+              <LoginFieldWrapper>
                 <StyledLabel>Придумайте пароль</StyledLabel>
                 <StyledContainer>
                   <DefaultField name="password" type="password" placeholder="Придумайте пароль"/>
@@ -163,16 +162,16 @@ const RegistrationPage = () => {
                     от 8 символов
                   </PasswordHint>
                 </PasswordHintsWrapper>
-              </FieldWrapper>
+              </LoginFieldWrapper>
 
-              <FieldWrapper>
+              <LoginFieldWrapper>
                 <StyledLabel>Повторите пароль</StyledLabel>
                 <StyledContainer>
                   <DefaultField  name="confirmPassword" type="password" placeholder="Повторите пароль"/>
                 </StyledContainer>
-              </FieldWrapper>
+              </LoginFieldWrapper>
 
-              <RegisterButton type="submit">Регистрация</RegisterButton>
+              <Button type="submit" onClick={handleNextStep}>Регистрация</Button>
 
               <TermsWrapper>
                 <CheckBoxField type="checkbox" name="terms"/>
@@ -188,9 +187,8 @@ const RegistrationPage = () => {
             <LoginA href="/login">Войти</LoginA>
           </LoginWrapper>
         </Block>
-      </StyledGird>
-    </PageWrapper>
+    </>
   );
 };
 
-export default RegistrationPage;
+export default RegistrationStep1;

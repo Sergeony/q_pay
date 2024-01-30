@@ -2,8 +2,8 @@ import React from 'react';
 import {useDispatch} from 'react-redux';
 import {Formik, Form, Field} from 'formik';
 import * as Yup from 'yup';
-import {registerUser} from '../actions/registrationActions';
-import {AppDispatch} from "../store/store";
+import {registerUser} from '../../actions/registrationActions';
+import {AppDispatch} from "../../store/store";
 
 const RegistrationSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
