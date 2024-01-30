@@ -10,8 +10,8 @@ const login = (email: string, password: string) => {
   return axios.post(API_URL + 'login/', { email, password });
 };
 
-const verifyOtp = (userId: string, otp: number) => {
-  return axios.post(API_URL + 'verify-otp/', { user_id: userId, otp });
+const verifyOtp = (userId: number, otp: number) => {
+  return axios.post(API_URL + 'verify-otp/', { user_id: userId, otp: otp });
 };
 
 export const authService = {

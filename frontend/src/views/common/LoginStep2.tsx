@@ -76,7 +76,7 @@ const LoginStep2 = () => {
     onSubmit: (values) => {
       dispatch(verifyUserOtp({
         otp: Number(formik.values.otp) || NaN,
-        userId: userState.user?.userId || "",
+        userId: userState.user?.userId || NaN,
       }))
         .then(unwrapResult)
         .then(() => {
@@ -105,7 +105,7 @@ const LoginStep2 = () => {
           <CodeContainer>
             <StyledPasteIcon/>
             <CodeField type="text"
-                       placeholder="Введите код"
+                       placeholder=""
                        name="otp"
                        onChange={formik.handleChange}
                        value={formik.values.otp}

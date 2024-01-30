@@ -1,5 +1,5 @@
 import React from 'react';
-import {Formik, Form} from 'formik';
+import {Formik, Form, useFormik} from 'formik';
 import * as Yup from 'yup';
 import Header from '../../components/common/Header';
 import styled from "styled-components";
@@ -13,6 +13,10 @@ import {
   StyledField, StyledLabel
 } from "../../UI/CommonUI";
 import {useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../store/store";
+import {loginUser, verifyUserOtp} from "../../slices/userSlice";
+import {unwrapResult} from "@reduxjs/toolkit";
 
 
 const RegistrationSchema = Yup.object().shape({
@@ -35,9 +39,40 @@ const Block = styled.div`
 
 const LoginStep1 = () => {
   const navigate = useNavigate();
-  const handleNextStep = () => {
-    navigate("2");
-  };
+
+  const dispatch = useDispatch<AppDispatch>();
+  const userState = useSelector((state: RootState) => state.user);
+
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: Yup.object({
+      email: Yup.string()
+        .required('Required'),
+      password: Yup.string()
+        .required('Required'),
+    }),
+    onSubmit: (values) => {
+      dispatch(loginUser({
+        email: formik.values.email || "",
+        password: formik.values.email || "",
+      }))
+        .then(unwrapResult)
+        .then(() => {
+          if (userState.user?.otpBase32) {
+            navigate("/sign-up/2/");
+          } else {
+            navigate("/sign-in/2/");
+          }
+        })
+        .catch((error) => {
+          console.error('Ошибка авторизации:', error);
+          // Обработка ошибки, например, отображение сообщения об ошибке
+        });
+    },
+  });
 
   return (
     <>
@@ -45,31 +80,33 @@ const LoginStep1 = () => {
         <RegistrationH2>Вход</RegistrationH2>
       </Block>
       <Block>
-        <Formik
-          initialValues={{email: '', password: ''}}
-          validationSchema={RegistrationSchema}
-          onSubmit={() => {
-            return
-          }}
-        >
-          <Form>
-            <LoginFieldWrapper>
-              <StyledLabel>Адрес электронной почты</StyledLabel>
-              <StyledContainer>
-                <DefaultField name="email" type="email" placeholder="Адрес электронной почты"/>
-              </StyledContainer>
-            </LoginFieldWrapper>
+        <form onSubmit={formik.handleSubmit}>
+          <LoginFieldWrapper>
+            <StyledLabel>Адрес электронной почты</StyledLabel>
+            <StyledContainer>
+              <DefaultField name="email"
+                            type="email"
+                            placeholder="Адрес электронной почты"
+                            onChange={formik.handleChange}
+                            value={formik.values.email}
+              />
+            </StyledContainer>
+          </LoginFieldWrapper>
 
-            <LoginFieldWrapper>
-              <StyledLabel>Введите пароль</StyledLabel>
-              <StyledContainer>
-                <DefaultField name="password" type="password" placeholder="Введите пароль"/>
-              </StyledContainer>
-            </LoginFieldWrapper>
+          <LoginFieldWrapper>
+            <StyledLabel>Введите пароль</StyledLabel>
+            <StyledContainer>
+              <DefaultField name="password"
+                            type="password"
+                            placeholder="Введите пароль"
+                            onChange={formik.handleChange}
+                            value={formik.values.password}
+              />
+            </StyledContainer>
+          </LoginFieldWrapper>
 
-            <Button type="submit" onClick={handleNextStep}>Вход</Button>
-          </Form>
-        </Formik>
+          <Button type="submit">Вход</Button>
+        </form>
       </Block>
     </>
   );
