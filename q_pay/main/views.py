@@ -64,10 +64,10 @@ class RequisitesViewSet(viewsets.ModelViewSet):
     serializer_class = RequisitesSerializer
 
     def get_queryset(self):
-        return Requisites.objects.filter(trader_id=self.request.user, is_deleted=False)
+        return Requisites.objects.filter(trader=self.request.user, is_deleted=False)
 
     def perform_create(self, serializer):
-        serializer.save(trader_id=self.request.user)
+        serializer.save(trader=self.request.user)
 
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
@@ -88,10 +88,10 @@ class AdvertisementsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsTrader]
 
     def get_queryset(self):
-        return Advertisement.objects.filter(trader_id=self.request.user)
+        return Advertisement.objects.filter(trader=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(trader_id=self.request.user)
+        serializer.save(trader=self.request.user)
 
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
