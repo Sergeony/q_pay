@@ -20,8 +20,8 @@ class BanksSerializer(serializers.ModelSerializer):
 
 
 class RequisitesSerializer(serializers.ModelSerializer):
-    bank = BanksSerializer(read_only=True, source='bank_id')
-    bank_id = serializers.PrimaryKeyRelatedField(queryset=Bank.objects.all(), write_only=True)
+    bank = BanksSerializer(read_only=True)
+    bank_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Requisites
@@ -49,7 +49,7 @@ class RequisitesSerializer(serializers.ModelSerializer):
 
 
 class RequisitesForAdvertisementsSerializer(serializers.ModelSerializer):
-    bank = BanksSerializer(source='bank_id')
+    bank = BanksSerializer(read_only=True)
     last_four_card_number = serializers.SerializerMethodField()
 
     @staticmethod
@@ -58,24 +58,24 @@ class RequisitesForAdvertisementsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Requisites
-        fields = [
-            'id', 'title', 'automation_used', 'last_four_card_number', 'bank',
-        ]
+        fields = ['id', 'title', 'last_four_card_number', 'bank', 'automation_used']
 
 
 class AdvertisementsSerializer(serializers.ModelSerializer):
-    requisites = RequisitesForAdvertisementsSerializer(read_only=True, source='requisites_id')
-    requisites_id = serializers.PrimaryKeyRelatedField(queryset=Requisites.objects.all(), write_only=True)
+    requisites = RequisitesForAdvertisementsSerializer(read_only=True)
+    requisites_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Advertisement
-        fields = [
-            'id', 'created_at', 'trader_usdt_rate', 'exchange_usdt_rate',
-            'requisites', 'requisites_id', 'is_activated',
-        ]
-        read_only_fields = [
-            'id', 'created_at', 'requisites', 'requisites_id',
-        ]
+        fields = ['trader_usdt_rate', 'exchange_usdt_rate', 'requisites', 'requisites_id', 'created_at', 'is_activated']
+        extra_kwargs = {
+            'created_at': {'read_only': True},
+        }
+
+    def create(self, validated_data):
+        requisites_id = validated_data.pop('requisites_id')
+        requisites = Requisites.objects.get(id=requisites_id)
+        return Advertisement.objects.create(**validated_data, requisites=requisites)
 
     def update(self, instance, validated_data):
         updatable_fields = [

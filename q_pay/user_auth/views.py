@@ -29,9 +29,8 @@ class UserRegisterView(GenericAPIView):
                 data={'error': 'Invalid invite code or it has already been expired.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        request.data._mutable = True
+
         request.data["user_type"] = user_type
-        request._mutable = False
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

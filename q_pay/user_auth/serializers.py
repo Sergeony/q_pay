@@ -41,7 +41,7 @@ class UserLoginSerializer(serializers.Serializer):
 
         user = authenticate(
             request=self.context.get("request"),
-            email=attrs.get("email").lower().strip(),
+            email=attrs.get("email").strip(),
             password=attrs.get("password")
         )
         if not user:
