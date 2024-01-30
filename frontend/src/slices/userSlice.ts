@@ -3,6 +3,10 @@ import { authService } from '../services/authService';
 
 interface userProps {
   role: string;
+  otpBase32: string;
+  email: string;
+  password: string;
+  userId: string;
 }
 
 interface stateProps {
@@ -53,6 +57,11 @@ export const registerUser = createAsyncThunk(
   async ({ email, password, inviteCode }: RegisterUserParams, thunkAPI) => {
     try {
       const response = await authService.register(email, password, inviteCode);
+      thunkAPI.dispatch(setUser({
+        email: email,
+        password: password,
+        // другие данные пользователя
+      }));
       return response.data; // Возвращаем данные пользователя
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);
@@ -64,7 +73,6 @@ export const registerUser = createAsyncThunk(
 interface LoginUserParams {
   email: string;
   password: string;
-  inviteCode: string;
 }
 
 export const loginUser = createAsyncThunk(
@@ -72,6 +80,12 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }: LoginUserParams, thunkAPI) => {
     try {
       const response = await authService.login(email, password);
+
+      thunkAPI.dispatch(setUser({
+        userId: response.data.user_id,
+        otpBase32: response.data.otp_base32,
+      }));
+
       return response.data; // Возвращаем данные пользователя
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);

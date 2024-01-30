@@ -15,6 +15,7 @@ import {
 import {useNavigate} from "react-router-dom";
 import {registerUser} from "../../slices/userSlice";
 import {AppDispatch} from "../../store/store";
+import {unwrapResult} from "@reduxjs/toolkit";
 
 
 const registrationSchema = Yup.object().shape({
@@ -113,9 +114,6 @@ const Block = styled.div`
 const RegistrationStep1 = () => {
 
   const navigate = useNavigate();
-  const handleNextStep = () => {
-    navigate("/sign-up/2/");
-  }
 
   const queryParams = new URLSearchParams(location.search);
   const inviteCode = queryParams.get('invite-code');
@@ -129,14 +127,20 @@ const RegistrationStep1 = () => {
     },
     validationSchema: registrationSchema,
     onSubmit: (values) => {
-      // Теперь вызываем registerUser как thunk-действие
       dispatch(registerUser({
-        email: values.email,
-        password: values.password,
+        email: formik.values.email,
+        password: formik.values.password,
         inviteCode: inviteCode || ""
-      }));
-
-      handleNextStep();
+      }))
+        .then(unwrapResult)
+        .then(() => {
+          navigate("/sign-up/2/"); // Успешная регистрация, переход на следующий шаг
+        })
+        .catch((error) => {
+          console.error('Ошибка регистрации:', error);
+          // Обработка ошибки, например, отображение сообщения об ошибке
+          formik.resetForm(); // Сброс формы
+        });
     },
   });
 
