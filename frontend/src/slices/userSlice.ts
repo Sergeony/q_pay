@@ -103,7 +103,7 @@ export const verifyUserOtp = createAsyncThunk(
     try {
       const response = await authService.verifyOtp(userId, otp);
       localStorage.setItem('refreshToken', response.data.refresh);
-      sessionStorage.setItem('accessToken', response.data.access);
+      localStorage.setItem('accessToken', response.data.access);
 
       const decodedToken: {user_type: number} = jwtDecode(response.data.access);
       thunkAPI.dispatch(setUser({
