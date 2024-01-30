@@ -1,9 +1,7 @@
 import React from 'react';
-import {Formik, Form, Field} from 'formik';
+import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {useDispatch} from 'react-redux';
-import {registerUser} from '../../actions/registrationActions';
-import {AppDispatch} from "../../store/store";
 import styled from "styled-components";
 import CheckIcon from "../../UI/SVG/icons/CheckIcon";
 import {CrossIcon} from "../../UI/SVG";
@@ -14,16 +12,18 @@ import {
   StyledContainer,
   StyledField, StyledLabel
 } from "../../UI/CommonUI";
-import RegistrationPage from "../../pages/common/RegistrationPage";
 import {useNavigate} from "react-router-dom";
+import {registerUser} from "../../slices/userSlice";
+import {AppDispatch} from "../../store/store";
 
 
-const RegistrationSchema = Yup.object().shape({
-  email: Yup.string().email('Invalid email').required('Required'),
-  password: Yup.string().min(8, 'Password must be at least 8 characters long').required('Password is required'),
-  confirmPassword: Yup.string().oneOf([Yup.ref('password'), undefined], 'Passwords must match').required('Confirm your password'),
+const registrationSchema = Yup.object().shape({
+  email: Yup.string().email('Неверный формат email').required('Email обязателен'),
+  password: Yup.string().min(8, 'Пароль должен содержать минимум 8 символов').required('Пароль обязателен'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password')], 'Пароли должны совпадать')
+    .required('Подтверждение пароля обязательно'),
 });
-
 
 
 const DefaultField = styled(StyledField)`
@@ -38,7 +38,7 @@ const TermsWrapper = styled.div`
     align-items: start;
 `;
 
-const CheckBoxField = styled(Field)`
+const CheckBoxField = styled.input`
     margin: 2px;
     justify-self: start;
 
@@ -111,82 +111,115 @@ const Block = styled.div`
 `;
 
 const RegistrationStep1 = () => {
-  const dispatch = useDispatch<AppDispatch>();
 
   const navigate = useNavigate();
   const handleNextStep = () => {
     navigate("/sign-up/2/");
   }
 
+  const queryParams = new URLSearchParams(location.search);
+  const inviteCode = queryParams.get('invite-code');
+
+  const dispatch = useDispatch<AppDispatch>();
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validationSchema: registrationSchema,
+    onSubmit: (values) => {
+      // Теперь вызываем registerUser как thunk-действие
+      dispatch(registerUser({
+        email: values.email,
+        password: values.password,
+        inviteCode: inviteCode || ""
+      }));
+
+      handleNextStep();
+    },
+  });
+
   return (
     <>
-        <Block>
-          <RegistrationH2>Регистрация</RegistrationH2>
-        </Block>
-        <Block>
-          <Formik
-            initialValues={{email: '', password: '', confirmPassword: ''}}
-            validationSchema={RegistrationSchema}
-            onSubmit={(values) => {
-              dispatch(registerUser(values));
-            }}
-          >
-            <Form>
-              <LoginFieldWrapper>
-                <StyledLabel>Адрес электронной почты</StyledLabel>
-                <StyledContainer>
-                  <DefaultField name="email" type="email" placeholder="Адрес электронной почты"/>
-                </StyledContainer>
-              </LoginFieldWrapper>
+      <Block>
+        <RegistrationH2>Регистрация</RegistrationH2>
+      </Block>
+      <Block>
+        <form onSubmit={formik.handleSubmit}>
+          <LoginFieldWrapper>
+            <StyledLabel>Адрес электронной почты</StyledLabel>
+            <StyledContainer>
+              <DefaultField placeholder="Адрес электронной почты"
+                            type="email"
+                            name="email"
+                            onChange={formik.handleChange}
+                            value={formik.values.email}
+                            onBlur={formik.handleBlur}/>
+            </StyledContainer>
+          </LoginFieldWrapper>
+          {formik.touched.email && formik.errors.email ? <div>{formik.errors.email}</div> : null}
 
-              <LoginFieldWrapper>
-                <StyledLabel>Придумайте пароль</StyledLabel>
-                <StyledContainer>
-                  <DefaultField name="password" type="password" placeholder="Придумайте пароль"/>
-                </StyledContainer>
-                <PasswordHintsWrapper>
-                  <PasswordHint>
-                    <PasswordHintCheck/>
-                    заглавные(A-Z)
-                  </PasswordHint>
-                  <PasswordHint>
-                    <PasswordHintCheck/>
-                    строчные(a-z)
-                  </PasswordHint>
-                  <PasswordHint>
-                    <PasswordHintCheck/>
-                    цифры(0-9)
-                  </PasswordHint>
-                  <PasswordHint>
-                    <PasswordHintCross/>
-                    от 8 символов
-                  </PasswordHint>
-                </PasswordHintsWrapper>
-              </LoginFieldWrapper>
+          <LoginFieldWrapper>
+            <StyledLabel>Придумайте пароль</StyledLabel>
+            <StyledContainer>
+              <DefaultField placeholder="Придумайте пароль"
+                            type="password"
+                            name="password"
+                            onChange={formik.handleChange}
+                            value={formik.values.password}
+                            onBlur={formik.handleBlur}/>
+            </StyledContainer>
+            <PasswordHintsWrapper>
+              <PasswordHint>
+                <PasswordHintCheck/>
+                заглавные(A-Z)
+              </PasswordHint>
+              <PasswordHint>
+                <PasswordHintCheck/>
+                строчные(a-z)
+              </PasswordHint>
+              <PasswordHint>
+                <PasswordHintCheck/>
+                цифры(0-9)
+              </PasswordHint>
+              <PasswordHint>
+                <PasswordHintCross/>
+                от 8 символов
+              </PasswordHint>
+            </PasswordHintsWrapper>
+          </LoginFieldWrapper>
+          {formik.touched.password && formik.errors.password ? <div>{formik.errors.password}</div> : null}
 
-              <LoginFieldWrapper>
-                <StyledLabel>Повторите пароль</StyledLabel>
-                <StyledContainer>
-                  <DefaultField  name="confirmPassword" type="password" placeholder="Повторите пароль"/>
-                </StyledContainer>
-              </LoginFieldWrapper>
+          <LoginFieldWrapper>
+            <StyledLabel>Повторите пароль</StyledLabel>
+            <StyledContainer>
+              <DefaultField placeholder="Повторите пароль"
+                            type="password"
+                            name="confirmPassword"
+                            onChange={formik.handleChange}
+                            value={formik.values.confirmPassword}
+                            onBlur={formik.handleBlur}/>
+            </StyledContainer>
+          </LoginFieldWrapper>
+          {formik.touched.confirmPassword && formik.errors.confirmPassword ?
+            <div>{formik.errors.confirmPassword}</div> : null}
 
-              <Button type="submit" onClick={handleNextStep}>Регистрация</Button>
+          <Button type="submit" >Регистрация</Button>
+        </form>
 
-              <TermsWrapper>
-                <CheckBoxField type="checkbox" name="terms"/>
-                <CheckBoxLabel>
-                  Подтверждаю согласие с политикой конфиденциальности и пользовательским соглашением сервиса QPay
-                </CheckBoxLabel>
-              </TermsWrapper>
-            </Form>
-          </Formik>
+        <TermsWrapper>
+          <CheckBoxField type="checkbox" name="terms"/>
+          <CheckBoxLabel>
+            Подтверждаю согласие с политикой конфиденциальности и пользовательским соглашением сервиса QPay
+          </CheckBoxLabel>
+        </TermsWrapper>
 
-          <LoginWrapper>
-            <AlreadyHaveAnAccountP>Есть аккаунт?</AlreadyHaveAnAccountP>
-            <LoginA href="/login">Войти</LoginA>
-          </LoginWrapper>
-        </Block>
+        <LoginWrapper>
+          <AlreadyHaveAnAccountP>Есть аккаунт?</AlreadyHaveAnAccountP>
+          <LoginA href="/login">Войти</LoginA>
+        </LoginWrapper>
+      </Block>
     </>
   );
 };

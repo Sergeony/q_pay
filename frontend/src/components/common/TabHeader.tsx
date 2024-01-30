@@ -1,12 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import {MoonIcon, SunIcon, ChevronIcon, NotificationBellIcon, SnowFlakeIcon, TetherIcon} from "../../UI/SVG";
-import {useAppDispatch} from "../../hooks/useAppDispatch";
-import {toggleTheme} from "../../reducers/setThemeReducer";
-import {useDispatch} from "react-redux";
-import {Dispatch} from "redux";
-import {AppThunk} from "../../store/store";
-import {Action} from "@reduxjs/toolkit";
 import Switch from "./Switch";
 
 
@@ -60,8 +53,6 @@ const RateValue = styled.span`
 
 
 const TabHeader = () => {
-  const dispatch = useAppDispatch();
-
 
   return (
     <HeaderContainer>

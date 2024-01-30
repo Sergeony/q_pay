@@ -12,38 +12,41 @@ import BuyPage from "./pages/trader/BuyPage";
 import TestPage from "./pages/testPage";
 import SellPage from "./pages/trader/SellPage";
 import SettingsPage from "./pages/trader/SettingsPage";
+import PrivateRoute from "./pages/common/PrivateRoute";
 
 function App() {
-  const theme = useSelector((state: RootState) => state.theme.theme);
+  const theme = useSelector((state: RootState) => state.theme.value);
 
   return (
-      <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-        <div className="App">
-          <Routes>
-            <Route path={"/advertisements/*"}
-                   element={<AdvertisementsPage/>}
-            />
-            <Route path={"/buy/*"}
-                   element={<BuyPage/>}
-            />
-            <Route path={"/sell/*"}
-                   element={<SellPage/>}
-            />
-            <Route path={"/sign-up/*"}
-                   element={<RegistrationPage/>}
-            />
-            <Route path={"/sign-in/*"}
-                   element={<LoginPage/>}
-            />
-            <Route path={"/settings/*"}
-                   element={<SettingsPage/>}
-            />
-            <Route path={"/test-page/*"}
-                   element={<TestPage/>}
-            />
-          </Routes>
-        </div>
-      </ThemeProvider>
+    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+      <div className="App">
+        <Routes>
+          <Route path={"/sign-up/*"}
+                 element={<RegistrationPage/>}
+          />
+          <Route path={"/sign-in/*"}
+                 element={<LoginPage/>}
+          />
+
+          <Route path={"/test-page/*"}
+                 element={<TestPage/>}
+          />
+
+          <Route path={"/advertisements/*"}
+                 element={<PrivateRoute component={AdvertisementsPage} roles={['trader']} />}
+          />
+          <Route path={"/buy/*"}
+                 element={<PrivateRoute component={BuyPage} roles={['trader']} />}
+          />
+          <Route path={"/sell/*"}
+                 element={<PrivateRoute component={SellPage} roles={['trader']} />}
+          />
+          <Route path={"/settings/*"}
+                 element={<PrivateRoute component={SettingsPage} roles={['trader']} />}
+          />
+        </Routes>
+      </div>
+    </ThemeProvider>
   );
 }
 

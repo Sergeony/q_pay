@@ -1,20 +1,17 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import registrationReducer from "../reducers/registrationReducer";
-import themeReducer from "../reducers/setThemeReducer";
+import { configureStore } from '@reduxjs/toolkit';
+import userReducer from "../slices/userSlice";
+import themeReducer from "../slices/themeSlice";
 
-// Определите тип для RootState
-export type RootState = ReturnType<typeof store.getState>;
 
-// Создайте store
 const store = configureStore({
   reducer: {
-    registration: registrationReducer,
     theme: themeReducer,
+    user: userReducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 });
 
-export default store;
-
-// Определите типы для AppDispatch и AppThunk
+export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, Action<string>>;
+
+export default store;

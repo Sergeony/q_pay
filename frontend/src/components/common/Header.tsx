@@ -1,12 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import {MoonIcon, SunIcon, ChevronIcon} from "../../UI/SVG";
-import {useAppDispatch} from "../../hooks/useAppDispatch";
-import {toggleTheme} from "../../reducers/setThemeReducer";
-import {useDispatch} from "react-redux";
-import {Dispatch} from "redux";
-import {AppThunk} from "../../store/store";
-import {Action} from "@reduxjs/toolkit";
 import DropDown from "./DropDown";
 
 
@@ -121,7 +115,6 @@ const defaultProps: IProps = {
 };
 
 const Header = ({ children }: IProps) => {
-  const dispatch = useAppDispatch();
 
 
   return (
@@ -134,7 +127,8 @@ const Header = ({ children }: IProps) => {
         </LogoPayAndUserTypeWrapper>
       </LogoWrapper>
 
-      <ThemeToggleWrapper onClick={() => dispatch(toggleTheme())}>
+      {/*TODO: implement toggle*/}
+      <ThemeToggleWrapper onClick={() => ""}>
         <ToggleCircle>
           <MoonIcon/>
         </ToggleCircle>

@@ -1,18 +1,12 @@
 import React, {useState} from 'react';
-import Header from '../../components/common/Header';
 import styled from "styled-components";
 import {
   BackArrow,
   Button,
-  Container,
-  PageWrapper,
-  RegistrationH2, LoginFieldWrapper, StyledContainer, StyledField, StyledLabel, StyledPasteIcon,
+  RegistrationH2, StyledContainer, StyledField, StyledLabel, StyledPasteIcon,
 } from "../../UI/CommonUI";
-import googleAuthenticatorLogo from "../../assets/img/google_authenticator_logo.png";
-import {registerUser} from "../../actions/registrationActions";
 import {Form, Formik} from "formik";
 import * as Yup from "yup";
-import {PasteIcon} from "../../UI/SVG";
 import {useNavigate} from "react-router-dom";
 
 const RegistrationSchema = Yup.object().shape({
@@ -109,7 +103,6 @@ const LoginStep2 = () => {
                                placeholder="Введите код"
                                value={code}
                                onChange={handleChange}
-                               maxLenght="7"
                   />
                 </CodeContainer>
             </Form>

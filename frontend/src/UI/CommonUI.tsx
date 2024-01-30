@@ -80,7 +80,7 @@ export const StyledContainer = styled.div`
     background: ${({theme}) => theme.field_background};
 `;
 
-export const StyledField = styled(Field)`
+export const StyledField = styled.input`
     color: ${({theme}) => theme.theme_accent};
     font-family: 'Mulish', serif;
     font-size: 16px;
