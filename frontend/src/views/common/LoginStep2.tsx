@@ -5,9 +5,13 @@ import {
   Button,
   RegistrationH2, StyledContainer, StyledField, StyledLabel, StyledPasteIcon,
 } from "../../UI/CommonUI";
-import {Form, Formik} from "formik";
+import {Form, Formik, useFormik} from "formik";
 import * as Yup from "yup";
 import {useNavigate} from "react-router-dom";
+import {registerUser, verifyUserOtp} from "../../slices/userSlice";
+import {unwrapResult} from "@reduxjs/toolkit";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../store/store";
 
 const RegistrationSchema = Yup.object().shape({
   code: Yup.string().required('Required'),
@@ -55,63 +59,63 @@ const CodeField = styled(StyledField)`
 
 
 const LoginStep2 = () => {
-  const [code, setCode] = useState('');
-
-  const handleChange = (e: any) => {
-    let input = e.target.value;
-
-    input = input.replace(/\D/g, '');
-
-    input = input.slice(0, 6);
-
-    if (input.length > 3) {
-      input = `${input.slice(0, 3)}-${input.slice(3)}`;
-    }
-
-    setCode(input);
-  };
-
   const navigate = useNavigate();
-  const handleNextStep = () => {
-    navigate("/advertisements/");
-  };
+
+  const dispatch = useDispatch<AppDispatch>();
+  const userState = useSelector((state: RootState) => state.user);
+
+
+  const formik = useFormik({
+    initialValues: {
+      otp: '',
+    },
+    validationSchema: Yup.object({
+      otp: Yup.number()
+        .required('Required'),
+    }),
+    onSubmit: (values) => {
+      dispatch(verifyUserOtp({
+        otp: Number(formik.values.otp) || NaN,
+        userId: userState.user?.userId || "",
+      }))
+        .then(unwrapResult)
+        .then(() => {
+          navigate("/advertisements/"); // Успешная регистрация, переход на следующий шаг
+        })
+        .catch((error) => {
+          console.error('Ошибка авторизации:', error);
+          // Обработка ошибки, например, отображение сообщения об ошибке
+        });
+    },
+  });
 
   return (
-      <>
-        <FirstBlock>
-          <BackArrow/>
-        </FirstBlock>
-        <div>
-          <RegistrationH2>Верификация</RegistrationH2>
-        </div>
-        <ThirdBlock>
-          <Formik
-            initialValues={{email: '', password: '', confirmPassword: ''}}
-            validationSchema={RegistrationSchema}
-            onSubmit={() => {
-              return
-            }}
-          >
-            <Form>
-                <StyledLabel>
-                  Введите код подтверждения Google Authenticator
-                </StyledLabel>
-                <CodeContainer>
-                  <StyledPasteIcon/>
-                  <CodeField name="code"
-                               type="text"
-                               placeholder="Введите код"
-                               value={code}
-                               onChange={handleChange}
-                  />
-                </CodeContainer>
-            </Form>
-          </Formik>
-          <Button type="submit" onClick={handleNextStep}>Завершить</Button>
-
-          <LoginA href="/login">Назад</LoginA>
-        </ThirdBlock>
-      </>
+    <>
+      <FirstBlock>
+        <BackArrow/>
+      </FirstBlock>
+      <div>
+        <RegistrationH2>Верификация</RegistrationH2>
+      </div>
+      <ThirdBlock>
+        <form onSubmit={formik.handleSubmit}>
+          <StyledLabel>
+            Введите код подтверждения Google Authenticator
+          </StyledLabel>
+          <CodeContainer>
+            <StyledPasteIcon/>
+            <CodeField type="text"
+                       placeholder="Введите код"
+                       name="otp"
+                       onChange={formik.handleChange}
+                       value={formik.values.otp}
+            />
+          </CodeContainer>
+          <Button type="submit">Завершить</Button>
+        </form>
+        <LoginA href="/login">Назад</LoginA>
+      </ThirdBlock>
+    </>
   );
 };
 

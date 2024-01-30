@@ -50,7 +50,7 @@ const RegistrationStep2 = () => {
   }, [dispatch, userState.user]);
 
   const copyCode = () => {
-    navigator.clipboard.writeText("some code...");
+    navigator.clipboard.writeText(userState.user?.otpBase32 || "");
   };
 
   const navigate = useNavigate();
@@ -81,7 +81,6 @@ const RegistrationStep2 = () => {
         <BackButton href="/login">Назад</BackButton>
       </ThirdBlock>
     </>
-
   );
 };
 

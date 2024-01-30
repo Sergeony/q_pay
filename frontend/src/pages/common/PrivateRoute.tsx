@@ -5,7 +5,7 @@ import { RootState } from '../../store/store';
 
 interface PrivateRouteProps {
   component: React.ComponentType;
-  roles: string[]; // Список разрешенных ролей
+  roles: number[]; // Список разрешенных ролей
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({component: Component, roles, ...rest}): React.ReactElement | null => {
@@ -13,7 +13,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({component: Component, roles,
 
   return (
     <>
-      {user && roles.includes(user.role)
+      {user && roles.includes(user.userType)
         ? <Component />
         : <Navigate to="/sign-in" />
       }

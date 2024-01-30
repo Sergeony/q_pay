@@ -9,14 +9,11 @@ import {
   StyledContainer,
   StyledPasteIcon
 } from "../../UI/CommonUI";
-import {Form, Formik} from 'formik';
+import {useFormik} from 'formik';
 import * as Yup from "yup";
 import {useNavigate} from "react-router-dom";
-
-
-const RegistrationSchema = Yup.object().shape({
-  code: Yup.string().required('Required'),
-});
+import {useSelector} from "react-redux";
+import {RootState} from "../../store/store";
 
 
 const LoginA = styled.a`
@@ -57,14 +54,37 @@ const ThirdBlock = styled.div`
 
 const RegistrationStep3 = () => {
 
-  const copyCode = () => {
-    navigator.clipboard.writeText("some code...");
-  };
+  const getTextFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+
+      if (text !== null) {
+        await formik.setFieldValue('otpInput', text);
+      }
+    } catch (error) {
+      console.error('Ошибка при чтении из буфера обмена:', error);
+      return null; // или обработайте ошибку по-другому
+    }
+  }
 
   const navigate = useNavigate();
-  const handleNextStep = () => {
-    navigate("/sign-up/4/");
-  }
+
+  const userState = useSelector((state: RootState) => state.user);
+  const formik = useFormik({
+    initialValues: {
+      otpInput: '',
+    },
+    validationSchema: Yup.object({
+      otpInput: Yup.string()
+        .required('Required')
+        .test('match', 'Invalid OTP Code', (otpInput) => {
+          return otpInput === userState.user?.otpBase32;
+        }),
+    }),
+    onSubmit: (values) => {
+      navigate("/sign-up/4/");
+    },
+  });
 
   return (
     <>
@@ -78,24 +98,23 @@ const RegistrationStep3 = () => {
         <DescriptionDiv>
           Введите только что сохраненный 16-значный ключ
         </DescriptionDiv>
-        <Formik
-          initialValues={{code: 'A2B13B511B3GSDF1'}}
-          validationSchema={RegistrationSchema}
-          onSubmit={() => {
-            return
-          }}
-        >
-          <Form>
-            <LoginFieldWrapper>
-              <StyledContainer id="codeField" onClick={copyCode}>
-                <StyledPasteIcon/>
-                <StyledField value='A2B13B511B3GSDF1'/>
-              </StyledContainer>
-            </LoginFieldWrapper>
+        <form onSubmit={formik.handleSubmit}>
 
-            <Button type="submit" onClick={handleNextStep}>Далее</Button>
-          </Form>
-        </Formik>
+          <LoginFieldWrapper>
+            <StyledContainer id="codeField" onClick={getTextFromClipboard}>
+              <StyledPasteIcon/>
+              <StyledField name="otpInput"
+                           onChange={formik.handleChange}
+                           value={formik.values.otpInput}/>
+            </StyledContainer>
+          </LoginFieldWrapper>
+
+          {formik.touched.otpInput && formik.errors.otpInput ? (
+            <div>{formik.errors.otpInput}</div>
+          ) : null}
+
+          <Button type="submit">Далее</Button>
+        </form>
         <LoginA href="/login">Назад</LoginA>
       </ThirdBlock>
     </>

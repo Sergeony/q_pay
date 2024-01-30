@@ -1,8 +1,9 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import { authService } from '../services/authService';
+import {jwtDecode} from "jwt-decode";
 
 interface userProps {
-  role: string;
+  userType: number;
   otpBase32: string;
   email: string;
   password: string;
@@ -11,14 +12,12 @@ interface userProps {
 
 interface stateProps {
   user: userProps | null;
-  token: string | null;
   loading: boolean;
   error: any;
 }
 
 const initialState: stateProps = {
   user: null,
-  token: null,
   loading: false,
   error: null,
 }
@@ -32,9 +31,6 @@ export const userSlice = createSlice({
     },
     setUser: (state, action) => {
       state.user = action.payload;
-    },
-    setToken: (state, action) => {
-      state.token = action.payload;
     },
     setError: (state, action) => {
       state.error = action.payload;
@@ -96,7 +92,7 @@ export const loginUser = createAsyncThunk(
 
 interface VerifyOtpParams {
   userId: string;
-  otp: string;
+  otp: number;
 }
 
 export const verifyUserOtp = createAsyncThunk(
@@ -104,6 +100,14 @@ export const verifyUserOtp = createAsyncThunk(
   async ({ userId, otp }: VerifyOtpParams, thunkAPI) => {
     try {
       const response = await authService.verifyOtp(userId, otp);
+      localStorage.setItem('refreshToken', response.data.refresh);
+      sessionStorage.setItem('accessToken', response.data.access);
+
+      const decodedToken: {user_type: number} = jwtDecode(response.data.access);
+      thunkAPI.dispatch(setUser({
+        userType: decodedToken.user_type
+      }));
+
       return response.data; // Возвращаем данные пользователя
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);
@@ -112,5 +116,5 @@ export const verifyUserOtp = createAsyncThunk(
 );
 
 
-export const { setLoading, setUser, setToken, setError } = userSlice.actions;
+export const { setLoading, setUser, setError } = userSlice.actions;
 export default userSlice.reducer;

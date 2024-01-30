@@ -33,16 +33,16 @@ function App() {
           />
 
           <Route path={"/advertisements/*"}
-                 element={<PrivateRoute component={AdvertisementsPage} roles={['trader']} />}
+                 element={<PrivateRoute component={AdvertisementsPage} roles={[1]} />}
           />
           <Route path={"/buy/*"}
-                 element={<PrivateRoute component={BuyPage} roles={['trader']} />}
+                 element={<PrivateRoute component={BuyPage} roles={[1]} />}
           />
           <Route path={"/sell/*"}
-                 element={<PrivateRoute component={SellPage} roles={['trader']} />}
+                 element={<PrivateRoute component={SellPage} roles={[1]} />}
           />
           <Route path={"/settings/*"}
-                 element={<PrivateRoute component={SettingsPage} roles={['trader']} />}
+                 element={<PrivateRoute component={SettingsPage} roles={[1]} />}
           />
         </Routes>
       </div>
