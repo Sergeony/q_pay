@@ -20,6 +20,10 @@ export interface advertisementsProps {
   is_activated: boolean;
 }
 
+export interface createAdvertisementsProps {
+  requisites_id: number;
+}
+
 interface stateProps {
   advertisements: advertisementsProps[];
   loading: boolean;

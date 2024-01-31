@@ -4,7 +4,8 @@ import styled from "styled-components";
 import Switch from "../../components/common/Switch";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../store/store";
-import {useFetchAdvertisementsQuery} from "../../service/advertisementsService";
+import {useDeleteAdvertisementMutation, useFetchAdvertisementsQuery} from "../../service/advertisementsService";
+import KebabMenu from "../../components/common/KebabMenu";
 
 
 const StyledTable = styled.table`
@@ -172,10 +173,18 @@ const BankIconWrapper = styled.div`
 
 const Advertisements = () => {
   const {data: advertisements, error, isLoading} = useFetchAdvertisementsQuery();
+  const [deleteAdvertisement] = useDeleteAdvertisementMutation();
 
-  // useEffect(() => {
-  //   dispatch(fetchAdvertisements());
-  // }, [dispatch]);
+  const handleDelete = (id: number) => {
+    deleteAdvertisement(id)
+      .unwrap()
+      .then(() => {
+        console.log("Объявление удалено");
+      })
+      .catch((error) => {
+        console.error("Ошибка при удалении объявления:", error);
+      });
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
@@ -230,7 +239,11 @@ const Advertisements = () => {
                   <Switch size={'small'}/>
                 </Activity>
                 <Menu>
-                  <KebabMenuIcon/>
+                  <KebabMenu showDelete={true}
+                             showEdit={false}
+                             onEdit={() => {return}}
+                             onDelete={() => handleDelete(a.id)}
+                  />
                 </Menu>
               </StyledRow>
             </BodyTr>
