@@ -13,7 +13,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({component: Component, roles,
 
   return (
     <>
-      {user && roles.includes(user.userType)
+      {/*TODO: implement check user type and refresh token if it's expired */}
+      {localStorage.getItem('accessToken')
         ? <Component />
         : <Navigate to="/sign-in" />
       }

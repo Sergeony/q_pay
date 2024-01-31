@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from "../slices/userSlice";
 import themeReducer from "../slices/themeSlice";
+import advertisementsReducer from "../slices/advertisementsSlice";
 
 
 const store = configureStore({
   reducer: {
     theme: themeReducer,
     user: userReducer,
+    advertisements: advertisementsReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 });

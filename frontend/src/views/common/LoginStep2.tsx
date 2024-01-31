@@ -75,7 +75,7 @@ const LoginStep2 = () => {
     }),
     onSubmit: (values) => {
       dispatch(verifyUserOtp({
-        otp: Number(formik.values.otp) || NaN,
+        otp: formik.values.otp || "",
         userId: userState.user?.userId || NaN,
       }))
         .then(unwrapResult)

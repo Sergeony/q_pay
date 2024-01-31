@@ -1,8 +1,10 @@
-import privat from "../../assets/img/privat.png";
-import {AutomationIcon, CardIcon, KebabMenuIcon} from "../../UI/SVG";
-import React from "react";
+import {AutomationIcon, BankIcons, CardIcon, KebabMenuIcon} from "../../UI/SVG";
+import React, {useEffect} from "react";
 import styled from "styled-components";
 import Switch from "../../components/common/Switch";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../store/store";
+import {fetchAdvertisements} from "../../slices/advertisementsSlice";
 
 
 const StyledTable = styled.table`
@@ -169,6 +171,15 @@ const BankIconWrapper = styled.div`
 `;
 
 const Advertisements = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { advertisements, loading, error } = useSelector((state: RootState) => state.advertisements);
+
+  useEffect(() => {
+    dispatch(fetchAdvertisements());
+  }, [dispatch]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
       <StyledTable>
@@ -184,43 +195,48 @@ const Advertisements = () => {
         </Tr>
         </thead>
         <tbody>
-        <BodyTr>
-          <StyledRow>
-            <Bank>
-              <Values>
-                <UAHValue>
-                  <BankIconWrapper>
-                    <img src={privat} alt={"Bank"} width={22} height={22}/>
-                  </BankIconWrapper>
-                  <span>ПриватБанк UAH</span>
-                </UAHValue>
-                <Value style={{gap: '4px', border: '1px solid #46404B', borderRadius: '8px', padding: '4px 8px', width: "fit-content"}}>
-                  <AutomationIcon/>
-                  <CardIcon/>
-                  <SecondLine>Туда 1234</SecondLine>
-                </Value>
-              </Values>
-            </Bank>
-            <MyRate>
-              <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
-                <SecondLine>3,75%</SecondLine>
-              </RateWrapper>
-            </MyRate>
-            <ExchangeRate>
-              <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
-                <SecondLine>BINANCE</SecondLine>
-              </RateWrapper>
-            </ExchangeRate>
-            <Activity>
-              <Switch size={'small'}/>
-            </Activity>
-            <Menu>
-              <KebabMenuIcon/>
-            </Menu>
-          </StyledRow>
-        </BodyTr>
+        {advertisements?.map((a, index) => {
+          const BankIcon = BankIcons[a.requisites.bank.id] || null;
+          return (
+            <BodyTr key={index}>
+              <StyledRow>
+                <Bank>
+                  <Values>
+                    <UAHValue>
+                      <BankIconWrapper>
+                        <BankIcon/>
+                      </BankIconWrapper>
+                      <span>{a.requisites.bank.title} UAH</span>
+                    </UAHValue>
+                    <Value style={{gap: '4px', border: '1px solid #46404B', borderRadius: '8px', padding: '4px 8px', width: "fit-content"}}>
+                      {a.requisites.automation_used &&  <AutomationIcon/>}
+                      <CardIcon/>
+                      <SecondLine>{a.requisites.title} {a.requisites.last_four_card_number}</SecondLine>
+                    </Value>
+                  </Values>
+                </Bank>
+                <MyRate>
+                  <RateWrapper>
+                    <FirstLine>{a.trader_usdt_rate}₴</FirstLine>
+                    <SecondLine>3,75%</SecondLine>
+                  </RateWrapper>
+                </MyRate>
+                <ExchangeRate>
+                  <RateWrapper>
+                    <FirstLine>{a.exchange_usdt_rate}₴</FirstLine>
+                    <SecondLine>BINANCE</SecondLine>
+                  </RateWrapper>
+                </ExchangeRate>
+                <Activity>
+                  <Switch size={'small'}/>
+                </Activity>
+                <Menu>
+                  <KebabMenuIcon/>
+                </Menu>
+              </StyledRow>
+            </BodyTr>
+          )
+        })}
         </tbody>
       </StyledTable>
   );

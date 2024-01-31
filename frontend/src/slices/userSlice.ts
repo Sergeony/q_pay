@@ -82,8 +82,6 @@ export const loginUser = createAsyncThunk(
         otpBase32: response.data.otp_base32,
       }));
 
-      alert(response.data.otp_base32);
-
       return response.data; // Возвращаем данные пользователя
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);
@@ -94,7 +92,7 @@ export const loginUser = createAsyncThunk(
 
 interface VerifyOtpParams {
   userId: number;
-  otp: number;
+  otp: string;
 }
 
 export const verifyUserOtp = createAsyncThunk(

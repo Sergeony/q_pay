@@ -19,15 +19,6 @@ import {loginUser, verifyUserOtp} from "../../slices/userSlice";
 import {unwrapResult} from "@reduxjs/toolkit";
 
 
-const RegistrationSchema = Yup.object().shape({
-  email: Yup.string().email('Invalid email').required('Required'),
-  password: Yup.string().min(8, 'Password must be at least 8 characters long').required('Password is required'),
-});
-
-
-const StyledGird = styled(Container)`
-    row-gap: 0;
-`;
 
 const DefaultField = styled(StyledField)`
     color: ${({theme}) => theme.field_text_color};
@@ -57,7 +48,7 @@ const LoginStep1 = () => {
     onSubmit: (values) => {
       dispatch(loginUser({
         email: formik.values.email || "",
-        password: formik.values.email || "",
+        password: formik.values.password || "",
       }))
         .then(unwrapResult)
         .then(() => {

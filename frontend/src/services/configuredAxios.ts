@@ -4,7 +4,7 @@ export const configuredAxios = axios.create();
 
 configuredAxios.interceptors.request.use(
   config => {
-    const token = sessionStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers['Authorization'] = 'Bearer ' + token;
     }
