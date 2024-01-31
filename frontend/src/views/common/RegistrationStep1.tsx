@@ -13,9 +13,8 @@ import {
   StyledField, StyledLabel
 } from "../../UI/CommonUI";
 import {useNavigate} from "react-router-dom";
-import {registerUser} from "../../slices/userSlice";
 import {AppDispatch} from "../../store/store";
-import {unwrapResult} from "@reduxjs/toolkit";
+import {useRegisterUserMutation} from "../../service/authService";
 
 
 const registrationSchema = Yup.object().shape({
@@ -118,7 +117,9 @@ const RegistrationStep1 = () => {
   const queryParams = new URLSearchParams(location.search);
   const inviteCode = queryParams.get('invite-code');
 
-  const dispatch = useDispatch<AppDispatch>();
+  const [registerUser] = useRegisterUserMutation();
+
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -126,21 +127,20 @@ const RegistrationStep1 = () => {
       confirmPassword: '',
     },
     validationSchema: registrationSchema,
-    onSubmit: (values) => {
-      dispatch(registerUser({
-        email: formik.values.email,
-        password: formik.values.password,
-        inviteCode: inviteCode || ""
-      }))
-        .then(unwrapResult)
-        .then(() => {
-          navigate("/sign-up/2/"); // Успешная регистрация, переход на следующий шаг
-        })
-        .catch((error) => {
-          console.error('Ошибка регистрации:', error);
-          // Обработка ошибки, например, отображение сообщения об ошибке
-          formik.resetForm(); // Сброс формы
+    onSubmit: async (values) => {
+      try{
+        await registerUser({
+          email: formik.values.email,
+          password: formik.values.password,
+          inviteCode: inviteCode || ""
         });
+
+        navigate("/sign-up/2/"); // Успешная регистрация, переход на следующий шаг
+      } catch (error) {
+        console.error('Ошибка регистрации:', error);
+        formik.resetForm(); // Сброс формы
+
+      }
     },
   });
 

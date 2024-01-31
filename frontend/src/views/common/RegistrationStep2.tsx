@@ -8,9 +8,9 @@ import {
   RegistrationH2, StyledContainer, StyledField, BackButton
 } from "../../UI/CommonUI";
 import {useNavigate} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../store/store";
-import {loginUser} from "../../slices/userSlice";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store/store";
+import {useLoginUserMutation} from "../../service/authService";
 
 
 const DescriptionDiv = styled.div`
@@ -36,21 +36,31 @@ const ThirdBlock = styled.div`
 `;
 
 const RegistrationStep2 = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const userState = useSelector((state: RootState) => state.user);
+  const authState = useSelector((state: RootState) => state.auth);
+  const [loginUser] = useLoginUserMutation();
 
   useEffect(() => {
-    if (userState.user && !userState.user.otpBase32) {
-      // Предполагая, что email и password сохранены в состоянии user
-      dispatch(loginUser({
-        email: userState.user.email,
-        password: userState.user.password,
-      }));
-    }
-  }, [dispatch, userState.user]);
+    const performLogin = async () => {
+      if (authState.auth && !authState.auth.otpBase32) {
+        try {
+          // Используем loginUser mutation
+          await loginUser({
+            email: authState.auth.email,
+            password: authState.auth.password
+          }).unwrap();
+        } catch (error) {
+          // Обработка ошибок здесь
+          console.error('Ошибка авторизации:', error);
+        }
+      }
+    };
+
+    performLogin();
+  }, [authState.auth, loginUser]);
+
 
   const copyCode = () => {
-    navigator.clipboard.writeText(userState.user?.otpBase32 || "");
+    navigator.clipboard.writeText(authState.auth?.otpBase32 || "");
   };
 
   const navigate = useNavigate();
@@ -74,7 +84,7 @@ const RegistrationStep2 = () => {
         <LoginFieldWrapper>
           <StyledContainer id="codeField" onClick={copyCode}>
             <StyledCopyIcon/>
-            <StyledField value={userState.user?.otpBase32} readOnly/>
+            <StyledField value={authState.auth?.otpBase32} readOnly/>
           </StyledContainer>
         </LoginFieldWrapper>
         <Button type="submit" onClick={handleNextStep}>Далее</Button>

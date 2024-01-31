@@ -69,7 +69,7 @@ const RegistrationStep3 = () => {
 
   const navigate = useNavigate();
 
-  const userState = useSelector((state: RootState) => state.user);
+  const authState = useSelector((state: RootState) => state.auth);
   const formik = useFormik({
     initialValues: {
       otpInput: '',
@@ -78,7 +78,7 @@ const RegistrationStep3 = () => {
       otpInput: Yup.string()
         .required('Required')
         .test('match', 'Invalid OTP Code', (otpInput) => {
-          return otpInput === userState.user?.otpBase32;
+          return otpInput === authState.auth?.otpBase32;
         }),
     }),
     onSubmit: (values) => {

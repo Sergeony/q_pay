@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Switch from "../../components/common/Switch";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../store/store";
-import {fetchAdvertisements} from "../../slices/advertisementsSlice";
+import {useFetchAdvertisementsQuery} from "../../service/advertisementsService";
 
 
 const StyledTable = styled.table`
@@ -171,15 +171,14 @@ const BankIconWrapper = styled.div`
 `;
 
 const Advertisements = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { advertisements, loading, error } = useSelector((state: RootState) => state.advertisements);
+  const {data: advertisements, error, isLoading} = useFetchAdvertisementsQuery();
 
-  useEffect(() => {
-    dispatch(fetchAdvertisements());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchAdvertisements());
+  // }, [dispatch]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error</div>;
 
   return (
       <StyledTable>

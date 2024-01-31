@@ -1,22 +1,19 @@
 import React from 'react';
-import {Formik, Form, useFormik} from 'formik';
+import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import Header from '../../components/common/Header';
 import styled from "styled-components";
 import {
   Button,
-  Container,
-  PageWrapper,
   LoginFieldWrapper,
   RegistrationH2,
   StyledContainer,
   StyledField, StyledLabel
 } from "../../UI/CommonUI";
 import {useNavigate} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../store/store";
-import {loginUser, verifyUserOtp} from "../../slices/userSlice";
-import {unwrapResult} from "@reduxjs/toolkit";
+import loginUser from "../../store/reducers/authSlice";
+import {useLoginUserMutation} from "../../service/authService";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store/store";
 
 
 
@@ -31,8 +28,8 @@ const Block = styled.div`
 const LoginStep1 = () => {
   const navigate = useNavigate();
 
-  const dispatch = useDispatch<AppDispatch>();
-  const userState = useSelector((state: RootState) => state.user);
+  const [loginUser] = useLoginUserMutation();
+  const authState = useSelector((state: RootState) => state.auth);
 
   const formik = useFormik({
     initialValues: {
@@ -40,28 +37,24 @@ const LoginStep1 = () => {
       password: '',
     },
     validationSchema: Yup.object({
-      email: Yup.string()
-        .required('Required'),
-      password: Yup.string()
-        .required('Required'),
+      email: Yup.string().required('Required'),
+      password: Yup.string().required('Required'),
     }),
-    onSubmit: (values) => {
-      dispatch(loginUser({
-        email: formik.values.email || "",
-        password: formik.values.password || "",
-      }))
-        .then(unwrapResult)
-        .then(() => {
-          if (userState.user?.otpBase32) {
-            navigate("/sign-up/2/");
-          } else {
-            navigate("/sign-in/2/");
-          }
-        })
-        .catch((error) => {
-          console.error('Ошибка авторизации:', error);
-          // Обработка ошибки, например, отображение сообщения об ошибке
+    onSubmit: async (values) => {
+      try {
+        await loginUser({
+          email: values.email,
+          password: values.password
         });
+
+        if (authState.auth.otpBase32) {
+          navigate("/sign-up/2/");
+        } else {
+          navigate("/sign-in/2/");
+        }
+      } catch (error) {
+        console.error('Ошибка авторизации:', error);
+      }
     },
   });
 

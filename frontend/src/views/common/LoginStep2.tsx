@@ -5,17 +5,12 @@ import {
   Button,
   RegistrationH2, StyledContainer, StyledField, StyledLabel, StyledPasteIcon,
 } from "../../UI/CommonUI";
-import {Form, Formik, useFormik} from "formik";
+import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useNavigate} from "react-router-dom";
-import {registerUser, verifyUserOtp} from "../../slices/userSlice";
-import {unwrapResult} from "@reduxjs/toolkit";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../store/store";
-
-const RegistrationSchema = Yup.object().shape({
-  code: Yup.string().required('Required'),
-});
+import {useVerifyUserOtpMutation} from "../../service/authService";
 
 
 const LoginA = styled.a`
@@ -61,8 +56,8 @@ const CodeField = styled(StyledField)`
 const LoginStep2 = () => {
   const navigate = useNavigate();
 
-  const dispatch = useDispatch<AppDispatch>();
-  const userState = useSelector((state: RootState) => state.user);
+  const authState = useSelector((state: RootState) => state.auth);
+  const [verifyUserOtp] = useVerifyUserOtpMutation();
 
 
   const formik = useFormik({
@@ -73,19 +68,15 @@ const LoginStep2 = () => {
       otp: Yup.number()
         .required('Required'),
     }),
-    onSubmit: (values) => {
-      dispatch(verifyUserOtp({
-        otp: formik.values.otp || "",
-        userId: userState.user?.userId || NaN,
-      }))
-        .then(unwrapResult)
-        .then(() => {
-          navigate("/advertisements/"); // Успешная регистрация, переход на следующий шаг
-        })
-        .catch((error) => {
-          console.error('Ошибка авторизации:', error);
-          // Обработка ошибки, например, отображение сообщения об ошибке
-        });
+    onSubmit: async (values) => {
+      try {
+        await verifyUserOtp({otp: formik.values.otp || "", userId: authState.auth.userId || NaN})
+
+        navigate("/advertisements/"); // Успешная регистрация, переход на следующий шаг
+
+      } catch (error) {
+        console.error('Ошибка авторизации:', error);
+      }
     },
   });
 
