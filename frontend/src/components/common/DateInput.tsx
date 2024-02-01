@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import DatePicker, {ReactDatePickerCustomHeaderProps} from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styled from 'styled-components';
@@ -64,22 +64,19 @@ const renderHeader = (params: ReactDatePickerCustomHeaderProps) => (
   </div>
 );
 
-// const day = () => {
-//
-// }
 
 interface InputProps {
   value: Date | null;
   onClick: () => void;
 }
 
-interface IProps {
-  placeholder: string | null;
+interface DateInputProps {
+  placeholder: string | undefined;
+  value: Date | undefined;
+  onChange: (date: Date | null) => void;
 }
 
-const DatePickerField = ({placeholder}: IProps) => {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-
+const DateInput = ({placeholder, value, onChange}: DateInputProps) => {
   const CustomInputComponent = ({value, onClick}: InputProps) => {
     return (
       <FieldWrapper onClick={onClick}>
@@ -97,11 +94,10 @@ const DatePickerField = ({placeholder}: IProps) => {
   return (
     <Wrapper>
       <DatePicker
-        selected={startDate}
-        onChange={(date: Date) => setStartDate(date)}
-        customInput={<CustomInputComponent value={startDate} onClick={() => {
-          console.log(startDate)
-        }}/>}
+        selected={value}
+        onChange={onChange}
+        customInput={<CustomInputComponent value={value || new Date()} onClick={() => { console.log(value) }}/>}
+        placeholderText={placeholder}
         renderCustomHeader={renderHeader}
         allowSameDay={true}
 
@@ -110,4 +106,4 @@ const DatePickerField = ({placeholder}: IProps) => {
   );
 };
 
-export default DatePickerField;
+export default DateInput;

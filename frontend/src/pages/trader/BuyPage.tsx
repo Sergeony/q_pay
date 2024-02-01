@@ -128,7 +128,7 @@ const BuyPage = () => {
                  element={<OutputDisputedTransactions/>}
           />
           <Route path={'/export/'}
-                 element={<Export/>}
+                 element={<Export transactionsType={'output'}/>}
           />
         </Routes>
       </ContentWrapper>
