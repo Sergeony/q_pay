@@ -1,7 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import {ChevronIcon} from "../../UI/SVG";
-import Select, {DropdownIndicatorProps, GroupBase, OptionProps, StylesConfig} from "react-select";
+import Select, {
+  ActionMeta,
+  DropdownIndicatorProps,
+  GroupBase,
+  MultiValue,
+  OptionProps,
+  PropsValue, SingleValue,
+  StylesConfig
+} from "react-select";
 import {components} from 'react-select';
 
 
@@ -124,11 +132,10 @@ const DropdownIndicator: React.FC<DropdownIndicatorProps<CustomOptionProps, bool
 
 
 
-interface CustomOptionProps {
+export interface CustomOptionProps {
   value: string | number;
   label: string;
   icon?: React.ElementType;
-  isPlaceholder?: boolean;
 }
 
 
@@ -145,20 +152,23 @@ interface DropDownProps {
   options: CustomOptionProps[];
   width: string;
   label?: string;
+  onChange?: (newValue: (MultiValue<CustomOptionProps> | SingleValue<CustomOptionProps>), actionMeta: ActionMeta<CustomOptionProps>) => void
+  value: PropsValue<CustomOptionProps> | undefined;
 }
 
 
-const DropDown: React.FC<DropDownProps> = ({ options, width, label }: DropDownProps) => {
+const DropDown: React.FC<DropDownProps> = ({options, width, label, onChange, value}) => {
   return (
     <div style={{width: width}}>
       {label && <StyledLabel>{label}</StyledLabel>}
-    <Select options={options}
-            styles={customStyles}
-            isSearchable={false}
-            components={{ Option, DropdownIndicator }}
-            hideSelectedOptions={true}
-            defaultValue={options.find(option => option.isPlaceholder) || options[0]}
-    />
+      <Select options={options}
+              styles={customStyles}
+              isSearchable={false}
+              components={{ Option, DropdownIndicator }}
+              hideSelectedOptions={true}
+              onChange={onChange}
+              value={value}
+      />
     </div>
   );
 };

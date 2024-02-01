@@ -35,14 +35,16 @@ const InputActiveTransactions = () => {
     <Wrapper>
       <FilterLine>
         <Select width={'158px'}
+                value={{label: "Категория", value: ""}}
                 options={[
-          {label: "Категория", value: "", isPlaceholder: true},
+          {label: "Категория", value: ""},
           {label: "Завершенные", value: "completed"},
           {label: "Споры", value: "disputed"},
         ]}/>
         <Select width={'158px'}
+                value={{label: "Банк", value: ""}}
                 options={[
-          {label: "Банк", value: "", isPlaceholder: true},
+          {label: "Банк", value: ""},
           {label: "ПриватБанк", value: "privat"},
           {label: "МоноБанк", value: "mono"},
           {label: "ОщадБанк", value: "oshchad"},
@@ -53,8 +55,9 @@ const InputActiveTransactions = () => {
           {label: "А Банк", value: "a"},
         ]}/>
         <Select width={'158px'}
+                value={{label: "Реквизиты", value: ""}}
                 options={[
-          {label: "Реквизиты", value: "", isPlaceholder: true},
+          {label: "Реквизиты", value: ""},
           {label: "*1234 матвиенко С.", value: 1},
           {label: "*1234 Соболенко С.", value: 1},
           {label: "*1234 Савченко С.", value: 1},

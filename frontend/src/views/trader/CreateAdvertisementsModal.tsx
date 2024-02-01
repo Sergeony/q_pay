@@ -8,6 +8,8 @@ import {BankIcons, CrossIcon} from "../../UI/SVG";
 import {useCreateAdvertisementMutation} from "../../service/advertisementsService";
 import {useFetchBanksQuery} from "../../service/banksService";
 import {BankProps} from "../../store/reducers/banksSlice";
+import {useFetchRequisitesQuery} from "../../service/requisitesService";
+import {RequisitesProps} from "../../store/reducers/requisitesSlice";
 
 
 const PopupOverlay = styled.div`
@@ -63,7 +65,7 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
 
   const formik = useFormik({
     initialValues: {
-      requisitesId: 3
+      requisitesId: NaN
     },
     validationSchema: Yup.object({
       requisitesId: Yup.number().required('Required'),
@@ -86,6 +88,17 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
     return banks?.map((o: BankProps) => ({ label: o.title, value: o.id, icon: BankIcons[o.id] })) || [];
   }, [banks]);
 
+  const {data: requisites, error, isLoading} = useFetchRequisitesQuery();
+
+  const requisitesOptions = useMemo(() => {
+    return requisites?.map((r: RequisitesProps) => ({ label: `${r.title} ${r.cardholder_name}`, value: r.id })) || [];
+  }, [banks]);
+
+  const handleRequisitesChange = (selectedOption: any) => {
+    formik.setFieldValue('requisitesId', selectedOption.value);
+  };
+
+
   return (
     <PopupOverlay>
       <PopupContainer>
@@ -96,16 +109,14 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
           <form onSubmit={formik.handleSubmit}>
             <DropDown label={'Выберите банк'}
                       width={'100%'}
-                      options={[{label: "Банк", value: "", isPlaceholder: true}, ...bankOptions]}
+                      value={{label: "Банк", value: ""}}
+                      options={[{label: "Банк", value: ""}, ...bankOptions]}
             />
             <DropDown label={"Выберете Реквизиты"}
                       width={'100%'}
-                      options={[
-                        {label: "Реквизиты", value: "", isPlaceholder: true},
-                        {label: "*1234 матвиенко С.", value: 1},
-                        {label: "*1234 Соболенко С.", value: 1},
-                        {label: "*1234 Савченко С.", value: 1},
-                      ]}
+                      options={[{label: "Реквизиты", value: ""}, ...requisitesOptions]}
+                      value={requisitesOptions.find(o => o.value === formik.values.requisitesId)}
+                      onChange={handleRequisitesChange}
             />
             <Button style={{width: "400px", marginTop: "16px"}} type="submit">Создать</Button>
           </form>

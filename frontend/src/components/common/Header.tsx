@@ -140,6 +140,7 @@ const Header = ({ children }: IProps) => {
       {children}
 
       <DropDown width={'132px'}
+                value={{value: "en", label: "English"}}
                 options={[
         {value: "en", label: "English"},
         {value: "ru", label: "Русский"},

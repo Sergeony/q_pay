@@ -4,7 +4,9 @@ import {authApi} from "../service/authService";
 import {advertisementsApi} from "../service/advertisementsService";
 import authReducer from "../store/reducers/authSlice";
 import advertisementsReducer from "../store/reducers/advertisementsSlice";
+import requisitesReducer from "../store/reducers/requisitesSlice";
 import {banksApi} from "../service/banksService";
+import {requisitesApi} from "../service/requisitesService";
 
 const store = configureStore({
   reducer: {
@@ -12,6 +14,8 @@ const store = configureStore({
     auth: authReducer,
     [authApi.reducerPath]: authApi.reducer,
     [banksApi.reducerPath]: banksApi.reducer,
+    [requisitesApi.reducerPath]: requisitesApi.reducer,
+    requisites: requisitesReducer,
     advertisements: advertisementsReducer,
     [advertisementsApi.reducerPath]: advertisementsApi.reducer,
   },
@@ -20,6 +24,7 @@ const store = configureStore({
       .concat(authApi.middleware)
       .concat(advertisementsApi.middleware)
       .concat(banksApi.middleware)
+      .concat(requisitesApi.middleware)
   ,
 });
 

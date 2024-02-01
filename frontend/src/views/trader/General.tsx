@@ -99,6 +99,7 @@ const General = () => {
         <Email>sergkong@gmail.com</Email>
         <EmailDescription>Для смены электронной почты, обратитесь в поддержку.</EmailDescription>
         <DropDown label={"Выберите часовой пояс"}
+                  value={{label: "GMT+0", value: 1}}
                   width={"284px"}
                   options={[
                     {label: "GMT+0", value: 1},
