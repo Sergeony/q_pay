@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import {ChevronIcon} from "../../UI/SVG";
-import Select, {DropdownIndicatorProps, GroupBase, StylesConfig} from "react-select";
+import Select, {DropdownIndicatorProps, GroupBase, OptionProps, StylesConfig} from "react-select";
 import {components} from 'react-select';
 
 
@@ -22,7 +22,7 @@ const StyledLabel = styled.label`
     margin-bottom: 4px;
 `;
 
-const customStyles: StylesConfig<Option, boolean, GroupBase<Option>> = {
+const customStyles: StylesConfig<CustomOptionProps, boolean, GroupBase<CustomOptionProps>> = {
   container: (provided: any, state: any) => {
     return {
       width: 'inherit',
@@ -106,11 +106,15 @@ const customStyles: StylesConfig<Option, boolean, GroupBase<Option>> = {
     fontWeight: 400,
     lineHeight: 'normal',
 
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+
     color: state.isFocused ? '#46404B' : '#AFAAB6',
   }),
 };
 
-const DropdownIndicator = (props: DropdownIndicatorProps<Option, boolean, GroupBase<Option>>) => {
+const DropdownIndicator: React.FC<DropdownIndicatorProps<CustomOptionProps, boolean, GroupBase<CustomOptionProps>>> = (props) => {
   return (
     <components.DropdownIndicator {...props}>
       <StyledChevronIcon />
@@ -119,27 +123,39 @@ const DropdownIndicator = (props: DropdownIndicatorProps<Option, boolean, GroupB
 };
 
 
-interface Option {
+
+interface CustomOptionProps {
   value: string | number;
   label: string;
+  icon?: React.ElementType;
   isPlaceholder?: boolean;
 }
 
-interface SelectProps {
-  options: Option[];
+
+const Option: React.FC<OptionProps<CustomOptionProps, false>> = (props) => {
+  return (
+    <components.Option {...props}>
+      {props.data.icon && <props.data.icon/>} {props.data.label}
+    </components.Option>
+  );
+};
+
+
+interface DropDownProps {
+  options: CustomOptionProps[];
   width: string;
   label?: string;
 }
 
 
-const DropDown: React.FC<SelectProps> = ({ options, width, label }: SelectProps) => {
+const DropDown: React.FC<DropDownProps> = ({ options, width, label }: DropDownProps) => {
   return (
     <div style={{width: width}}>
       {label && <StyledLabel>{label}</StyledLabel>}
     <Select options={options}
             styles={customStyles}
             isSearchable={false}
-            components={{DropdownIndicator}}
+            components={{ Option, DropdownIndicator }}
             hideSelectedOptions={true}
             defaultValue={options.find(option => option.isPlaceholder) || options[0]}
     />

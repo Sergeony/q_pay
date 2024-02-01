@@ -13,6 +13,7 @@ import {BaseQueryArg} from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 export const advertisementsApi = createApi({
   reducerPath: 'advertisementsApi',
   baseQuery,
+  // TODO: rename to plural
   tagTypes: ["Advertisement"],
   endpoints: (builder) => ({
     fetchAdvertisements: builder.query<advertisementsProps[], void>({

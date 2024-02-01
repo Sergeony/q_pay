@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 
+ // TODO: rename to singular
 export interface advertisementsProps {
   id: number;
   trader_usdt_rate: number;
