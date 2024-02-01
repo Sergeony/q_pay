@@ -1,7 +1,5 @@
 import React, {useState, useRef, useEffect, FunctionComponent} from 'react';
-// import { ReactComponent as DeleteIcon } from './icons/delete.svg';
-// import { ReactComponent as EditIcon } from './icons/edit.svg';
-import {KebabMenuIcon} from "../../UI/SVG";
+import {DeleteIcon, EditIcon, KebabMenuIcon} from "../../UI/SVG";
 import styled from "styled-components";
 
 
@@ -76,12 +74,12 @@ const KebabMenu: FunctionComponent<KebabMenuProps> = ({ showEdit, showDelete, on
         <MenuContainer className="kebab-menu">
           {showEdit && (
             <MenuItem onClick={() => {onEdit(); setIsOpen(false)}}>
-              Изменить
+              <EditIcon/> Изменить
             </MenuItem>
           )}
           {showDelete && (
             <MenuItem onClick={() => {onDelete(); setIsOpen(false)}}>
-              Удалить
+              <DeleteIcon/> Удалить
             </MenuItem>
           )}
         </MenuContainer>
