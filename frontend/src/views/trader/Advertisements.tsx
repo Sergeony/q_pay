@@ -4,7 +4,11 @@ import styled from "styled-components";
 import Switch from "../../components/common/Switch";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../store/store";
-import {useDeleteAdvertisementMutation, useFetchAdvertisementsQuery} from "../../service/advertisementsService";
+import {
+  useDeleteAdvertisementMutation,
+  useFetchAdvertisementsQuery,
+  useToggleAdvertisementActivityMutation
+} from "../../service/advertisementsService";
 import KebabMenu from "../../components/common/KebabMenu";
 
 
@@ -186,6 +190,13 @@ const Advertisements = () => {
       });
   };
 
+  const [toggleActivity] = useToggleAdvertisementActivityMutation();
+
+  const handleToggle = (id: number, isActivated: boolean) => {
+    toggleActivity({ id, is_activated: isActivated });
+  };
+
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
 
@@ -236,7 +247,9 @@ const Advertisements = () => {
                   </RateWrapper>
                 </ExchangeRate>
                 <Activity>
-                  <Switch size={'small'}/>
+                  <Switch size={'small'}
+                          isActivated={a.is_activated}
+                          onToggle={() => handleToggle(a.id, !a.is_activated)}/>
                 </Activity>
                 <Menu>
                   <KebabMenu showDelete={true}

@@ -39,7 +39,8 @@ export const lightTheme = {
   rate_label_text_color: '#AFAAB6',
   rate_text_color: '#6B48A4',
 
-  toggle_span_background_color: '#F8F5FE',
+  toggle_span_background_color: '#0E1503',
+  toggle_span: '#FDFFF9',
 
 };
 
@@ -82,6 +83,6 @@ export const darkTheme = {
   rate_label_text_color: '#AFB4A8',
   rate_text_color: '#829F44',
 
-  toggle_span_background_color: '#0E1503',
-
+  toggle_span_background_color: '#474A40',
+  toggle_span: '#0E1503',
 };

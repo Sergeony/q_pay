@@ -209,7 +209,7 @@ const Requisites = () => {
               </RateWrapper>
             </ExchangeRate>
             <Activity>
-              <Switch size={'small'}/>
+              {/*<Switch size={'small'}/>*/}
             </Activity>
             <Menu>
               <KebabMenuIcon/>

@@ -66,7 +66,7 @@ const TabHeader = () => {
           <RateValue>38.74 / 48.52</RateValue>
         </RateWrapper>
       {/*</RatesWrapper>*/}
-      <Switch size={"large"} />
+      {/*<Switch size={"large"} />*/}
     </HeaderContainer>
   );
 };

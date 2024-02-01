@@ -20,9 +20,15 @@ export interface advertisementsProps {
   is_activated: boolean;
 }
 
-export interface createAdvertisementsProps {
+export interface createAdvertisementProps {
   requisites_id: number;
 }
+
+export interface toggleAdvertisementActivityProps {
+  id: number;
+  is_activated: boolean;
+}
+
 
 interface stateProps {
   advertisements: advertisementsProps[];
