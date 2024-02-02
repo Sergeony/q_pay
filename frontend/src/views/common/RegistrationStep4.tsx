@@ -57,7 +57,6 @@ const ImageWrapper = styled.div`
 `;
 
 const RegistrationStep4 = () => {
-
   const navigate = useNavigate();
   const handleNextStep = () => {
     navigate("/sign-in/2/");

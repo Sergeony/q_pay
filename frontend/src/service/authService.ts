@@ -7,30 +7,31 @@ import {jwtDecode} from "jwt-decode";
 interface RegisterUserParams {
   email: string;
   password: string;
-  inviteCode: string;
+  invite_code: string | null;
 }
 
+interface RegisterUserResponseParams {
+  message: string;
+}
 
 interface LoginUserParams {
   email: string;
   password: string;
 }
 
+interface LoginUserResponseParams {
+  user_id: number;
+  otp_base32?: string;
+}
 
 interface VerifyOtpParams {
-  userId: number;
+  user_id: number;
   otp: string;
 }
 
-
-interface RegisterUserParams {
-  email: string;
-  password: string;
-  inviteCode: string;
-}
-
-interface RegisterUserResponse {
-  message: string;
+interface VerifyOtpResponseParams {
+  access: string;
+  refresh: string;
 }
 
 
@@ -38,7 +39,7 @@ export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery,
   endpoints: (builder) => ({
-    registerUser: builder.mutation({
+    registerUser: builder.mutation<RegisterUserResponseParams, RegisterUserParams>({
       query: (body) => ({
         url: 'auth/register/',
         method: 'POST',
@@ -46,14 +47,14 @@ export const authApi = createApi({
       }),
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
         try {
-          const { data } = await queryFulfilled;
-          dispatch(setUser({ email: data.email, password: data.password }));
+          await queryFulfilled;
+          dispatch(setUser({ email: arg.email, password: arg.password }));
         } catch (error) {
           // Обработка ошибок
         }
       },
     }),
-    loginUser: builder.mutation<any, LoginUserParams>({
+    loginUser: builder.mutation<LoginUserResponseParams, LoginUserParams>({
       query: (body) => ({
         url: 'auth/login/',
         method: 'POST',
@@ -68,11 +69,11 @@ export const authApi = createApi({
         }
       },
     }),
-    verifyUserOtp: builder.mutation({
-      query: ({ userId, otp }) => ({
+    verifyUserOtp: builder.mutation<VerifyOtpResponseParams, VerifyOtpParams>({
+      query: (body) => ({
         url: 'auth/verify-otp/',
         method: 'POST',
-        body: { user_id: userId, otp }
+        body
       }),
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
         try {

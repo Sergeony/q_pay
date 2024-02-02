@@ -53,6 +53,8 @@ const ThirdBlock = styled.div`
 `;
 
 const RegistrationStep3 = () => {
+  const navigate = useNavigate();
+  const authState = useSelector((state: RootState) => state.auth);
 
   const getTextFromClipboard = async () => {
     try {
@@ -63,13 +65,10 @@ const RegistrationStep3 = () => {
       }
     } catch (error) {
       console.error('Ошибка при чтении из буфера обмена:', error);
-      return null; // или обработайте ошибку по-другому
+      return null;
     }
   }
 
-  const navigate = useNavigate();
-
-  const authState = useSelector((state: RootState) => state.auth);
   const formik = useFormik({
     initialValues: {
       otpInput: '',
@@ -81,7 +80,7 @@ const RegistrationStep3 = () => {
           return otpInput === authState.auth?.otpBase32;
         }),
     }),
-    onSubmit: (values) => {
+    onSubmit: () => {
       navigate("/sign-up/4/");
     },
   });

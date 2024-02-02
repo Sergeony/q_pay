@@ -55,28 +55,28 @@ const CodeField = styled(StyledField)`
 
 const LoginStep2 = () => {
   const navigate = useNavigate();
-
   const authState = useSelector((state: RootState) => state.auth);
   const [verifyUserOtp] = useVerifyUserOtpMutation();
-
 
   const formik = useFormik({
     initialValues: {
       otp: '',
     },
     validationSchema: Yup.object({
-      otp: Yup.number()
-        .required('Required'),
+      otp: Yup.number().required('Required'),
     }),
     onSubmit: async (values) => {
-      try {
-        await verifyUserOtp({otp: formik.values.otp || "", userId: authState.auth.userId || NaN})
-
-        navigate("/advertisements/"); // Успешная регистрация, переход на следующий шаг
-
-      } catch (error) {
-        console.error('Ошибка авторизации:', error);
-      }
+      await verifyUserOtp({
+        otp: values.otp,
+        user_id: authState.auth.userId
+      })
+        .unwrap()
+        .then(() => {
+          navigate("/advertisements/");
+        })
+        .catch((error) => {
+          console.error('Ошибка авторизации:', error);
+        })
     },
   });
 
