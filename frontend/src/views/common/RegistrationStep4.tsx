@@ -6,7 +6,6 @@ import {
   RegistrationH2,
 } from "../../UI/CommonUI";
 import googleAuthenticatorLogo from "../../assets/img/google_authenticator_logo.png";
-import RegistrationPage from '../../pages/common/RegistrationPage';
 import {useNavigate} from "react-router-dom";
 
 
@@ -83,7 +82,7 @@ const RegistrationStep4 = () => {
           Вам нужно будет добавить учетную запись QPay в приложение Google Authenticator и вручную ввести 16-значный
           ключ.
         </DescriptionDiv>
-        <Button type="submit" onClick={handleNextStep}>Далее</Button>
+        <Button type="submit" onClick={handleNextStep} style={{marginTop: "32px"}}>Далее</Button>
 
         <LoginA href="/login">Назад</LoginA>
       </ThirdBlock>

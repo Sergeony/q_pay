@@ -76,6 +76,8 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
           requisites_id: values.requisitesId
         });
 
+        onClose();
+
       } catch (error) {
         console.error('Ошибка авторизации:', error);
       }

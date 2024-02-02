@@ -9,8 +9,8 @@ interface ExportProps {
   to?: string;
 }
 
-export const transactionsApi = createApi({
-  reducerPath: 'transactionsApi',
+export const exportApi = createApi({
+  reducerPath: 'exportApi',
   baseQuery,
   tagTypes: ["Transactions"],
   endpoints: (builder) => ({
@@ -35,4 +35,4 @@ export const transactionsApi = createApi({
 
 export const {
   useLazyExportTransactionsQuery,
-} = transactionsApi;
+} = exportApi;

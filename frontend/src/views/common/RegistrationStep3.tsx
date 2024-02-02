@@ -113,7 +113,7 @@ const RegistrationStep3 = () => {
             <div>{formik.errors.otpInput}</div>
           ) : null}
 
-          <Button type="submit">Далее</Button>
+          <Button type="submit" style={{marginTop: "32px"}}>Далее</Button>
         </form>
         <LoginA href="/login">Назад</LoginA>
       </ThirdBlock>

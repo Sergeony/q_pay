@@ -1,15 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {BankProps} from "./banksSlice";
 
 export interface RequisitesProps {
   id: number;
   title: string;
   card_number: number;
   cardholder_name: string;
-  bank: {
-    id: number;
-    title: string;
-    icon_url: string;
-  },
+  bank: BankProps,
   daily_limit: number;
   weekly_limit: number;
   monthly_limit: number;

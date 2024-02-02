@@ -1,9 +1,8 @@
-import pumb from "../../assets/img/pumb.png";
-import privat from "../../assets/img/privat.png";
-import {AutomationIcon, TetherIcon} from "../../UI/SVG";
+import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
-import {Button} from "../../UI/CommonUI";
+import {useGetInputCompletedTransactionsQuery} from "../../service/transactionsService";
+import {formatDate, formatTime} from "../../utils";
 
 
 const StyledTable = styled.table`
@@ -199,87 +198,94 @@ const StatusText = styled.span`
 `;
 
 const InputCompletedTransactions = () => {
+  const {data: transactions} = useGetInputCompletedTransactionsQuery();
+
 
   return (
-      <StyledTable>
-        <thead>
-        <Tr>
-          <HeadRow>
-            <Bank></Bank>
-            <TranID><TranIDTitle>ID Сделки</TranIDTitle></TranID>
-            <MyRate>Мой курс</MyRate>
-            <ExchangeRate>Курс биржи</ExchangeRate>
-            <Client>Клиент</Client>
-            <Reqs>Мои реквизиты</Reqs>
-            <Start>Создана</Start>
-            <End>Закрыта</End>
-            <Status><StatusTitle>Статус</StatusTitle></Status>
-          </HeadRow>
-        </Tr>
-        </thead>
-        <tbody>
-        <BodyTr>
-          <StyledRow>
-            <Bank>
-              <img src={pumb} alt={"Bank"} width={32} height={32}/>
-              <Values>
-                <UAHValue>
-                  <BankIconWrapper>
-                    <img src={privat} alt={"Bank"} width={22} height={22}/>
-                  </BankIconWrapper>
-                  <span>1942₴</span>
-                </UAHValue>
-                <Value>
-                  <TetherIcon/>
-                  <SecondLine>48,86₮</SecondLine>
-                </Value>
-              </Values>
-            </Bank>
-            <TranID><span>d491d727-02b6-40f2-9dd3-144297526c24</span></TranID>
-            <MyRate>
-              <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
-                <SecondLine>3,75%</SecondLine>
-              </RateWrapper>
-            </MyRate>
-            <ExchangeRate>
-              <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
-                <SecondLine>BINANCE</SecondLine>
-              </RateWrapper>
-            </ExchangeRate>
-            <Client>
-              <RateWrapper>
-                <FirstLine>9999</FirstLine>
-                <SecondLine>0 l 0₮</SecondLine>
-              </RateWrapper>
-            </Client>
-            <Reqs>
-              <RateWrapper>
-                <FirstLine>Туда 1234</FirstLine>
-                <SecondLine>Соболенко С.</SecondLine>
-              </RateWrapper>
-            </Reqs>
-            <Start>
-              <RateWrapper>
-                <FirstLine>01:56</FirstLine>
-                <SecondLine>12.31.2024</SecondLine>
-              </RateWrapper>
-            </Start>
-            <End>
-              <RateWrapper>
-                <FirstLine>01:56</FirstLine>
-                <SecondLine>12.31.2024</SecondLine>
-              </RateWrapper>
-            </End>
-            <Status>
-              <AutomationIcon height={"24px"} width={"24px"} useGradient={true}/>
-              <StatusText>Автозакрытие</StatusText>
-            </Status>
-          </StyledRow>
-        </BodyTr>
-        </tbody>
-      </StyledTable>
+    <StyledTable>
+      <thead>
+      <Tr>
+        <HeadRow>
+          <Bank></Bank>
+          <TranID><TranIDTitle>ID Сделки</TranIDTitle></TranID>
+          <MyRate>Мой курс</MyRate>
+          <ExchangeRate>Курс биржи</ExchangeRate>
+          <Client>Клиент</Client>
+          <Reqs>Мои реквизиты</Reqs>
+          <Start>Создана</Start>
+          <End>Закрыта</End>
+          <Status><StatusTitle>Статус</StatusTitle></Status>
+        </HeadRow>
+      </Tr>
+      </thead>
+      <tbody>
+      {transactions?.map((t, index) => {
+        const BankIcon = BankIcons[t.requisites.bank.id] || null;
+        return (
+          <BodyTr key={index}>
+            <StyledRow>
+              <Bank>
+                <BankIcon width={32} height={32}/>
+                <Values>
+                  <UAHValue>
+                    <BankIconWrapper>
+                      <BankIcon width={24} height={24}/>
+                    </BankIconWrapper>
+                    <span>{t.actual_amount}₴</span>
+                  </UAHValue>
+                  <Value>
+                    <TetherIcon/>
+                    <SecondLine>{(Number(t.actual_amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
+                  </Value>
+                </Values>
+              </Bank>
+              <TranID><span>{t.id}</span></TranID>
+              <MyRate>
+                <RateWrapper>
+                  <FirstLine>{t.trader_usdt_rate}₴</FirstLine>
+                  <SecondLine>3,75%</SecondLine>
+                </RateWrapper>
+              </MyRate>
+              <ExchangeRate>
+                <RateWrapper>
+                  <FirstLine>{t.exchange_usdt_rate}₴</FirstLine>
+                  <SecondLine>BINANCE</SecondLine>
+                </RateWrapper>
+              </ExchangeRate>
+              <Client>
+                <RateWrapper>
+                  <FirstLine>{t.merchant}</FirstLine>
+                  <SecondLine>0 l 0₮</SecondLine>
+                </RateWrapper>
+              </Client>
+              <Reqs>
+                <RateWrapper>
+                  <FirstLine>{t.requisites.title} {t.requisites.card_number}</FirstLine>
+                  <SecondLine>{t.requisites.cardholder_name}</SecondLine>
+                </RateWrapper>
+              </Reqs>
+              <Start>
+                <RateWrapper>
+                  <FirstLine>{formatTime(t.created_at)}</FirstLine>
+                  <SecondLine>{formatDate(t.created_at)}</SecondLine>
+                </RateWrapper>
+              </Start>
+              <End>
+                <RateWrapper>
+                  <FirstLine>{formatTime(t.finished_at)}</FirstLine>
+                  <SecondLine>{formatDate(t.finished_at)}</SecondLine>
+                </RateWrapper>
+              </End>
+              <Status>
+                {t.automation_used && <AutomationIcon height={"24px"} width={"24px"} useGradient={true}/>}
+                <StatusText>{t.automation_used ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
+              </Status>
+            </StyledRow>
+          </BodyTr>
+        )
+      })}
+      </tbody>
+    </StyledTable>
   );
 };
 

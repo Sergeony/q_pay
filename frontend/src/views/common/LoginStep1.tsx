@@ -10,7 +10,6 @@ import {
   StyledField, StyledLabel
 } from "../../UI/CommonUI";
 import {useNavigate} from "react-router-dom";
-import loginUser from "../../store/reducers/authSlice";
 import {useLoginUserMutation} from "../../service/authService";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store/store";
@@ -89,11 +88,12 @@ const LoginStep1 = () => {
             </StyledContainer>
           </LoginFieldWrapper>
 
-          <Button type="submit">Вход</Button>
+          <Button type="submit" style={{marginTop: "32px"}}>Вход</Button>
         </form>
       </Block>
     </>
   );
 };
+//TODO: create internal styles for button instead of the inline ones
 
 export default LoginStep1;

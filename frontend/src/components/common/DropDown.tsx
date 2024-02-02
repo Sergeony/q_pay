@@ -90,6 +90,7 @@ const customStyles: StylesConfig<CustomOptionProps, boolean, GroupBase<CustomOpt
     border: '1px solid #AFAAB6',
     borderTop: 'none',
     width: 'inherit',
+    maxWidth: '398px',
     boxShadow: 'none',
     background: 'none',
     margin: '0',

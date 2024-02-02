@@ -87,7 +87,7 @@ const RegistrationStep2 = () => {
             <StyledField value={authState.auth?.otpBase32} readOnly/>
           </StyledContainer>
         </LoginFieldWrapper>
-        <Button type="submit" onClick={handleNextStep}>Далее</Button>
+        <Button type="submit" onClick={handleNextStep} style={{marginTop: "32px"}}>Далее</Button>
         <BackButton href="/login">Назад</BackButton>
       </ThirdBlock>
     </>

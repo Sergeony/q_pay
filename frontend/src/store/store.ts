@@ -7,7 +7,8 @@ import advertisementsReducer from "../store/reducers/advertisementsSlice";
 import requisitesReducer from "../store/reducers/requisitesSlice";
 import {banksApi} from "../service/banksService";
 import {requisitesApi} from "../service/requisitesService";
-import {transactionsApi} from "../service/exportService";
+import {exportApi} from "../service/exportService";
+import {transactionsApi} from "../service/transactionsService";
 
 const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ const store = configureStore({
     requisites: requisitesReducer,
     advertisements: advertisementsReducer,
     [advertisementsApi.reducerPath]: advertisementsApi.reducer,
+    [exportApi.reducerPath]: exportApi.reducer,
     [transactionsApi.reducerPath]: transactionsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -27,6 +29,7 @@ const store = configureStore({
       .concat(advertisementsApi.middleware)
       .concat(banksApi.middleware)
       .concat(requisitesApi.middleware)
+      .concat(exportApi.middleware)
       .concat(transactionsApi.middleware)
   ,
 });

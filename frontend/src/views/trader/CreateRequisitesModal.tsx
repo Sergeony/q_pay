@@ -96,6 +96,8 @@ const CreateRequisitesModal = ({onClose}: IProps) => {
           cardholder_name: values.name
         });
 
+        onClose();
+
       } catch (error) {
         console.error('Ошибка авторизации:', error);
       }
@@ -120,12 +122,15 @@ const CreateRequisitesModal = ({onClose}: IProps) => {
         </CloseButton>
         <Title>Создание объявления</Title>
         <form onSubmit={formik.handleSubmit}>
+         {/*TODO: move it to extranl styles */}
+        <div style={{marginBottom: "16px", display: "flex"}}>
           <DropDown label={'Выберите банк'}
                     width={'100%'}
                     options={[{ label: "Банк", value: ""}, ...bankOptions]}
                     onChange={handleBankChange}
                     value={bankOptions.find(o => o.value === formik.values.bankId)}
           />
+          </div>
           <label>Номер карты</label>
           <FormField>
             <StyledField name="cardNumber"

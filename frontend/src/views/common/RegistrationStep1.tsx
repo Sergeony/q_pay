@@ -1,7 +1,6 @@
 import React from 'react';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import {useDispatch} from 'react-redux';
 import styled from "styled-components";
 import CheckIcon from "../../UI/SVG/icons/CheckIcon";
 import {CrossIcon} from "../../UI/SVG";
@@ -13,7 +12,6 @@ import {
   StyledField, StyledLabel
 } from "../../UI/CommonUI";
 import {useNavigate} from "react-router-dom";
-import {AppDispatch} from "../../store/store";
 import {useRegisterUserMutation} from "../../service/authService";
 
 
@@ -132,7 +130,7 @@ const RegistrationStep1 = () => {
         await registerUser({
           email: formik.values.email,
           password: formik.values.password,
-          inviteCode: inviteCode || ""
+          invite_code: inviteCode || ""
         });
 
         navigate("/sign-up/2/"); // Успешная регистрация, переход на следующий шаг
@@ -209,7 +207,7 @@ const RegistrationStep1 = () => {
           {formik.touched.confirmPassword && formik.errors.confirmPassword ?
             <div>{formik.errors.confirmPassword}</div> : null}
 
-          <Button type="submit" >Регистрация</Button>
+          <Button type="submit" style={{marginTop: "32px"}}>Регистрация</Button>
         </form>
 
         <TermsWrapper>

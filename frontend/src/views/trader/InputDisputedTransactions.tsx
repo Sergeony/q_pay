@@ -1,9 +1,10 @@
-import pumb from "../../assets/img/pumb.png";
-import privat from "../../assets/img/privat.png";
-import {AutomationIcon, TetherIcon} from "../../UI/SVG";
+import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
-import {Button} from "../../UI/CommonUI";
+import {
+  useGetInputDisputedTransactionsQuery
+} from "../../service/transactionsService";
+import {formatDate, formatTime} from "../../utils";
 
 
 const StyledTable = styled.table`
@@ -199,6 +200,7 @@ const StatusText = styled.span`
 `;
 
 const InputDisputedTransactions = () => {
+  const {data: transactions} = useGetInputDisputedTransactionsQuery();
 
   return (
       <StyledTable>
@@ -218,52 +220,55 @@ const InputDisputedTransactions = () => {
         </Tr>
         </thead>
         <tbody>
-        <BodyTr>
+        {transactions?.map((t, index) => {
+          const BankIcon = BankIcons[t.requisites.bank.id] || null;
+          return (
+        <BodyTr key={index}>
           <StyledRow>
             <Bank>
-              <img src={pumb} alt={"Bank"} width={32} height={32}/>
+              <BankIcon width={32} height={32}/>
               <Values>
                 <UAHValue>
                   <BankIconWrapper>
-                    <img src={privat} alt={"Bank"} width={22} height={22}/>
+                    <BankIcon width={22} height={22}/>
                   </BankIconWrapper>
-                  <span>1942₴</span>
+                  <span>{t.actual_amount}₴</span>
                 </UAHValue>
                 <Value>
                   <TetherIcon/>
-                  <SecondLine>48,86₮</SecondLine>
+                  <SecondLine>{(Number(t.actual_amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
                 </Value>
               </Values>
             </Bank>
-            <TranID><span>d491d727-02b6-40f2-9dd3-144297526c24</span></TranID>
+            <TranID><span>{t.id}</span></TranID>
             <MyRate>
               <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
+                <FirstLine>{t.trader_usdt_rate}₴</FirstLine>
                 <SecondLine>3,75%</SecondLine>
               </RateWrapper>
             </MyRate>
             <ExchangeRate>
               <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
+                <FirstLine>{t.exchange_usdt_rate}₴</FirstLine>
                 <SecondLine>BINANCE</SecondLine>
               </RateWrapper>
             </ExchangeRate>
             <Client>
               <RateWrapper>
-                <FirstLine>9999</FirstLine>
+                <FirstLine>{t.merchant}</FirstLine>
                 <SecondLine>0 l 0₮</SecondLine>
               </RateWrapper>
             </Client>
             <Reqs>
               <RateWrapper>
-                <FirstLine>Туда 1234</FirstLine>
-                <SecondLine>Соболенко С.</SecondLine>
+                <FirstLine>{t.requisites.title} {t.requisites.card_number}</FirstLine>
+                <SecondLine>{t.requisites.cardholder_name}</SecondLine>
               </RateWrapper>
             </Reqs>
             <Start>
               <RateWrapper>
-                <FirstLine>01:56</FirstLine>
-                <SecondLine>12.31.2024</SecondLine>
+                <FirstLine>{formatTime(t.created_at)}</FirstLine>
+                <SecondLine>{formatDate(t.created_at)}</SecondLine>
               </RateWrapper>
             </Start>
             <End>
@@ -272,11 +277,13 @@ const InputDisputedTransactions = () => {
               </RateWrapper>
             </End>
             <Status>
-              <AutomationIcon height={"24px"} width={"24px"} useGradient={true}/>
-              <StatusText>Автозакрытие</StatusText>
+              {t.automation_used && <AutomationIcon height={"24px"} width={"24px"} useGradient={true}/>}
+              <StatusText>{t.automation_used ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
             </Status>
           </StyledRow>
         </BodyTr>
+          )
+        })}
         </tbody>
       </StyledTable>
   );
