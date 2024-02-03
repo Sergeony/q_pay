@@ -1,5 +1,4 @@
-import privat from "../../assets/img/privat.png";
-import {AutomationIcon, BankIcons, CardIcon, CrossIcon, KebabMenuIcon} from "../../UI/SVG";
+import {BankIcons, CrossIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
 import Switch from "../../components/common/Switch";
@@ -8,7 +7,6 @@ import {
   useFetchRequisitesQuery,
   useUpdateRequisiteMutation
 } from "../../service/requisitesService";
-import {useToggleAdvertisementActivityMutation} from "../../service/advertisementsService";
 import KebabMenu from "../../components/common/KebabMenu";
 
 

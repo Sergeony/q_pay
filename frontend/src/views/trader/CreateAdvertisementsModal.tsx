@@ -94,7 +94,7 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
 
   const requisitesOptions = useMemo(() => {
     return requisites?.map((r: RequisitesProps) => ({ label: `${r.title} ${r.cardholder_name}`, value: r.id })) || [];
-  }, [banks]);
+  }, [requisites]);
 
   const handleRequisitesChange = (selectedOption: any) => {
     formik.setFieldValue('requisitesId', selectedOption.value);

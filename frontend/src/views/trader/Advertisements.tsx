@@ -1,9 +1,7 @@
-import {AutomationIcon, BankIcons, CardIcon, KebabMenuIcon} from "../../UI/SVG";
-import React, {useEffect} from "react";
+import {AutomationIcon, BankIcons, CardIcon} from "../../UI/SVG";
+import React from "react";
 import styled from "styled-components";
 import Switch from "../../components/common/Switch";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../store/store";
 import {
   useDeleteAdvertisementMutation,
   useFetchAdvertisementsQuery,
