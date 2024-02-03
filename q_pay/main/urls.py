@@ -6,7 +6,6 @@ from .views import *
 trader_router = DefaultRouter()
 trader_router.register(r'requisites', RequisitesViewSet, 'requisites')
 trader_router.register(r'advertisements', AdvertisementsViewSet, 'advertisements')
-trader_router.register(r'transfers', MerchantTransferViewSet, 'transfers')
 
 merchant_router = DefaultRouter()
 merchant_router.register(r'transfers', MerchantTransferViewSet, 'transfers')
