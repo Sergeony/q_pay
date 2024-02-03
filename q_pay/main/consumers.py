@@ -3,6 +3,7 @@ import json
 from django.shortcuts import get_object_or_404
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.utils import timezone
 
 from main.models import InputTransaction, OutputTransaction
 
@@ -55,6 +56,20 @@ class BaseTransactionConsumer(AsyncWebsocketConsumer):
                 'transaction_data': updated_transaction
             })
         )
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        action = text_data_json.get('action')
+
+        if action == 'ping':
+            await self.update_last_seen()
+
+    @database_sync_to_async
+    def update_last_seen(self):
+        """Обновляет время последнего посещения пользователя."""
+        user = self.scope["user"]
+        user.last_seen = timezone.now()
+        user.save()
 
     @database_sync_to_async
     def is_trader_authorized_for_transaction(self, transaction_id):

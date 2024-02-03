@@ -67,15 +67,18 @@ class AdvertisementsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Advertisement
-        fields = ['trader_usdt_rate', 'exchange_usdt_rate', 'requisites', 'requisites_id', 'created_at', 'is_activated']
+        fields = ['id', 'trader_usdt_rate', 'exchange_usdt_rate', 'requisites', 'requisites_id', 'created_at', 'is_activated']
         extra_kwargs = {
             'created_at': {'read_only': True},
+            'id': {'read_only': True},
+            'exchange_usdt_rate': {'read_only': True},
+            'trader_usdt_rate': {'read_only': True},
         }
 
     def create(self, validated_data):
         requisites_id = validated_data.pop('requisites_id')
         requisites = Requisites.objects.get(id=requisites_id)
-        return Advertisement.objects.create(**validated_data, requisites=requisites)
+        return Advertisement.objects.create(**validated_data, requisites=requisites, exchange_usdt_rate=20.0, trader_usdt_rate=22.0)
 
     def update(self, instance, validated_data):
         updatable_fields = [
@@ -91,6 +94,8 @@ class AdvertisementsSerializer(serializers.ModelSerializer):
 
 
 class InputTransactionSerializer(serializers.ModelSerializer):
+    requisites = RequisitesForAdvertisementsSerializer(read_only=True)
+    
     class Meta:
         model = InputTransaction
         fields = ['id', 'status', 'trader', 'merchant', 'created_at',
@@ -101,6 +106,8 @@ class InputTransactionSerializer(serializers.ModelSerializer):
 
 
 class OutputTransactionSerializer(serializers.ModelSerializer):
+    requisites = RequisitesForAdvertisementsSerializer(read_only=True)
+    
     class Meta:
         model = OutputTransaction
         fields = ['id', 'status', 'trader', 'merchant', 'created_at',
