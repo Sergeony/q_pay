@@ -2,13 +2,22 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from ".";
 import { RequisitesProps, setRequisites } from "../store/reducers/requisitesSlice";
 
+
+interface FetchRequisitesRequestProps {
+  trader_id?: number;
+}
+
+
 export const requisitesApi = createApi({
   reducerPath: 'requisitesApi',
   baseQuery,
   tagTypes: ["Requisites"],
   endpoints: (builder) => ({
-    fetchRequisites: builder.query<RequisitesProps[], void>({
-      query: () => 'api/v1/trader/requisites',
+    fetchRequisites: builder.query<RequisitesProps[], FetchRequisitesRequestProps>({
+      query: (params) => ({
+        url:'api/v1/trader/requisites',
+        params,
+      }),
       providesTags: ["Requisites"],
       onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
         try {

@@ -3,12 +3,14 @@ import themeReducer from "./reducers/themeSlice";
 import {authApi} from "../service/authService";
 import {advertisementsApi} from "../service/advertisementsService";
 import authReducer from "../store/reducers/authSlice";
+import adminReducer from "../store/reducers/adminSlice";
 import advertisementsReducer from "../store/reducers/advertisementsSlice";
 import requisitesReducer from "../store/reducers/requisitesSlice";
 import {banksApi} from "../service/banksService";
 import {requisitesApi} from "../service/requisitesService";
 import {exportApi} from "../service/exportService";
 import {transactionsApi} from "../service/transactionsService";
+import {adminApi} from "../service/adminService";
 
 const store = configureStore({
   reducer: {
@@ -22,15 +24,19 @@ const store = configureStore({
     [advertisementsApi.reducerPath]: advertisementsApi.reducer,
     [exportApi.reducerPath]: exportApi.reducer,
     [transactionsApi.reducerPath]: transactionsApi.reducer,
+    [adminApi.reducerPath]: adminApi.reducer,
+    admin: adminReducer,
+
   },
   middleware: (getDefaultMiddleware) =>
-     getDefaultMiddleware()
+    getDefaultMiddleware()
       .concat(authApi.middleware)
       .concat(advertisementsApi.middleware)
       .concat(banksApi.middleware)
       .concat(requisitesApi.middleware)
       .concat(exportApi.middleware)
       .concat(transactionsApi.middleware)
+      .concat(adminApi.middleware)
   ,
 });
 

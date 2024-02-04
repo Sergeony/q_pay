@@ -14,8 +14,13 @@ export interface TransactionProps {
   trader_usdt_rate: string;
   exchange_usdt_rate: string;
   automation_used: boolean;
-  claimed_amount: string;
-  actual_amount: string;
+  claimed_amount?: string;
+  actual_amount?: string;
+  amount?: string;
+}
+
+interface GetCompletedTransactionsRequestProps {
+  trader_id?: number;
 }
 
 export const transactionsApi = createApi({
@@ -23,9 +28,10 @@ export const transactionsApi = createApi({
   baseQuery,
   tagTypes: ["Input", "Output"],
   endpoints: (builder) => ({
-    getInputCompletedTransactions: builder.query<TransactionProps[], void>({
-      query: () => ({
-        url: 'api/v1/trader/transactions/input/completed/'
+    getInputCompletedTransactions: builder.query<TransactionProps[], GetCompletedTransactionsRequestProps>({
+      query: (params) => ({
+        url: 'api/v1/trader/transactions/input/completed/',
+        params,
       }),
       providesTags: ["Input"],
     }),
@@ -33,8 +39,11 @@ export const transactionsApi = createApi({
       query: () => 'api/v1/trader/transactions/input/disputed/',
       providesTags: ["Input"]
     }),
-    getOutputCompletedTransactions: builder.query<TransactionProps[], void>({
-      query: () => 'api/v1/trader/transactions/output/completed/',
+    getOutputCompletedTransactions: builder.query<TransactionProps[], GetCompletedTransactionsRequestProps>({
+      query: (params) => ({
+        url: 'api/v1/trader/transactions/output/completed/',
+        params,
+      }),
       providesTags: ["Output"]
 
     }),

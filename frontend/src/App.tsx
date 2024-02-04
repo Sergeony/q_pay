@@ -16,6 +16,8 @@ import PrivateRoute from "./pages/common/PrivateRoute";
 import WithdrawalPage from "./pages/merchant/WithdrawalPage";
 import DepositPage from "./pages/merchant/DepositPage";
 import MerchantSettingsPage from "./pages/merchant/MerchantSettingsPage";
+import TradersPage from "./pages/admin/TradersPage";
+import TraderStatsPage from "./pages/admin/TraderStatsPage";
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.value);
@@ -54,6 +56,18 @@ function App() {
                  element={<PrivateRoute component={WithdrawalPage} roles={[1]} />}
           />
           <Route path={"/m/settings/*"}
+                 element={<PrivateRoute component={MerchantSettingsPage} roles={[1]} />}
+          />
+          <Route path={"/traders/"}
+                 element={<PrivateRoute component={TradersPage} roles={[1]} />}
+          />
+          <Route path="/traders/:traderId/*"
+                 element={<PrivateRoute component={TraderStatsPage} roles={[1]} />}
+          />
+          <Route path={"/merchants/*"}
+                 element={<PrivateRoute component={MerchantSettingsPage} roles={[1]} />}
+          />
+          <Route path={"/a/settings/*"}
                  element={<PrivateRoute component={MerchantSettingsPage} roles={[1]} />}
           />
         </Routes>

@@ -90,7 +90,7 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
     return banks?.map((o: BankProps) => ({ label: o.title, value: o.id, icon: BankIcons[o.id] })) || [];
   }, [banks]);
 
-  const {data: requisites, error, isLoading} = useFetchRequisitesQuery();
+  const {data: requisites, error, isLoading} = useFetchRequisitesQuery({});
 
   const requisitesOptions = useMemo(() => {
     return requisites?.map((r: RequisitesProps) => ({ label: `${r.title} ${r.cardholder_name}`, value: r.id })) || [];

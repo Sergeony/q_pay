@@ -173,8 +173,13 @@ const BankIconWrapper = styled.div`
     padding: 1px;
 `;
 
-const Advertisements = () => {
-  const {data: advertisements, error, isLoading} = useFetchAdvertisementsQuery();
+interface AdvertisementsViewProps {
+  traderId?: number;
+}
+
+const Advertisements = ({traderId}: AdvertisementsViewProps) => {
+  const params = traderId ? {trader_id: traderId} : {};
+  const {data: advertisements, error, isLoading} = useFetchAdvertisementsQuery(params);
   const [deleteAdvertisement] = useDeleteAdvertisementMutation();
 
   const handleDelete = (id: number) => {

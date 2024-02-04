@@ -197,9 +197,14 @@ const StatusText = styled.span`
     -webkit-text-fill-color: transparent;
 `;
 
-const InputCompletedTransactions = () => {
-  const {data: transactions} = useGetInputCompletedTransactionsQuery();
 
+interface InputCompletedTransactionsViewProps {
+  traderId?: number;
+}
+
+const InputCompletedTransactions = ({traderId}: InputCompletedTransactionsViewProps) => {
+  const params = traderId ? {trader_id: traderId} : {};
+  const {data: transactions} = useGetInputCompletedTransactionsQuery(params);
 
   return (
     <StyledTable>

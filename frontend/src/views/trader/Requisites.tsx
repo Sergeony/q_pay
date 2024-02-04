@@ -173,8 +173,13 @@ const BankIconWrapper = styled.div`
     padding: 1px;
 `;
 
-const Requisites = () => {
-  const {data: requisites, error, isLoading} = useFetchRequisitesQuery();
+interface RequisitesViewProps {
+  traderId?: number;
+}
+
+const Requisites = ({traderId}: RequisitesViewProps) => {
+  const params = traderId ? {trader_id: traderId} : {};
+  const {data: requisites, error, isLoading} = useFetchRequisitesQuery(params);
   const [deleteRequisites] = useDeleteRequisiteMutation();
 
   const handleDelete = (id: number) => {

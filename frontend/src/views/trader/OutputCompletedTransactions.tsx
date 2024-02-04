@@ -199,8 +199,14 @@ const StatusText = styled.span`
     -webkit-text-fill-color: transparent;
 `;
 
-const OutputCompletedTransactions = () => {
-  const {data: transactions} = useGetOutputCompletedTransactionsQuery();
+
+interface OutputCompletedTransactionsViewProps {
+  traderId?: number;
+}
+
+const OutputCompletedTransactions = ({traderId}: OutputCompletedTransactionsViewProps) => {
+  const params = traderId ? {trader_id: traderId} : {};
+  const {data: transactions} = useGetOutputCompletedTransactionsQuery(params);
 
   return (
     <StyledTable>
@@ -232,11 +238,11 @@ const OutputCompletedTransactions = () => {
                     <BankIconWrapper>
                       <BankIcon width={22} height={22}/>
                     </BankIconWrapper>
-                    <span>{t.actual_amount}₴</span>
+                    <span>{t.amount}₴</span>
                   </UAHValue>
                   <Value>
                     <TetherIcon/>
-                    <SecondLine>{(Number(t.actual_amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
+                    <SecondLine>{(Number(t.amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
                   </Value>
                 </Values>
               </Bank>
