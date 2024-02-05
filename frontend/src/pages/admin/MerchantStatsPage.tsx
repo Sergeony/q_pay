@@ -4,17 +4,14 @@ import {
   PageWrapper,
 } from "../../UI/CommonUI";
 import TabHeader from "../../components/common/TabHeader";
-import {NavLink, Route, Routes} from "react-router-dom";
-import InputCompletedTransactions from "../../views/trader/InputCompletedTransactions";
+import {NavLink, Route, Routes, useLocation, useParams} from "react-router-dom";
+import InputCompletedTransactions from "../../views/merchant/InputCompletedTransactions";
+import OutputCompletedTransactions from '../../views/merchant/OutputCompletedTransactions';
 import Switch from "../../components/common/Switch";
 import KebabMenu from "../../components/common/KebabMenu";
-import Advertisements from '../../views/trader/Advertisements';
 import { RootState } from '../../store/store';
 import { useSelector } from 'react-redux';
-import Requisites from '../../views/trader/Requisites';
-import OutputCompletedTransactions from '../../views/trader/OutputCompletedTransactions';
 import AdminHeader from '../../components/admin/AdminHeader';
-
 
 const ContentWrapper = styled.div`
     grid-column-gap: 20px;
@@ -47,6 +44,9 @@ const Title = styled.span`
 
 `;
 
+const SearchWrapper = styled.div`
+    grid-column: 4/7;
+`;
 
 const StyledNav = styled.nav`
     display: flex;
@@ -76,11 +76,11 @@ const SwitchAndKebabWrapper = styled.div`
 `;
 
 
-const TraderStatsPage = () => {
+const MerchantStatsPage = () => {
   const { email, userId } = useSelector((state: RootState) => state.admin);
 
   if (!userId)
-    return (<div>No trader were specified</div>)
+    return (<div>No merchant were specified</div>)
 
   return (
     <PageWrapper>
@@ -103,38 +103,26 @@ const TraderStatsPage = () => {
         </TitleWrapper>
 
         <StyledNav>
-          <TabLink to={`/traders/${userId}/sell/`}
+          <TabLink to={`/merchants/${userId}/deposit/`}
                    className={({isActive}) => isActive ? 'active' : ''} 
-          >Продажа</TabLink>
-          <TabLink to={`/traders/${userId}/buy/`}
+          >Пополнение</TabLink>
+          <TabLink to={`/merchants/${userId}/withrawal/`}
                    className={({isActive}) => isActive ? 'active' : ''}
-          >Покупка</TabLink>
-          <TabLink to={`/traders/${userId}/advertisements/`}
-                   className={({isActive}) => isActive ? 'active' : ''}
-          >Объявления</TabLink>
-          <TabLink to={`/traders/${userId}/requisites/`}
-                   className={({isActive}) => isActive ? 'active' : ''}
-          >Реквизиты</TabLink>
-          <TabLink to={`/traders/${userId}/settings/`}
+          >Вывод</TabLink>
+          <TabLink to={`/merchants/${userId}/settings/`}
                    className={({isActive}) => isActive ? 'active' : ''}
           >Настройки</TabLink>
-          <TabLink to={`/traders/${userId}/stats/`}
+          <TabLink to={`/merchants/${userId}/stats/`}
                    className={({isActive}) => isActive ? 'active' : ''}
           >Статистика</TabLink>
         </StyledNav>
 
         <Routes>
-          <Route path={'/sell/'}
-                 element={<InputCompletedTransactions traderId={userId}/>}
+          <Route path={'/deposit/'}
+                 element={<InputCompletedTransactions merchantId={userId}/>}
           />
-          <Route path={'/buy/'}
-                 element={<OutputCompletedTransactions traderId={userId}/>}
-          />
-          <Route path={`/advertisements/`}
-                 element={<Advertisements traderId={userId}/>}
-          />
-          <Route path={'/requisites/'}
-                 element={<Requisites traderId={userId}/>}
+          <Route path={'/withrawal/'}
+                 element={<OutputCompletedTransactions merchantId={userId}/>}
           />
         </Routes>
       </ContentWrapper>
@@ -142,4 +130,4 @@ const TraderStatsPage = () => {
   );
 };
 
-export default TraderStatsPage;
+export default MerchantStatsPage;

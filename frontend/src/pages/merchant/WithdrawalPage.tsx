@@ -4,14 +4,12 @@ import {
   Button,
   PageWrapper,
 } from "../../UI/CommonUI";
-import TabHeader from "../../components/common/TabHeader";
 import Search from "../../components/common/Search";
 import {NavLink, Route, Routes} from "react-router-dom";
 
-import OutputCompletedTransactions from "../../views/trader/OutputCompletedTransactions";
+import OutputCompletedTransactions from "../../views/merchant/OutputCompletedTransactions";
 import OutputDisputedTransactions from "../../views/trader/OutputDisputedTransactions";
-import InputActiveTransactions from "../../views/trader/InputActiveTransactions";
-import InputCompletedTransactions from "../../views/trader/InputCompletedTransactions";
+import OutputActiveTransactions from '../../views/trader/OutputActiveTransactions';
 import MerchantHeader from "../../components/merchant/MerchantHeader";
 
 
@@ -118,10 +116,10 @@ const WithdrawalPage = () => {
 
         <Routes>
           <Route path={'/awaiting-processing/'}
-                 element={<InputActiveTransactions/>}
+                 element={<OutputActiveTransactions/>}
           />
           <Route path={'/in-processing/'}
-                 element={<InputCompletedTransactions/>}
+                 element={<OutputCompletedTransactions/>}
           />
           <Route path={'/awaiting-settlement/'}
                  element={<OutputCompletedTransactions/>}

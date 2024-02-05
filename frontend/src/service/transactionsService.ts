@@ -23,6 +23,10 @@ interface GetCompletedTransactionsRequestProps {
   trader_id?: number;
 }
 
+interface GetMerchantTransactionsRequestProps {
+  merchant_id?: number;
+}
+
 export const transactionsApi = createApi({
   reducerPath: 'transactionsApi',
   baseQuery,
@@ -52,6 +56,22 @@ export const transactionsApi = createApi({
       providesTags: ["Output"]
 
     }),
+
+    getMerchantInputTransactions: builder.query<TransactionProps[], GetMerchantTransactionsRequestProps>({
+      query: (params) => ({
+        url: 'api/v1/merchant/transactions/input/',
+        params
+      }),
+      providesTags: ["Input"]
+
+    }),
+    getMerchantOutputTransactions: builder.query<TransactionProps[], GetMerchantTransactionsRequestProps>({
+        query: (params) => ({
+          url: 'api/v1/merchant/transactions/output/',
+          params,
+        }),
+        providesTags: ["Output"]
+    }),
   }),
 });
 
@@ -60,4 +80,8 @@ export const {
   useGetInputDisputedTransactionsQuery,
   useGetOutputCompletedTransactionsQuery,
   useGetOutputDisputedTransactionsQuery,
+
+  useGetMerchantInputTransactionsQuery,
+  useGetMerchantOutputTransactionsQuery,
+
 } = transactionsApi;

@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import Switch from "../../components/common/Switch";
 import KebabMenu from "../../components/common/KebabMenu";
-import {useDeleteTraderMutation, useFetchTradersQuery, useUpdateTraderMutation} from "../../service/adminService";
+import {useDeleteMerchantMutation, useFetchMerchantsQuery, useUpdateMerchantMutation} from "../../service/adminService";
 import {useNavigate} from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../../store/reducers/adminSlice";
@@ -105,15 +105,15 @@ const HeadRow = styled(StyledRow)`
 `;
 
 
-const Traders = () => {
-  const {data: traders, error, isLoading} = useFetchTradersQuery();
-  const [deleteTrader] = useDeleteTraderMutation();
-  const [toggleActivity] = useUpdateTraderMutation();
+const Merchants = () => {
+  const {data: merchants, error, isLoading} = useFetchMerchantsQuery();
+  const [deleteMerchant] = useDeleteMerchantMutation();
+  const [toggleActivity] = useUpdateMerchantMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleDelete = (id: number) => {
-    deleteTrader({
+    deleteMerchant({
       id
     })
       .unwrap()
@@ -138,7 +138,7 @@ const Traders = () => {
 
   const handleClick = (userId: number, email: string) => {
     dispatch(setUserData({ userId, email }));
-    navigate(`/traders/${userId}/`);
+    navigate(`/merchants/${userId}/`);
   }
 
   if (isLoading) return <div>Loading...</div>;
@@ -150,7 +150,7 @@ const Traders = () => {
         <Tr>
           <HeadRow>
             <TranID>Логин</TranID>
-            <MyRate>ID Трейдера</MyRate>
+            <MyRate>ID Мерчанта</MyRate>
             <ExchangeRate>Сделок</ExchangeRate>
             <Activity>Баланс</Activity>
             <Activity>Активность</Activity>
@@ -158,7 +158,7 @@ const Traders = () => {
         </Tr>
         </thead>
         <tbody>
-        {traders?.map((t, index: number) => {
+        {merchants?.map((t, index: number) => {
           return (
             <BodyTr key={index} onClick={() => handleClick(t.id, t.email)}>
               <StyledRow>
@@ -187,4 +187,4 @@ const Traders = () => {
   );
 };
 
-export default Traders;
+export default Merchants;

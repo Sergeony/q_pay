@@ -2,25 +2,25 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface AdminProps {
     email: string | null;
-    traderId: number | null;
+    userId: number | null;
 }
 
 const initialState: AdminProps = {
   email: null,
-  traderId: null,
+  userId: null,
 };
 
 export const adminSlice = createSlice({
   name: 'adminSlice',
   initialState,
   reducers: {
-    setTraderData: (state, action) => {
+    setUserData: (state, action) => {
       state.email = action.payload.email;
-      state.traderId = action.payload.traderId;
+      state.userId = action.payload.userId;
     },
   },
 });
 
-export const { setTraderData } = adminSlice.actions;
+export const { setUserData } = adminSlice.actions;
 
 export default adminSlice.reducer;

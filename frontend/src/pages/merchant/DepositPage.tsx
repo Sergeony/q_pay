@@ -3,11 +3,10 @@ import styled from "styled-components";
 import {
   PageWrapper,
 } from "../../UI/CommonUI";
-import TabHeader from "../../components/common/TabHeader";
 import Search from "../../components/common/Search";
 import {NavLink, Route, Routes} from "react-router-dom";
 import InputActiveTransactions from "../../views/trader/InputActiveTransactions";
-import InputCompletedTransactions from "../../views/trader/InputCompletedTransactions";
+import InputCompletedTransactions from "../../views/merchant/InputCompletedTransactions";
 import InputDisputedTransactions from "../../views/trader/InputDisputedTransactions";
 import MerchantHeader from "../../components/merchant/MerchantHeader";
 
