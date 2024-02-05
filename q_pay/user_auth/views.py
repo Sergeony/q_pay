@@ -30,13 +30,12 @@ class UserRegisterView(GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        request.data._mutable = True
-        request.data["user_type"] = user_type
+        modified_data = request.data.copy()
+        modified_data['user_type'] = user_type
 
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=modified_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        request._mutable = False
 
         return Response(
             data={"message": "Registration successful!"},

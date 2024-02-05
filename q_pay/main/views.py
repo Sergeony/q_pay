@@ -43,7 +43,7 @@ from .services import (
     create_transactions_excel,
     get_eligible_trader_ids_for_transactions
 )
-from .permissions import IsTrader, IsMerchant
+from .permissions import IsTraderOrAdminReadOnly, IsMerchantOrAdminReadOnly
 from q_pay.redis_client import get_redis_client
 
 
@@ -60,11 +60,15 @@ class BankListView(APIView):
 
 
 class RequisitesViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsTrader]
+    permission_classes = [IsAuthenticated, IsTraderOrAdminReadOnly]
     serializer_class = RequisitesSerializer
 
     def get_queryset(self):
-        return Requisites.objects.filter(trader=self.request.user, is_deleted=False)
+        if self.request.user.is_staff:
+            trader_id = self.request.query_params.get('trader_id')
+        else:
+            trader_id = self.request.user
+        return Requisites.objects.filter(trader=trader_id, is_deleted=False)
 
     def perform_create(self, serializer):
         serializer.save(trader=self.request.user)
@@ -85,10 +89,14 @@ class RequisitesViewSet(viewsets.ModelViewSet):
 
 class AdvertisementsViewSet(viewsets.ModelViewSet):
     serializer_class = AdvertisementsSerializer
-    permission_classes = [IsAuthenticated, IsTrader]
+    permission_classes = [IsAuthenticated, IsTraderOrAdminReadOnly]
 
     def get_queryset(self):
-        return Advertisement.objects.filter(trader=self.request.user)
+        if self.request.user.is_staff:
+            trader_id = self.request.query_params.get('trader_id')
+        else:
+            trader_id = self.request.user
+        return Advertisement.objects.filter(trader=trader_id)
 
     def perform_create(self, serializer):
         serializer.save(trader=self.request.user)
@@ -105,70 +113,71 @@ class AdvertisementsViewSet(viewsets.ModelViewSet):
         )
 
 
-class InputTransactionsView(APIView):
-    permission_classes = [IsAuthenticated, IsTrader]
+class BaseTransactionView(APIView):
+    permission_classes = [IsAuthenticated, IsTraderOrAdminReadOnly]
+    transaction_model = None
+    valid_statuses = {}
+    transaction_serializer: Type[Serializer] = None
+
+    @staticmethod
+    def get_trader_id(request):
+        if request.user.is_staff:
+            return request.query_params.get('trader_id', None)
+        return request.user
+
+    def filter_transactions(self, trader_id, status_group=None):
+        transactions = self.transaction_model.objects.filter(trader_id=trader_id)
+        if not self.request.user.is_staff and status_group:
+            if status_group not in self.valid_statuses:
+                return Response(data={"error": "Invalid status"}, status=400)
+            transactions = transactions.filter(status__in=self.valid_statuses[status_group])
+        return transactions
 
     def get(self, request, status_group=None):
-        valid_statuses = {
-            'completed': [
-                InputTransaction.Status.CANCELLED,
-                InputTransaction.Status.EXPIRED,
-                InputTransaction.Status.MANUALLY_COMPLETED,
-                InputTransaction.Status.AUTO_COMPLETED
-            ],
-            'disputed': [
-                InputTransaction.Status.DISPUTED
-            ]
-        }
-
-        if status_group not in valid_statuses:
-            return Response(
-                data={"error": "Invalid status"},
-                status=400
-            )
-
-        transactions = InputTransaction.objects.filter(
-            trader_id=request.user.id,
-            status__in=valid_statuses[status_group]
-        )
-        serializer = InputTransactionSerializer(transactions, many=True)
+        trader_id = self.get_trader_id(request)
+        transactions = self.filter_transactions(trader_id, status_group)
+        if isinstance(transactions, Response):  # Error handling for invalid status
+            return transactions
+        serializer = self.transaction_serializer(transactions, many=True)
         return Response(serializer.data)
 
 
-class OutputTransactionsView(APIView):
-    permission_classes = [IsAuthenticated, IsTrader]
+class InputTransactionsView(BaseTransactionView):
+    transaction_model = InputTransaction
+    transaction_serializer = InputTransactionSerializer
+    valid_statuses = {
+        'completed': [
+            InputTransaction.Status.CANCELLED,
+            InputTransaction.Status.EXPIRED,
+            InputTransaction.Status.MANUALLY_COMPLETED,
+            InputTransaction.Status.AUTO_COMPLETED
+        ],
+        'disputed': [
+            InputTransaction.Status.DISPUTED
+        ]
+    }
 
-    def get(self, request, status_group=None):
-        valid_statuses = {
-            'completed': [
-                OutputTransaction.Status.MANUALLY_COMPLETED,
-                OutputTransaction.Status.EXPIRED,
-                OutputTransaction.Status.CANCELLED,
-            ],
-            'checking': [
-                OutputTransaction.Status.CONFIRMED
-            ],
-            'disputed': [
-                InputTransaction.Status.DISPUTED
-            ]
-        }
 
-        if status_group not in valid_statuses:
-            return Response(
-                data={"error": "Invalid status"},
-                status=400
-            )
-
-        transactions = OutputTransaction.objects.filter(
-            trader_id=request.user.id,
-            status__in=valid_statuses[status_group]
-        )
-        serializer = OutputTransactionSerializer(transactions, many=True)
-        return Response(serializer.data)
+class OutputTransactionsView(BaseTransactionView):
+    transaction_model = OutputTransaction
+    transaction_serializer = OutputTransactionSerializer
+    valid_statuses = {
+        'completed': [
+            OutputTransaction.Status.MANUALLY_COMPLETED,
+            OutputTransaction.Status.EXPIRED,
+            OutputTransaction.Status.CANCELLED,
+        ],
+        'checking': [
+            OutputTransaction.Status.CONFIRMED
+        ],
+        'disputed': [
+            OutputTransaction.Status.DISPUTED
+        ]
+    }
 
 
 class BaseExportTransactionsView(APIView):
-    permission_classes = [IsAuthenticated, IsTrader]
+    permission_classes = [IsAuthenticated, IsTraderOrAdminReadOnly]
     transaction_model: InputTransaction | OutputTransaction = None
     transaction_type: str = None
 
@@ -209,12 +218,16 @@ class ExportOutputTransactionsView(BaseExportTransactionsView):
 
 
 class BaseMerchantTransactionsView(APIView):
-    permission_classes = [IsAuthenticated, IsMerchant]
+    permission_classes = [IsAuthenticated, IsMerchantOrAdminReadOnly]
     transaction_model: InputTransaction | OutputTransaction = None
     transaction_serializer: Type[Serializer] = None
 
     def get(self, request):
-        merchant_id = request.user.id
+        if request.user.is_staff:
+            merchant_id = self.request.query_params.get('merchant_id')
+        else:
+            merchant_id = request.user
+
         transactions = self.transaction_model.objects.filter(merchant_id=merchant_id)
         serializer = self.transaction_serializer(transactions, many=True)
 
@@ -235,7 +248,7 @@ class MerchantOutputTransactionsView(BaseMerchantTransactionsView):
 
 
 class MerchantTransferViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsMerchant]
+    permission_classes = [IsAuthenticated, IsMerchantOrAdminReadOnly]
     serializer_class = TransferSerializer
 
     def get_queryset(self):
@@ -246,7 +259,7 @@ class MerchantTransferViewSet(viewsets.ModelViewSet):
 
 
 class MerchantIntegrationsViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, IsMerchant]
+    permission_classes = [IsAuthenticated, IsMerchantOrAdminReadOnly]
     serializer_class = MerchantIntegrationsSerializer
 
     def get_queryset(self):
