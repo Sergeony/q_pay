@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled from "styled-components";
 import {
   BackArrow,
@@ -8,8 +8,8 @@ import {
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useNavigate} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../store/store";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store/store";
 import {useVerifyUserOtpMutation} from "../../service/authService";
 
 
@@ -55,28 +55,28 @@ const CodeField = styled(StyledField)`
 
 const LoginStep2 = () => {
   const navigate = useNavigate();
-
   const authState = useSelector((state: RootState) => state.auth);
   const [verifyUserOtp] = useVerifyUserOtpMutation();
-
 
   const formik = useFormik({
     initialValues: {
       otp: '',
     },
     validationSchema: Yup.object({
-      otp: Yup.number()
-        .required('Required'),
+      otp: Yup.number().required('Required'),
     }),
     onSubmit: async (values) => {
-      try {
-        await verifyUserOtp({otp: formik.values.otp || "", userId: authState.auth.userId || NaN})
-
-        navigate("/advertisements/"); // Успешная регистрация, переход на следующий шаг
-
-      } catch (error) {
-        console.error('Ошибка авторизации:', error);
-      }
+      await verifyUserOtp({
+        otp: values.otp,
+        user_id: authState.auth.userId
+      })
+        .unwrap()
+        .then(() => {
+          navigate("/advertisements/");
+        })
+        .catch((error) => {
+          console.error('Ошибка авторизации:', error);
+        })
     },
   });
 
@@ -102,7 +102,7 @@ const LoginStep2 = () => {
                        value={formik.values.otp}
             />
           </CodeContainer>
-          <Button type="submit">Завершить</Button>
+          <Button type="submit" style={{marginTop: "32px"}}>Завершить</Button>
         </form>
         <LoginA href="/login">Назад</LoginA>
       </ThirdBlock>

@@ -10,7 +10,6 @@ import {
   StyledField, StyledLabel
 } from "../../UI/CommonUI";
 import {useNavigate} from "react-router-dom";
-import loginUser from "../../store/reducers/authSlice";
 import {useLoginUserMutation} from "../../service/authService";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store/store";
@@ -25,11 +24,11 @@ const Block = styled.div`
     grid-column: 2/3;
 `;
 
-const LoginStep1 = () => {
-  const navigate = useNavigate();
 
+const LoginStep1 = () => {
   const [loginUser] = useLoginUserMutation();
   const authState = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -37,24 +36,24 @@ const LoginStep1 = () => {
       password: '',
     },
     validationSchema: Yup.object({
-      email: Yup.string().required('Required'),
+      email: Yup.string().email().required('Required'),
       password: Yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-      try {
-        await loginUser({
-          email: values.email,
-          password: values.password
+      await loginUser({
+        email: values.email,
+        password: values.password
+      })
+        .unwrap()
+        .then(() => {
+          if (authState.auth.otpBase32)
+            navigate("/sign-up/2/");
+          else
+            navigate("/sign-in/2/");
+        })
+        .catch((error) => {
+          console.error('Ошибка авторизации:', error);
         });
-
-        if (authState.auth.otpBase32) {
-          navigate("/sign-up/2/");
-        } else {
-          navigate("/sign-in/2/");
-        }
-      } catch (error) {
-        console.error('Ошибка авторизации:', error);
-      }
     },
   });
 
@@ -89,11 +88,12 @@ const LoginStep1 = () => {
             </StyledContainer>
           </LoginFieldWrapper>
 
-          <Button type="submit">Вход</Button>
+          <Button type="submit" style={{marginTop: "32px"}}>Вход</Button>
         </form>
       </Block>
     </>
   );
 };
+//TODO: create internal styles for button instead of the inline ones
 
 export default LoginStep1;

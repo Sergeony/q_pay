@@ -1,7 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import {useDispatch} from 'react-redux';
 import styled from "styled-components";
 import CheckIcon from "../../UI/SVG/icons/CheckIcon";
 import {CrossIcon} from "../../UI/SVG";
@@ -13,17 +12,7 @@ import {
   StyledField, StyledLabel
 } from "../../UI/CommonUI";
 import {useNavigate} from "react-router-dom";
-import {AppDispatch} from "../../store/store";
 import {useRegisterUserMutation} from "../../service/authService";
-
-
-const registrationSchema = Yup.object().shape({
-  email: Yup.string().email('Неверный формат email').required('Email обязателен'),
-  password: Yup.string().min(8, 'Пароль должен содержать минимум 8 символов').required('Пароль обязателен'),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password')], 'Пароли должны совпадать')
-    .required('Подтверждение пароля обязательно'),
-});
 
 
 const DefaultField = styled(StyledField)`
@@ -111,14 +100,9 @@ const Block = styled.div`
 `;
 
 const RegistrationStep1 = () => {
-
-  const navigate = useNavigate();
-
-  const queryParams = new URLSearchParams(location.search);
-  const inviteCode = queryParams.get('invite-code');
-
+  const [agreed, setAgreed] = useState<boolean>(false);
   const [registerUser] = useRegisterUserMutation();
-
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -126,21 +110,35 @@ const RegistrationStep1 = () => {
       password: '',
       confirmPassword: '',
     },
-    validationSchema: registrationSchema,
+    validationSchema: Yup.object().shape({
+      email: Yup.string().email('Неверный формат email').required('Email обязателен'),
+      password: Yup.string().min(8, 'Пароль должен содержать минимум 8 символов').required('Пароль обязателен'),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref('password')], 'Пароли должны совпадать')
+        .required('Подтверждение пароля обязательно'),
+    }),
     onSubmit: async (values) => {
-      try{
-        await registerUser({
-          email: formik.values.email,
-          password: formik.values.password,
-          inviteCode: inviteCode || ""
+      if (!agreed)
+        return;
+
+      const queryParams = new URLSearchParams(location.search);
+      const inviteCode = queryParams.get('invite-code');
+      if (!inviteCode)
+        console.error("Invite code was not provided.");
+
+      await registerUser({
+        email: values.email,
+        password: values.password,
+        invite_code: inviteCode
+      })
+        .unwrap()
+        .then(() => {
+          navigate("/sign-up/2/");
+        })
+        .catch((error) => {
+          formik.resetForm();
+          console.error(`Ошибка регистрации`, error);
         });
-
-        navigate("/sign-up/2/"); // Успешная регистрация, переход на следующий шаг
-      } catch (error) {
-        console.error('Ошибка регистрации:', error);
-        formik.resetForm(); // Сброс формы
-
-      }
     },
   });
 
@@ -209,11 +207,15 @@ const RegistrationStep1 = () => {
           {formik.touched.confirmPassword && formik.errors.confirmPassword ?
             <div>{formik.errors.confirmPassword}</div> : null}
 
-          <Button type="submit" >Регистрация</Button>
+          <Button type="submit" style={{marginTop: "32px"}}>Регистрация</Button>
         </form>
 
         <TermsWrapper>
-          <CheckBoxField type="checkbox" name="terms"/>
+          <CheckBoxField type="checkbox"
+                         name="terms"
+                         checked={agreed}
+                         onChange={() => setAgreed(!agreed)}
+          />
           <CheckBoxLabel>
             Подтверждаю согласие с политикой конфиденциальности и пользовательским соглашением сервиса QPay
           </CheckBoxLabel>

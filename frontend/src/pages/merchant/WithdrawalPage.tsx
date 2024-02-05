@@ -1,19 +1,16 @@
 import React from 'react';
 import styled from "styled-components";
 import {
+  Button,
   PageWrapper,
 } from "../../UI/CommonUI";
-import TraderHeader from "../../components/trader/TraderHeader";
-import TabHeader from "../../components/common/TabHeader";
-
 import Search from "../../components/common/Search";
-import {NavLink, Route, Routes, useLocation} from "react-router-dom";
+import {NavLink, Route, Routes} from "react-router-dom";
 
-import OutputActiveTransactions from "../../views/trader/OutputActiveTransactions";
-import OutputCompletedTransactions from "../../views/trader/OutputCompletedTransactions";
+import OutputCompletedTransactions from "../../views/merchant/OutputCompletedTransactions";
 import OutputDisputedTransactions from "../../views/trader/OutputDisputedTransactions";
-import Export from "../../views/trader/Export";
-import OutputReceiptTransactions from "../../views/trader/OutputReceiptTransactions";
+import OutputActiveTransactions from '../../views/trader/OutputActiveTransactions';
+import MerchantHeader from "../../components/merchant/MerchantHeader";
 
 
 const ContentWrapper = styled.div`
@@ -50,9 +47,13 @@ const SearchWrapper = styled.div`
     grid-column: 4/7;
 `;
 
+const UnloadRegistryWrapper = styled.div`
+    grid-column: 10;
+  `;
+
 const StyledNav = styled.nav`
     display: flex;
-    width: 589px;
+    width: 1049px;
     margin-left: 152px;
     justify-content: space-between;
 `;
@@ -73,62 +74,64 @@ const TabLink = styled(NavLink)`
 `;
 
 
-const BuyPage = () => {
-  const location = useLocation();
-  const isExportPage = location.pathname.includes('/export');
-
+const WithdrawalPage = () => {
   return (
     <PageWrapper>
-      <TraderHeader/>
-      <TabHeader/>
+      <MerchantHeader/>
       <ContentWrapper>
         <TitleWrapper>
-          <Title>Покупка USDT</Title>
-          {!isExportPage && (
-            <SearchWrapper>
-              <Search placeholder={"ID Сделки"}
-                      onSearch={() => {
-                        console.log("search precessed")
-                      }}
-              />
-            </SearchWrapper>
-          )}
+          <Title>Вывод</Title>
+          <SearchWrapper>
+            <Search placeholder={"ID Сделки"}
+                    onSearch={() => {
+                      console.log("search precessed")
+                    }}
+            />
+          </SearchWrapper>
+          <UnloadRegistryWrapper>
+            <Button style={{width: "284px"}}>Выгрузить реестр</Button>
+          </UnloadRegistryWrapper>
         </TitleWrapper>
 
         <StyledNav>
-          <TabLink to={"/buy/active/"}
+          <TabLink to={"/withdrawal/awaiting-processing/"}
                    className={({isActive}) => isActive ? 'active' : ''}
-          >Активные</TabLink>
-          <TabLink to={"/buy/receipt/"}
+          >Ожидает обработки</TabLink>
+          <TabLink to={"/withdrawal/in-processing/"}
                    className={({isActive}) => isActive ? 'active' : ''}
-          >Чеки</TabLink>
-          <TabLink to={"/buy/completed/"}
+          >В обработке</TabLink>
+          <TabLink to={"/withdrawal/awaiting-settlement/"}
                    className={({isActive}) => isActive ? 'active' : ''}
-          >Завершенные</TabLink>
-          <TabLink to={"/buy/dispute/"}
+          >Ожидает сеттльмент</TabLink>
+          <TabLink to={"/withdrawal/settlement-completed/"}
+                   className={({isActive}) => isActive ? 'active' : ''}
+          >Сеттльмент выполнен</TabLink>
+          <TabLink to={"/withdrawal/cancelled/"}
+                   className={({isActive}) => isActive ? 'active' : ''}
+          >Отмененные</TabLink>
+          <TabLink to={"/withdrawal/dispute/"}
                    className={({isActive}) => isActive ? 'active' : ''}
           >Споры</TabLink>
-          <TabLink to={"/buy/export/"}
-                   className={({isActive}) => isActive ? 'active' : ''}
-          >Экспорт</TabLink>
         </StyledNav>
 
-
         <Routes>
-          <Route path={'/active/'}
+          <Route path={'/awaiting-processing/'}
                  element={<OutputActiveTransactions/>}
           />
-          <Route path={'/receipt/'}
-                 element={<OutputReceiptTransactions/>}
-          />
-          <Route path={'/completed/'}
+          <Route path={'/in-processing/'}
                  element={<OutputCompletedTransactions/>}
+          />
+          <Route path={'/awaiting-settlement/'}
+                 element={<OutputCompletedTransactions/>}
+          />
+          <Route path={'/settlement-completed/'}
+                 element={<OutputCompletedTransactions/>}
+          />
+          <Route path={'/cancelled/'}
+                 element={<OutputDisputedTransactions/>}
           />
           <Route path={'/dispute/'}
                  element={<OutputDisputedTransactions/>}
-          />
-          <Route path={'/export/'}
-                 element={<Export transactionsType={'output'}/>}
           />
         </Routes>
       </ContentWrapper>
@@ -136,4 +139,4 @@ const BuyPage = () => {
   );
 };
 
-export default BuyPage;
+export default WithdrawalPage;

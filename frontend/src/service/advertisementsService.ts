@@ -9,15 +9,21 @@ import {
 import {BaseQueryArg} from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 
 
+interface FetchAdvertisementsRequestProps {
+  trader_id?: number;
+}
+
 
 export const advertisementsApi = createApi({
   reducerPath: 'advertisementsApi',
   baseQuery,
+  // TODO: rename to plural
   tagTypes: ["Advertisement"],
   endpoints: (builder) => ({
-    fetchAdvertisements: builder.query<advertisementsProps[], void>({
-      query: () => ({
-        url: 'api/v1/trader/advertisements/'
+    fetchAdvertisements: builder.query<advertisementsProps[], FetchAdvertisementsRequestProps>({
+      query: (params) => ({
+        url: 'api/v1/trader/advertisements/',
+        params,
       }),
       providesTags: ["Advertisement"],
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {

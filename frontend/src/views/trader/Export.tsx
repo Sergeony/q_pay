@@ -1,8 +1,16 @@
-import React from "react";
-import Select from "../../components/common/DropDown";
+import React, {useMemo} from "react";
 import DateInput from "../../components/common/DateInput";
 import styled from "styled-components";
 import {Button} from "../../UI/CommonUI";
+import DropDown from "../../components/common/DropDown";
+import {useFetchBanksQuery} from "../../service/banksService";
+import {BankProps} from "../../store/reducers/banksSlice";
+import {BankIcons} from "../../UI/SVG";
+import {useFetchRequisitesQuery} from "../../service/requisitesService";
+import {RequisitesProps} from "../../store/reducers/requisitesSlice";
+import {useFormik} from "formik";
+import * as Yup from "yup";
+import {useLazyExportTransactionsQuery} from "../../service/exportService";
 
 
 const FilterLine = styled.div`
@@ -30,44 +38,109 @@ const Wrapper = styled.div`
     margin-left: 152px;
 `;
 
-const InputActiveTransactions = () => {
+
+interface FormValues {
+  bankId?: number;
+  requisitesId?: number;
+  from?: Date;
+  to?: Date;
+}
+
+
+interface ExportProps {
+  transactionsType: 'input' | 'output';
+}
+
+const Export = ({transactionsType}: ExportProps) => {
+  const [exportInputTransactions] = useLazyExportTransactionsQuery();
+
+  const formik = useFormik({
+    initialValues: {
+      bankId: undefined,
+      requisitesId: undefined,
+      from: undefined,
+      to: undefined,
+    },
+    validationSchema: Yup.object({
+      bankId: Yup.number(),
+      requisitesId: Yup.number(),
+      from: Yup.date(),
+      to: Yup.date(),
+    }),
+    onSubmit: async (values: FormValues) => {
+      try {
+        await exportInputTransactions({
+          transactionsType,
+          bank: values.bankId,
+          requisites: values.requisitesId,
+          from: values.from ? values.from.toISOString() : "",
+          to: values.to ? values.to.toISOString() : "",
+        }).unwrap();
+
+      } catch (error) {
+        console.error('Ошибка при загрузке файла:', error);
+      }
+    },
+  });
+
+  const {data: banks} = useFetchBanksQuery();
+  const bankOptions = useMemo(() => {
+    return banks?.map((o: BankProps) => ({ label: o.title, value: o.id, icon: BankIcons[o.id] })) || [];
+  }, [banks]);
+  const handleBankChange = (selectedOption: any) => {
+    formik.setFieldValue('bankId', selectedOption.value);
+  };
+
+  const {data: requisites} = useFetchRequisitesQuery({});
+  const requisitesOptions = useMemo(() => {
+    return requisites?.map((r: RequisitesProps) => ({ label: `${r.title} ${r.cardholder_name}`, value: r.id })) || [];
+  }, [requisites]);
+  const handleRequisitesChange = (selectedOption: any) => {
+    formik.setFieldValue('requisitesId', selectedOption.value);
+  };
+
+  const handleStatusChange = (selectedOption: any) => {
+    // TODO: implement on server status parameter and add to here
+  };
+
   return (
     <Wrapper>
-      <FilterLine>
-        <Select width={'158px'}
-                options={[
-          {label: "Категория", value: "", isPlaceholder: true},
-          {label: "Завершенные", value: "completed"},
-          {label: "Споры", value: "disputed"},
-        ]}/>
-        <Select width={'158px'}
-                options={[
-          {label: "Банк", value: "", isPlaceholder: true},
-          {label: "ПриватБанк", value: "privat"},
-          {label: "МоноБанк", value: "mono"},
-          {label: "ОщадБанк", value: "oshchad"},
-          {label: "УкрГазБанк", value: "urk_gaz"},
-          {label: "Райффайзен Банк", value: "raiffeisen"},
-          {label: "УкрСибБанк", value: "ukr_sib"},
-          {label: "Пумб", value: "pumb"},
-          {label: "А Банк", value: "a"},
-        ]}/>
-        <Select width={'158px'}
-                options={[
-          {label: "Реквизиты", value: "", isPlaceholder: true},
-          {label: "*1234 матвиенко С.", value: 1},
-          {label: "*1234 Соболенко С.", value: 1},
-          {label: "*1234 Савченко С.", value: 1},
-        ]}/>
-      </FilterLine>
-      <DateTitle>Выберите временной промежуток для экспорта</DateTitle>
-      <FilterLine>
-        <DateInput placeholder={"От"}/>
-        <DateInput placeholder={"До"}/>
-      </FilterLine>
-      <Button style={{width: "284px"}}>Export .xlsx</Button>
+      <form onSubmit={formik.handleSubmit}>
+        <FilterLine>
+          <DropDown width={'158px'}
+                    options={[{label: "Статус", value: ""},
+                      {label: "Завершенные", value: "completed"},
+                      {label: "Споры", value: "disputed"},
+                    ]}
+                    value={{label: "Статус", value: ""}}
+                    onChange={handleStatusChange}
+          />
+          <DropDown width={'158px'}
+                    options={[{label: "Банк", value: ""}, ...bankOptions]}
+                    value={bankOptions.find(o => o.value === formik.values.bankId)}
+                    onChange={handleBankChange}
+          />
+          <DropDown width={'158px'}
+                    options={[{label: "Реквизиты", value: ""}, ...requisitesOptions]}
+                    value={requisitesOptions.find(o => o.value === formik.values.requisitesId)}
+                    onChange={handleRequisitesChange}
+          />
+        </FilterLine>
+        <DateTitle>Выберите временной промежуток для экспорта</DateTitle>
+        <FilterLine>
+          <DateInput placeholder={"От"}
+                     value={formik.values.from}
+                     onChange={(date) => formik.setFieldValue("from", date)}
+          />
+          <DateInput placeholder={"До"}
+                     value={formik.values.to}
+                     onChange={(date) => formik.setFieldValue("to", date)}
+          />
+        </FilterLine>
+        <Button style={{width: "284px"}} type="submit">Export .xlsx</Button>
+      </form>
     </Wrapper>
-  );
+);
 };
 
-export default InputActiveTransactions;
+export default Export;

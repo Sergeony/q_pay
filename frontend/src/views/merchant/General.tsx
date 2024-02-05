@@ -1,19 +1,18 @@
-import privat from "../../assets/img/privat.png";
-import {AutomationIcon, CardIcon, CopyIcon, KebabMenuIcon} from "../../UI/SVG";
+import {EditIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
-import Switch from "../../components/common/Switch";
 import DropDown from "../../components/common/DropDown";
+import {StyledField} from "../../UI/CommonUI";
+import {useFormik} from "formik";
+import * as Yup from "yup";
 
 
 const Wrapper = styled.div`
-
     font-family: 'Helvetica', serif;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-
-
+    
     margin-left: 152px;
 
     margin-top: 8px;
@@ -27,7 +26,6 @@ const OptionTitle = styled.div`
     font-size: 22px;
     font-weight: 700;
 `;
-
 
 const Email = styled.span`
     color: #9E68F7;
@@ -48,51 +46,46 @@ const EmailDescription = styled.p`
     margin: 8px 0 24px;
 `;
 
-const WarningsWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-`;
-
-const WalletWarning = styled.b`
-    color: #F93D3D;
-
-    font-family: 'Mulish', serif;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    display: inline-block;
-`;
-
-const WalletField = styled.div`
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 16px;
-`;
-
-const WalletText = styled.span`
-    color: #9E68F7;
-    font-family: 'Mulish', serif;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-`;
-
 const Section = styled.section`
     margin-top: 24px;
 `;
 
-const StyledCopyIcon = styled(CopyIcon)`
-    fill: #46404B;
+const DefaultField = styled(StyledField)`
+    color: ${({theme}) => theme.field_text_color};
+`;
+
+export const StyledContainer = styled.div`
+    display: flex;
+    padding: 16px;
+    border-radius: 16px;
+    border: ${({theme}) => theme.field_border};
+    background: ${({theme}) => theme.field_background};
+    width: 436px;
 `;
 
 const General = () => {
+  const {changePassword}: any = {};
+
+  const formik = useFormik({
+    initialValues: {
+      password: '',
+    },
+    validationSchema: Yup.object().shape({
+      password: Yup.string().required('Пароль обязателен'),
+    }),
+    onSubmit: async (values) => {
+      await changePassword({
+        password: values.password,
+      })
+        .unwrap()
+        .catch((error: any) => {
+          formik.resetForm();
+          console.error(`Ошибка смены пароля`, error);
+        });
+    },
+  });
 
   return (
-
     <Wrapper>
       <Section>
         <OptionTitle>Электронная почта</OptionTitle>
@@ -117,19 +110,23 @@ const General = () => {
                   ]}
         />
       </Section>
-      <Section>
-        <OptionTitle>Адрес пополнения баланса</OptionTitle>
-        <WarningsWrapper>
-          <WalletWarning>Внимание! Перевод средств принимается ТОЛЬКО внутри сети Trom TRC20.</WalletWarning>
-          <WalletWarning>В противном случае средства будут утеряны, и мы не сможем Вам помочь. </WalletWarning>
-        </WarningsWrapper>
-        <WalletField>
-          <WalletText>TYRJxtS4j1PQKUjY1KUsgX5ECV2N5hKimW</WalletText>
-          <StyledCopyIcon/>
-        </WalletField>
-      </Section>
+      <form onSubmit={formik.handleSubmit}>
+        <Section>
+          <OptionTitle>Пароль</OptionTitle>
+          <StyledContainer>
+            <DefaultField placeholder="Пароль"
+                          type="password"
+                          name="password"
+                          onChange={formik.handleChange}
+                          value={formik.values.password}
+                          onBlur={formik.handleBlur}
+            />
+            <EditIcon/>
+          </StyledContainer>
+        </Section>
+      </form>
     </Wrapper>
-  );
+);
 };
 
 export default General;

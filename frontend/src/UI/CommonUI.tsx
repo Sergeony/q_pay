@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import {ChevronIcon, CopyIcon, PasteIcon} from "./SVG";
-import {Field} from "formik";
 
 
 export const PageWrapper = styled.div`
@@ -8,7 +7,8 @@ export const PageWrapper = styled.div`
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    height: 100vh;
+    min-height: 100vh;
+    padding-bottom: 100px;
     background-color: ${({ theme }) => theme.body_background_color};
 `;
 
@@ -152,42 +152,3 @@ export const BackButton = styled.a`
     text-align: left;
     text-underline-position: under;
 `;
-
-// <StyledRow>
-//   <HeadCell>Банк</HeadCell>
-//   <HeadCell>Курс биржи</HeadCell>
-//   <HeadCell>Мой курс</HeadCell>
-//   <HeadCell>Активность</HeadCell>
-// </StyledRow>
-//
-// <StyledBodyRow>
-//   <StyledCell>
-//     <ReqsWrapper>
-//       <Bank>
-//         <BankIcon/>
-//         ПриватБанк
-//         <UAH>UAH</UAH>
-//       </Bank>
-//       <Reqs>
-//         <AutomationIcon/>
-//         <CardIcon/>
-//         <span>Туда 1234</span>
-//       </Reqs>
-//     </ReqsWrapper>
-//   </StyledCell>
-//   <StyledCell>
-//     <Rate>38,74₴</Rate>
-//   </StyledCell>
-//   <StyledCell>
-//     <RateWrapper>
-//       <MyRate>38,74₴</MyRate>
-//       <InterestRate>3.25%</InterestRate>
-//     </RateWrapper>
-//   </StyledCell>
-//   <ActivityButtonCell>
-//     <Switch size={"small"} />
-//   </ActivityButtonCell>
-//   <KebabMenuIconCell>
-//     <KebabMenuIcon/>
-//   </KebabMenuIconCell>
-// </StyledBodyRow>

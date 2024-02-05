@@ -38,32 +38,30 @@ const ThirdBlock = styled.div`
 const RegistrationStep2 = () => {
   const authState = useSelector((state: RootState) => state.auth);
   const [loginUser] = useLoginUserMutation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const performLogin = async () => {
-      if (authState.auth && !authState.auth.otpBase32) {
-        try {
-          // Используем loginUser mutation
-          await loginUser({
-            email: authState.auth.email,
-            password: authState.auth.password
-          }).unwrap();
-        } catch (error) {
-          // Обработка ошибок здесь
-          console.error('Ошибка авторизации:', error);
-        }
+      if (!authState.auth.otpBase32) {
+        await loginUser({
+          email: authState.auth.email,
+          password: authState.auth.password
+        })
+          .unwrap()
+          .catch((error) => {
+            console.error('Ошибка авторизации:', error);
+          });
+      } else {
+        console.error("OTP has already been saved. So you shouldn't have been redirected here.")
       }
     };
-
     performLogin();
-  }, [authState.auth, loginUser]);
+  }, []);
 
-
-  const copyCode = () => {
-    navigator.clipboard.writeText(authState.auth?.otpBase32 || "");
+  const copyCode = async () => {
+    await navigator.clipboard.writeText(authState.auth?.otpBase32);
   };
 
-  const navigate = useNavigate();
   const handleNextStep = () => {
     navigate("/sign-up/3/");
   }
@@ -87,7 +85,7 @@ const RegistrationStep2 = () => {
             <StyledField value={authState.auth?.otpBase32} readOnly/>
           </StyledContainer>
         </LoginFieldWrapper>
-        <Button type="submit" onClick={handleNextStep}>Далее</Button>
+        <Button type="submit" onClick={handleNextStep} style={{marginTop: "32px"}}>Далее</Button>
         <BackButton href="/login">Назад</BackButton>
       </ThirdBlock>
     </>

@@ -67,18 +67,18 @@ const KebabMenu: FunctionComponent<KebabMenuProps> = ({ showEdit, showDelete, on
 
   return (
     <div ref={menuRef}>
-      <MenuButton onClick={() => setIsOpen(!isOpen)}>
+      <MenuButton onClick={(event) => { event.stopPropagation(); setIsOpen(!isOpen);}}>
         <KebabMenuIcon/>
       </MenuButton>
       {isOpen && (
         <MenuContainer className="kebab-menu">
           {showEdit && (
-            <MenuItem onClick={() => {onEdit(); setIsOpen(false)}}>
+            <MenuItem onClick={(event) => { event.stopPropagation(); onEdit(); setIsOpen(false);}}>
               <EditIcon/> Изменить
             </MenuItem>
           )}
           {showDelete && (
-            <MenuItem onClick={() => {onDelete(); setIsOpen(false)}}>
+            <MenuItem onClick={(event) => { event.stopPropagation(); onDelete(); setIsOpen(false);}}>
               <DeleteIcon/> Удалить
             </MenuItem>
           )}

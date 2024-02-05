@@ -1,9 +1,7 @@
-import {AutomationIcon, BankIcons, CardIcon, KebabMenuIcon} from "../../UI/SVG";
-import React, {useEffect} from "react";
+import {AutomationIcon, BankIcons, CardIcon} from "../../UI/SVG";
+import React from "react";
 import styled from "styled-components";
 import Switch from "../../components/common/Switch";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../store/store";
 import {
   useDeleteAdvertisementMutation,
   useFetchAdvertisementsQuery,
@@ -175,8 +173,13 @@ const BankIconWrapper = styled.div`
     padding: 1px;
 `;
 
-const Advertisements = () => {
-  const {data: advertisements, error, isLoading} = useFetchAdvertisementsQuery();
+interface AdvertisementsViewProps {
+  traderId?: number;
+}
+
+const Advertisements = ({traderId}: AdvertisementsViewProps) => {
+  const params = traderId ? {trader_id: traderId} : {};
+  const {data: advertisements, error, isLoading} = useFetchAdvertisementsQuery(params);
   const [deleteAdvertisement] = useDeleteAdvertisementMutation();
 
   const handleDelete = (id: number) => {

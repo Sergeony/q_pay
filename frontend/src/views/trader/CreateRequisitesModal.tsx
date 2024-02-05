@@ -1,21 +1,15 @@
-import React, {useState} from 'react';
+import React, {useMemo} from 'react';
 import styled from 'styled-components';
 import {BackButton, Button, StyledField} from "../../UI/CommonUI";
 import DropDown from "../../components/common/DropDown";
-import Select from "../../components/common/DropDown";
-import {Form, Formik } from 'formik';
+import {useFormik} from 'formik';
 import * as Yup from "yup";
-import {CrossIcon} from "../../UI/SVG";
-
-const RegistrationSchema = Yup.object().shape({
-  bank: Yup.string().required('Required'),
-  cardNumber: Yup.string().min(8, '').required('Required'),
-  name: Yup.string().min(8, '').required('Required'),
-  title: Yup.string().min(8, ''),
-});
+import {BankIcons, CrossIcon} from "../../UI/SVG";
+import {useFetchBanksQuery} from "../../service/banksService";
+import {BankProps} from "../../store/reducers/banksSlice";
+import {useCreateRequisiteMutation} from "../../service/requisitesService";
 
 
-// Стилизация попапа и его содержимого
 const PopupOverlay = styled.div`
     position: fixed;
     top: 0;
@@ -78,6 +72,48 @@ interface IProps {
 }
 
 const CreateRequisitesModal = ({onClose}: IProps) => {
+  const [createRequisites] = useCreateRequisiteMutation();
+
+  const formik = useFormik({
+    initialValues: {
+      bankId: NaN,
+      cardNumber: '',
+      name: "",
+      title: "",
+    },
+    validationSchema: Yup.object({
+      bankId: Yup.number(),
+      cardNumber: Yup.number(),
+      name: Yup.string(),
+      title: Yup.string(),
+    }),
+    onSubmit: async (values) => {
+      try {
+        await createRequisites({
+          bank_id: values.bankId,
+          title: values.title,
+          card_number: values.cardNumber,
+          cardholder_name: values.name
+        });
+
+        onClose();
+
+      } catch (error) {
+        console.error('Ошибка авторизации:', error);
+      }
+    },
+  });
+
+  const {data: banks} = useFetchBanksQuery();
+
+  const bankOptions = useMemo(() => {
+    return banks?.map((o: BankProps) => ({ label: o.title, value: o.id, icon: BankIcons[o.id] })) || [];
+  }, [banks]);
+
+  const handleBankChange = (selectedOption: any) => {
+    formik.setFieldValue('bankId', selectedOption.value);
+  };
+
   return (
     <PopupOverlay>
       <PopupContainer>
@@ -85,45 +121,44 @@ const CreateRequisitesModal = ({onClose}: IProps) => {
           <CrossIcon/>
         </CloseButton>
         <Title>Создание объявления</Title>
-        <Formik
-          initialValues={{email: '', password: ''}}
-          validationSchema={RegistrationSchema}
-          onSubmit={() => {
-            return
-          }}
-        >
-          <Form>
-              <DropDown
-                        label={'Выберите банк'}
-                        width={'100%'}
-                        options={[
-                          {label: "Банк", value: "", isPlaceholder: true},
-                          {label: "ПриватБанк", value: "privat"},
-                          {label: "МоноБанк", value: "mono"},
-                          {label: "ОщадБанк", value: "oshchad"},
-                          {label: "УкрГазБанк", value: "urk_gaz"},
-                          {label: "Райффайзен Банк", value: "raiffeisen"},
-                          {label: "УкрСибБанк", value: "ukr_sib"},
-                          {label: "Пумб", value: "pumb"},
-                          {label: "А Банк", value: "a"},
-                        ]}/>
-            <label>Номер карты</label>
-            <FormField>
-              <StyledField name="cardNumber" type="text"/>
-            </FormField>
+        <form onSubmit={formik.handleSubmit}>
+         {/*TODO: move it to extranl styles */}
+        <div style={{marginBottom: "16px", display: "flex"}}>
+          <DropDown label={'Выберите банк'}
+                    width={'100%'}
+                    options={[{ label: "Банк", value: ""}, ...bankOptions]}
+                    onChange={handleBankChange}
+                    value={bankOptions.find(o => o.value === formik.values.bankId)}
+          />
+          </div>
+          <label>Номер карты</label>
+          <FormField>
+            <StyledField name="cardNumber"
+                         type="text"
+                         onChange={formik.handleChange}
+                         value={formik.values.cardNumber}
+            />
+          </FormField>
 
-            <label>Фамилия и Имя</label>
-            <FormField>
-              <StyledField name="name" type="text"/>
-            </FormField>
+          <label>Фамилия и Имя</label>
+          <FormField>
+            <StyledField name="name"
+                         type="text"
+                         onChange={formik.handleChange}
+                         value={formik.values.name}
+            />
+          </FormField>
 
-            <label>Название Реквизитов</label>
-            <FormField>
-              <StyledField name="title" type="text"/>
-            </FormField>
-            <Button style={{width: "400px", marginTop: "16px"}}>Создать</Button>
-          </Form>
-        </Formik>
+          <label>Название Реквизитов</label>
+          <FormField>
+            <StyledField name="title"
+                         type="text"
+                         onChange={formik.handleChange}
+                         value={formik.values.title}
+            />
+          </FormField>
+          <Button style={{width: "400px", marginTop: "16px"}} type="submit">Создать</Button>
+        </form>
         <BackButton style={{marginTop: "8px"}} onClick={onClose}>Отменить</BackButton>
       </PopupContainer>
     </PopupOverlay>

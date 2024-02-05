@@ -1,10 +1,8 @@
 import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
+import {useGetInputCompletedTransactionsQuery, useGetMerchantInputTransactionsQuery} from "../../service/transactionsService";
 import {formatDate, formatTime} from "../../utils";
-import {
-  useGetOutputDisputedTransactionsQuery
-} from "../../service/transactionsService";
 
 
 const StyledTable = styled.table`
@@ -199,8 +197,14 @@ const StatusText = styled.span`
     -webkit-text-fill-color: transparent;
 `;
 
-const InputDisputedTransactions = () => {
-  const {data: transactions} = useGetOutputDisputedTransactionsQuery();
+
+interface InputCompletedTransactionsViewProps {
+  merchantId?: number;
+}
+
+const InputCompletedTransactions = ({merchantId}: InputCompletedTransactionsViewProps) => {
+  const params = merchantId ? {merchant_id: merchantId} : {};
+  const {data: transactions} = useGetMerchantInputTransactionsQuery(params);
 
   return (
     <StyledTable>
@@ -212,7 +216,7 @@ const InputDisputedTransactions = () => {
           <MyRate>Мой курс</MyRate>
           <ExchangeRate>Курс биржи</ExchangeRate>
           <Client>Клиент</Client>
-          <Reqs>Реквизиты клиента</Reqs>
+          <Reqs>Мои реквизиты</Reqs>
           <Start>Создана</Start>
           <End>Закрыта</End>
           <Status><StatusTitle>Статус</StatusTitle></Status>
@@ -230,7 +234,7 @@ const InputDisputedTransactions = () => {
                 <Values>
                   <UAHValue>
                     <BankIconWrapper>
-                      <BankIcon width={22} height={22}/>
+                      <BankIcon width={24} height={24}/>
                     </BankIconWrapper>
                     <span>{t.actual_amount}₴</span>
                   </UAHValue>
@@ -261,7 +265,8 @@ const InputDisputedTransactions = () => {
               </Client>
               <Reqs>
                 <RateWrapper>
-                  <FirstLine>{t.requisites.card_number}</FirstLine>
+                  <FirstLine>{t.requisites.title} {t.requisites.card_number}</FirstLine>
+                  <SecondLine>{t.requisites.cardholder_name}</SecondLine>
                 </RateWrapper>
               </Reqs>
               <Start>
@@ -272,7 +277,8 @@ const InputDisputedTransactions = () => {
               </Start>
               <End>
                 <RateWrapper>
-                  <FirstLine>-</FirstLine>
+                  <FirstLine>{formatTime(t.finished_at)}</FirstLine>
+                  <SecondLine>{formatDate(t.finished_at)}</SecondLine>
                 </RateWrapper>
               </End>
               <Status>
@@ -288,4 +294,4 @@ const InputDisputedTransactions = () => {
   );
 };
 
-export default InputDisputedTransactions;
+export default InputCompletedTransactions;

@@ -1,25 +1,17 @@
-import React, {useState} from 'react';
+import React, {useMemo} from 'react';
 import styled from 'styled-components';
-import {BackButton, Button, StyledField} from "../../UI/CommonUI";
+import {BackButton, Button} from "../../UI/CommonUI";
 import DropDown from "../../components/common/DropDown";
-import Select from "../../components/common/DropDown";
-import {Form, Formik, useFormik} from 'formik';
+import {useFormik} from 'formik';
 import * as Yup from "yup";
-import {CrossIcon} from "../../UI/SVG";
-import {useLoginUserMutation} from "../../service/authService";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store/store";
+import {BankIcons, CrossIcon} from "../../UI/SVG";
 import {useCreateAdvertisementMutation} from "../../service/advertisementsService";
-import {Simulate} from "react-dom/test-utils";
-import submit = Simulate.submit;
-
-const RegistrationSchema = Yup.object().shape({
-  bank: Yup.string().required('Required'),
-  reqs: Yup.string().min(8, '').required('Required'),
-});
+import {useFetchBanksQuery} from "../../service/banksService";
+import {BankProps} from "../../store/reducers/banksSlice";
+import {useFetchRequisitesQuery} from "../../service/requisitesService";
+import {RequisitesProps} from "../../store/reducers/requisitesSlice";
 
 
-// Стилизация попапа и его содержимого
 const PopupOverlay = styled.div`
     position: fixed;
     top: 0;
@@ -63,19 +55,6 @@ const Title = styled.h2`
     line-height: normal;
 `;
 
-const FormField = styled.div`
-    margin-bottom: 16px;
-
-    display: flex;
-    padding: 8px 16px;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-
-    border-radius: 8px;
-    border: 1px solid #46404B;
-`;
-
 
 interface IProps {
   onClose: () => void;
@@ -86,7 +65,7 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
 
   const formik = useFormik({
     initialValues: {
-      requisitesId: 3
+      requisitesId: NaN
     },
     validationSchema: Yup.object({
       requisitesId: Yup.number().required('Required'),
@@ -97,11 +76,30 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
           requisites_id: values.requisitesId
         });
 
+        onClose();
+
       } catch (error) {
         console.error('Ошибка авторизации:', error);
       }
     },
   });
+
+  const {data: banks} = useFetchBanksQuery();
+
+  const bankOptions = useMemo(() => {
+    return banks?.map((o: BankProps) => ({ label: o.title, value: o.id, icon: BankIcons[o.id] })) || [];
+  }, [banks]);
+
+  const {data: requisites, error, isLoading} = useFetchRequisitesQuery({});
+
+  const requisitesOptions = useMemo(() => {
+    return requisites?.map((r: RequisitesProps) => ({ label: `${r.title} ${r.cardholder_name}`, value: r.id })) || [];
+  }, [requisites]);
+
+  const handleRequisitesChange = (selectedOption: any) => {
+    formik.setFieldValue('requisitesId', selectedOption.value);
+  };
+
 
   return (
     <PopupOverlay>
@@ -113,25 +111,15 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
           <form onSubmit={formik.handleSubmit}>
             <DropDown label={'Выберите банк'}
                       width={'100%'}
-                      options={[
-                        {label: "Банк", value: "", isPlaceholder: true},
-                        {label: "ПриватБанк", value: "privat"},
-                        {label: "МоноБанк", value: "mono"},
-                        {label: "ОщадБанк", value: "oshchad"},
-                        {label: "УкрГазБанк", value: "urk_gaz"},
-                        {label: "Райффайзен Банк", value: "raiffeisen"},
-                        {label: "УкрСибБанк", value: "ukr_sib"},
-                        {label: "Пумб", value: "pumb"},
-                        {label: "А Банк", value: "a"},
-                      ]}/>
-            <Select label={"Выберете Реквизиты"}
-                    width={'100%'}
-                    options={[
-                      {label: "Реквизиты", value: "", isPlaceholder: true},
-                      {label: "*1234 матвиенко С.", value: 1},
-                      {label: "*1234 Соболенко С.", value: 1},
-                      {label: "*1234 Савченко С.", value: 1},
-                    ]}/>
+                      value={{label: "Банк", value: ""}}
+                      options={[{label: "Банк", value: ""}, ...bankOptions]}
+            />
+            <DropDown label={"Выберете Реквизиты"}
+                      width={'100%'}
+                      options={[{label: "Реквизиты", value: ""}, ...requisitesOptions]}
+                      value={requisitesOptions.find(o => o.value === formik.values.requisitesId)}
+                      onChange={handleRequisitesChange}
+            />
             <Button style={{width: "400px", marginTop: "16px"}} type="submit">Создать</Button>
           </form>
           <BackButton style={{marginTop: "8px"}} onClick={onClose}>Отменить</BackButton>

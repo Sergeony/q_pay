@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import {MoonIcon, SunIcon, ChevronIcon} from "../../UI/SVG";
+import {MoonIcon, SunIcon} from "../../UI/SVG";
 import DropDown from "./DropDown";
+import {useDispatch} from "react-redux";
+import {toggleTheme} from "../../store/reducers/themeSlice";
 
 
 const HeaderContainer = styled.header`
@@ -77,34 +79,6 @@ const LangWrapper = styled.div`
     margin-inline-start: auto;
 `;
 
-const LangSelect = styled.select`
-    width: 96px;
-    height: 34px;
-    background-color: transparent;
-    border-radius: 8px;
-    border: 2px solid;
-    border-color: ${({theme}) => theme.lang_select_color};
-    color: ${({theme}) => theme.lang_select_color};;
-    padding: 6px 14px;
-    appearance: none;
-    font-family: Mulish, sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 18px;
-`;
-
-const StyledChevronIcon = styled(ChevronIcon)`
-    stroke: ${({theme}) => theme.lang_select_color};
-`;
-
-const LangChevronIconWrapper = styled.div`
-    display: flex;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-`;
 
 interface IProps {
   children?: React.ReactNode;
@@ -115,7 +89,7 @@ const defaultProps: IProps = {
 };
 
 const Header = ({ children }: IProps) => {
-
+  const dispatch = useDispatch();
 
   return (
     <HeaderContainer>
@@ -127,8 +101,7 @@ const Header = ({ children }: IProps) => {
         </LogoPayAndUserTypeWrapper>
       </LogoWrapper>
 
-      {/*TODO: implement toggle*/}
-      <ThemeToggleWrapper onClick={() => ""}>
+      <ThemeToggleWrapper onClick={() => dispatch(toggleTheme())}>
         <ToggleCircle>
           <MoonIcon/>
         </ToggleCircle>
@@ -139,11 +112,14 @@ const Header = ({ children }: IProps) => {
 
       {children}
 
+      <LangWrapper>
       <DropDown width={'132px'}
+                value={{value: "en", label: "English"}}
                 options={[
         {value: "en", label: "English"},
         {value: "ru", label: "Русский"},
       ]}/>
+      </LangWrapper>
     </HeaderContainer>
   );
 };

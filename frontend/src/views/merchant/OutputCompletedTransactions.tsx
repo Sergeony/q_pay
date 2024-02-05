@@ -1,10 +1,8 @@
 import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
+import {useGetMerchantOutputTransactionsQuery} from "../../service/transactionsService";
 import {formatDate, formatTime} from "../../utils";
-import {
-  useGetOutputDisputedTransactionsQuery
-} from "../../service/transactionsService";
 
 
 const StyledTable = styled.table`
@@ -199,8 +197,14 @@ const StatusText = styled.span`
     -webkit-text-fill-color: transparent;
 `;
 
-const InputDisputedTransactions = () => {
-  const {data: transactions} = useGetOutputDisputedTransactionsQuery();
+
+interface OutputCompletedTransactionsViewProps {
+  merchantId?: number;
+}
+
+const OutputCompletedTransactions = ({merchantId}: OutputCompletedTransactionsViewProps) => {
+  const params = merchantId ? {merchant_id: merchantId} : {};
+  const {data: transactions} = useGetMerchantOutputTransactionsQuery(params);
 
   return (
     <StyledTable>
@@ -232,11 +236,11 @@ const InputDisputedTransactions = () => {
                     <BankIconWrapper>
                       <BankIcon width={22} height={22}/>
                     </BankIconWrapper>
-                    <span>{t.actual_amount}₴</span>
+                    <span>{t.amount}₴</span>
                   </UAHValue>
                   <Value>
                     <TetherIcon/>
-                    <SecondLine>{(Number(t.actual_amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
+                    <SecondLine>{(Number(t.amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
                   </Value>
                 </Values>
               </Bank>
@@ -272,7 +276,8 @@ const InputDisputedTransactions = () => {
               </Start>
               <End>
                 <RateWrapper>
-                  <FirstLine>-</FirstLine>
+                  <FirstLine>{formatTime(t.finished_at)}</FirstLine>
+                  <SecondLine>{formatDate(t.finished_at)}</SecondLine>
                 </RateWrapper>
               </End>
               <Status>
@@ -288,4 +293,4 @@ const InputDisputedTransactions = () => {
   );
 };
 
-export default InputDisputedTransactions;
+export default OutputCompletedTransactions;

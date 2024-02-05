@@ -1,8 +1,13 @@
-import privat from "../../assets/img/privat.png";
-import {AutomationIcon, CardIcon, KebabMenuIcon} from "../../UI/SVG";
+import {BankIcons, CrossIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
 import Switch from "../../components/common/Switch";
+import {
+  useDeleteRequisiteMutation,
+  useFetchRequisitesQuery,
+  useUpdateRequisiteMutation
+} from "../../service/requisitesService";
+import KebabMenu from "../../components/common/KebabMenu";
 
 
 const StyledTable = styled.table`
@@ -168,7 +173,34 @@ const BankIconWrapper = styled.div`
     padding: 1px;
 `;
 
-const Requisites = () => {
+interface RequisitesViewProps {
+  traderId?: number;
+}
+
+const Requisites = ({traderId}: RequisitesViewProps) => {
+  const params = traderId ? {trader_id: traderId} : {};
+  const {data: requisites, error, isLoading} = useFetchRequisitesQuery(params);
+  const [deleteRequisites] = useDeleteRequisiteMutation();
+
+  const handleDelete = (id: number) => {
+    deleteRequisites(id)
+      .unwrap()
+      .then(() => {
+        console.log("Реквизиты удалены");
+      })
+      .catch((error) => {
+        console.error("Ошибка при удалении реквизитов:", error);
+      });
+  };
+
+  const [toggleActivity] = useUpdateRequisiteMutation();
+
+  const handleToggle = (id: number, isActivated: boolean) => {
+    toggleActivity({ id, is_activated: isActivated });
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error</div>;
 
   return (
       <StyledTable>
@@ -176,46 +208,57 @@ const Requisites = () => {
         <Tr>
           <HeadRow>
             <TranID><TranIDTitle>Банк</TranIDTitle></TranID>
-            <MyRate>Мой курс</MyRate>
-            <ExchangeRate>Курс биржи</ExchangeRate>
+            <MyRate>Название</MyRate>
+            <ExchangeRate>Данные карты</ExchangeRate>
             <Activity>Активность</Activity>
             <Activity></Activity>
           </HeadRow>
         </Tr>
         </thead>
         <tbody>
-        <BodyTr>
-          <StyledRow>
-            <Bank>
-              <Values>
-                <UAHValue>
-                  <BankIconWrapper>
-                    <img src={privat} alt={"Bank"} width={22} height={22}/>
-                  </BankIconWrapper>
-                  <span>ПриватБанк UAH</span>
-                </UAHValue>
-              </Values>
-            </Bank>
-            <MyRate>
-              <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
-                <SecondLine>3,75%</SecondLine>
-              </RateWrapper>
-            </MyRate>
-            <ExchangeRate>
-              <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
-                <SecondLine>BINANCE</SecondLine>
-              </RateWrapper>
-            </ExchangeRate>
-            <Activity>
-              {/*<Switch size={'small'}/>*/}
-            </Activity>
-            <Menu>
-              <KebabMenuIcon/>
-            </Menu>
-          </StyledRow>
-        </BodyTr>
+        {requisites?.map((r, index) => {
+          const BankIcon = BankIcons[r.bank.id] || <CrossIcon/>;
+          return (
+            <BodyTr key={index}>
+              <StyledRow>
+                <Bank>
+                  <Values>
+                    <UAHValue>
+                      <BankIconWrapper>
+                        <BankIcon width={22} height={22}/>
+                      </BankIconWrapper>
+                      <span>{r.bank.title} UAH</span>
+                    </UAHValue>
+                  </Values>
+                </Bank>
+                <MyRate>
+                  <RateWrapper>
+                    <FirstLine>{r.title}</FirstLine>
+                  </RateWrapper>
+                </MyRate>
+                <ExchangeRate>
+                  <RateWrapper>
+                    <FirstLine>{r.card_number}</FirstLine>
+                    <SecondLine>{r.cardholder_name}</SecondLine>
+                  </RateWrapper>
+                </ExchangeRate>
+                <Activity>
+                  <Switch size={'small'}
+                          isActivated={r.is_activated}
+                          onToggle={() => handleToggle(r.id, !r.is_activated)}
+                  />
+                </Activity>
+                <Menu>
+                  <KebabMenu showDelete={true}
+                             showEdit={true}
+                             onEdit={() => {alert("EDITING...")}}
+                             onDelete={() => handleDelete(r.id)}
+                  />
+                </Menu>
+              </StyledRow>
+            </BodyTr>
+          )
+        })}
         </tbody>
       </StyledTable>
   );

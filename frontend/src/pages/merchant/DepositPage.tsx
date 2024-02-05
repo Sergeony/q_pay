@@ -3,14 +3,12 @@ import styled from "styled-components";
 import {
   PageWrapper,
 } from "../../UI/CommonUI";
-import TraderHeader from "../../components/trader/TraderHeader";
-import TabHeader from "../../components/common/TabHeader";
 import Search from "../../components/common/Search";
-import {NavLink, Route, Routes, useLocation} from "react-router-dom";
+import {NavLink, Route, Routes} from "react-router-dom";
 import InputActiveTransactions from "../../views/trader/InputActiveTransactions";
-import Export from "../../views/trader/Export";
-import InputCompletedTransactions from "../../views/trader/InputCompletedTransactions";
+import InputCompletedTransactions from "../../views/merchant/InputCompletedTransactions";
 import InputDisputedTransactions from "../../views/trader/InputDisputedTransactions";
+import MerchantHeader from "../../components/merchant/MerchantHeader";
 
 
 const ContentWrapper = styled.div`
@@ -50,7 +48,7 @@ const SearchWrapper = styled.div`
 
 const StyledNav = styled.nav`
     display: flex;
-    width: 589px;
+    width: 1049px;
     margin-left: 152px;
     justify-content: space-between;
 `;
@@ -71,56 +69,61 @@ const TabLink = styled(NavLink)`
 `;
 
 
-const SellPage = () => {
-  const location = useLocation();
-  const isExportPage = location.pathname.includes('/export');
-
+const DepositPage = () => {
   return (
     <PageWrapper>
-      <TraderHeader/>
-      <TabHeader/>
+      <MerchantHeader/>
       <ContentWrapper>
         <TitleWrapper>
-          <Title>Продажа USDT</Title>
-
-          {!isExportPage && (
-            <SearchWrapper>
-              <Search placeholder={"ID Сделки"}
-                      onSearch={() => {
-                        console.log("search precessed")
-                      }}
-              />
-            </SearchWrapper>
-          )}
+          <Title>Пополнение</Title>
+          <SearchWrapper>
+            <Search placeholder={"ID Сделки"}
+                    onSearch={() => {
+                      console.log("search precessed")
+                    }}
+            />
+          </SearchWrapper>
         </TitleWrapper>
 
         <StyledNav>
-          <TabLink to={"/sell/active/"}
+          <TabLink to={"/deposit/awaiting-processing/"}
                    className={({isActive}) => isActive ? 'active' : ''}
-          >Активные</TabLink>
-          <TabLink to={"/sell/completed/"}
+          >Ожидает обработки</TabLink>
+          <TabLink to={"/deposit/in-processing/"}
                    className={({isActive}) => isActive ? 'active' : ''}
-          >Завершенные</TabLink>
-          <TabLink to={"/sell/dispute/"}
+          >В обработке</TabLink>
+          <TabLink to={"/deposit/awaiting-settlement/"}
+                   className={({isActive}) => isActive ? 'active' : ''}
+          >Ожидает сеттльмент</TabLink>
+          <TabLink to={"/deposit/settlement-completed/"}
+                   className={({isActive}) => isActive ? 'active' : ''}
+          >Сеттльмент выполнен</TabLink>
+          <TabLink to={"/deposit/cancelled/"}
+                   className={({isActive}) => isActive ? 'active' : ''}
+          >Отмененные</TabLink>
+          <TabLink to={"/deposit/dispute/"}
                    className={({isActive}) => isActive ? 'active' : ''}
           >Споры</TabLink>
-          <TabLink to={"/sell/export/"}
-                   className={({isActive}) => isActive ? 'active' : ''}
-          >Экспорт</TabLink>
         </StyledNav>
 
         <Routes>
-          <Route path={'/active/'}
+          <Route path={'/awaiting-processing/'}
                  element={<InputActiveTransactions/>}
           />
-          <Route path={'/completed/'}
+          <Route path={'/in-processing/'}
                  element={<InputCompletedTransactions/>}
+          />
+          <Route path={'/awaiting-settlement/'}
+                 element={<InputDisputedTransactions/>}
+          />
+          <Route path={'/settlement-completed/'}
+                 element={<InputDisputedTransactions/>}
+          />
+          <Route path={'/cancelled/'}
+                 element={<InputDisputedTransactions/>}
           />
           <Route path={'/dispute/'}
                  element={<InputDisputedTransactions/>}
-          />
-          <Route path={'/export/'}
-                 element={<Export transactionsType={'input'}/>}
           />
         </Routes>
       </ContentWrapper>
@@ -128,4 +131,4 @@ const SellPage = () => {
   );
 };
 
-export default SellPage;
+export default DepositPage;

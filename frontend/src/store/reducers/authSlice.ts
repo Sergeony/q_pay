@@ -17,11 +17,11 @@ interface stateProps {
 
 const initialState: stateProps = {
   auth: {
-    userType: 0,
+    userType: NaN,
     otpBase32: '',
     email: '',
     password: '',
-    userId: 0,
+    userId: NaN,
   },
   loading: false,
   error: '',
@@ -34,7 +34,6 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.auth = action.payload;
     },
-    // Другие редьюсеры по необходимости
   },
 });
 
