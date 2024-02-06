@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from ".";
+import {baseQuery, baseQueryWithReauth} from ".";
 
 interface ExportProps {
   transactionsType: 'input' | 'output';
@@ -11,7 +11,7 @@ interface ExportProps {
 
 export const exportApi = createApi({
   reducerPath: 'exportApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Transactions"],
   endpoints: (builder) => ({
     exportTransactions: builder.query<any, ExportProps>({

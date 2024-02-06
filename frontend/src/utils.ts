@@ -1,3 +1,6 @@
+import {jwtDecode} from "jwt-decode";
+
+
 export const formatTime = (stringDate: string | null) => {
   if (stringDate === null)
     stringDate = new Date().toISOString();
@@ -19,3 +22,13 @@ export const formatDate = (stringDate: string | null) => {
 
     return `${month}.${day}.${year}`;
 }
+
+
+export const getUserTypeFromToken = () => {
+  const token = localStorage.getItem('access');
+  if (token) {
+    const decodedToken: {user_type: number} = jwtDecode(token);
+    return decodedToken.user_type;
+  }
+  return null;
+};

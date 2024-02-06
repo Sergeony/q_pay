@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from ".";
+import {baseQuery, baseQueryWithReauth} from ".";
 import { RequisitesProps, setRequisites } from "../store/reducers/requisitesSlice";
 
 
@@ -10,7 +10,7 @@ interface FetchRequisitesRequestProps {
 
 export const requisitesApi = createApi({
   reducerPath: 'requisitesApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Requisites"],
   endpoints: (builder) => ({
     fetchRequisites: builder.query<RequisitesProps[], FetchRequisitesRequestProps>({

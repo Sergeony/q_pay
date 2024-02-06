@@ -1,25 +1,20 @@
 import React from 'react';
 import {Navigate} from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import {getUserTypeFromToken} from "../../utils";
 
 interface PrivateRouteProps {
-  component: React.ComponentType;
-  roles: number[]; // Список разрешенных ролей
+  Component: React.ComponentType;
+  useTypes: number[];
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({component: Component, roles, ...rest}): React.ReactElement | null => {
-  const user = useSelector((state: RootState) => state.auth.auth);
+const PrivateRoute: React.FC<PrivateRouteProps> = ({Component, useTypes})=> {
+    const userType = getUserTypeFromToken();
 
-  return (
-    <>
-      {/*TODO: implement check user type and refresh token if it's expired */}
-      {localStorage.getItem('accessToken')
-        ? <Component />
-        : <Navigate to="/sign-in" />
-      }
-    </>
-  );
-};
+    if (!userType || !useTypes.includes(userType)) {
+      return <Navigate to="/sign-in/" replace />;
+    }
+
+    return <Component />;
+  };
 
 export default PrivateRoute;

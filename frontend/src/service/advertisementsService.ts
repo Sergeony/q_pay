@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-import {baseQuery} from ".";
+import {baseQuery, baseQueryWithReauth} from ".";
 import {
   advertisementsProps,
   createAdvertisementProps,
@@ -16,7 +16,7 @@ interface FetchAdvertisementsRequestProps {
 
 export const advertisementsApi = createApi({
   reducerPath: 'advertisementsApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   // TODO: rename to plural
   tagTypes: ["Advertisement"],
   endpoints: (builder) => ({
