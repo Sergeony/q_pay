@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-import {baseQuery} from ".";
+import {baseQueryWithReauth, DecodedToken} from ".";
 import {setUser} from "../store/reducers/authSlice";
 import {jwtDecode} from "jwt-decode";
 
@@ -31,13 +31,12 @@ interface VerifyOtpParams {
 
 interface VerifyOtpResponseParams {
   access: string;
-  refresh: string;
 }
 
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     registerUser: builder.mutation<RegisterUserResponseParams, RegisterUserParams>({
       query: (body) => ({
@@ -73,14 +72,14 @@ export const authApi = createApi({
       query: (body) => ({
         url: 'auth/verify-otp/',
         method: 'POST',
+        credentials: 'include',
         body
       }),
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-          localStorage.setItem('refreshToken', data.refresh);
-          localStorage.setItem('accessToken', data.access);
-          const decodedToken: {user_type: number} = jwtDecode(data.access);
+          localStorage.setItem('access', data.access);
+          const decodedToken: DecodedToken = jwtDecode(data.access);
           dispatch(setUser({ userType: decodedToken.user_type }));
         } catch (error) {
           // Обработка ошибок

@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-import {baseQuery} from ".";
+import {baseQuery, baseQueryWithReauth} from ".";
 
 interface UserProps {
   id: number;
@@ -34,7 +34,7 @@ interface CreateInviteCodeRequestProps {
 
 export const adminApi = createApi({
   reducerPath: 'adminApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Trader", "Merchant"],
   endpoints: (builder) => ({
     createInviteCode: builder.mutation<CreateInviteCodeResponseProps, CreateInviteCodeRequestProps>({

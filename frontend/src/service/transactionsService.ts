@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import {RequisitesProps} from "../store/reducers/requisitesSlice";
-import {baseQuery} from "./index";
+import {baseQuery, baseQueryWithReauth} from "./index";
 
 export interface TransactionProps {
   id: string;
@@ -29,7 +29,7 @@ interface GetMerchantTransactionsRequestProps {
 
 export const transactionsApi = createApi({
   reducerPath: 'transactionsApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Input", "Output"],
   endpoints: (builder) => ({
     getInputCompletedTransactions: builder.query<TransactionProps[], GetCompletedTransactionsRequestProps>({

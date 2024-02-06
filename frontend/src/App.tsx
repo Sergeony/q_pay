@@ -19,6 +19,7 @@ import TradersPage from "./pages/admin/TradersPage";
 import TraderStatsPage from "./pages/admin/TraderStatsPage";
 import MerchantsPage from './pages/admin/MerchantsPage';
 import MerchantStatsPage from './pages/admin/MerchantStatsPage';
+import PublicRoute from "./pages/common/PublicRoute";
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.value);
@@ -28,49 +29,49 @@ function App() {
       <div className="App">
         <Routes>
           <Route path={"/sign-up/*"}
-                 element={<RegistrationPage/>}
+                 element={<PublicRoute Component={RegistrationPage} />}
           />
           <Route path={"/sign-in/*"}
-                 element={<LoginPage/>}
+                 element={<PublicRoute Component={LoginPage} />}
           />
 
           <Route path={"/advertisements/*"}
-                 element={<PrivateRoute component={AdvertisementsPage} roles={[1]} />}
+                 element={<PrivateRoute Component={AdvertisementsPage} useTypes={[1]} />}
           />
           <Route path={"/buy/*"}
-                 element={<PrivateRoute component={BuyPage} roles={[1]} />}
+                 element={<PrivateRoute Component={BuyPage} useTypes={[1]} />}
           />
           <Route path={"/sell/*"}
-                 element={<PrivateRoute component={SellPage} roles={[1]} />}
+                 element={<PrivateRoute Component={SellPage} useTypes={[1]} />}
           />
           <Route path={"/settings/*"}
-                 element={<PrivateRoute component={SettingsPage} roles={[1]} />}
+                 element={<PrivateRoute Component={SettingsPage} useTypes={[1]} />}
           />
 
           <Route path={"/deposit/*"}
-                 element={<PrivateRoute component={DepositPage} roles={[1]} />}
+                 element={<PrivateRoute Component={DepositPage} useTypes={[2]} />}
           />
           <Route path={"/withdrawal/*"}
-                 element={<PrivateRoute component={WithdrawalPage} roles={[1]} />}
+                 element={<PrivateRoute Component={WithdrawalPage} useTypes={[2]} />}
           />
           <Route path={"/m/settings/*"}
-                 element={<PrivateRoute component={MerchantSettingsPage} roles={[1]} />}
+                 element={<PrivateRoute Component={MerchantSettingsPage} useTypes={[2]} />}
           />
 
           <Route path={"/traders/"}
-                 element={<PrivateRoute component={TradersPage} roles={[1]} />}
+                 element={<PrivateRoute Component={TradersPage} useTypes={[3]} />}
           />
           <Route path="/traders/:traderId/*"
-                 element={<PrivateRoute component={TraderStatsPage} roles={[1]} />}
+                 element={<PrivateRoute Component={TraderStatsPage} useTypes={[3]} />}
           />
           <Route path={"/merchants/*"}
-                 element={<PrivateRoute component={MerchantsPage} roles={[1]} />}
+                 element={<PrivateRoute Component={MerchantsPage} useTypes={[3]} />}
           />
           <Route path="/merchants/:merchantId/*"
-                 element={<PrivateRoute component={MerchantStatsPage} roles={[1]} />}
+                 element={<PrivateRoute Component={MerchantStatsPage} useTypes={[3]} />}
           />
           <Route path={"/a/settings/*"}
-                 element={<PrivateRoute component={MerchantSettingsPage} roles={[1]} />}
+                 element={<PrivateRoute Component={MerchantSettingsPage} useTypes={[3]} />}
           />
         </Routes>
       </div>

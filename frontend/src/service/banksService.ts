@@ -1,11 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-import {baseQuery} from ".";
+import {baseQuery, baseQueryWithReauth} from ".";
 import {BankProps, setBanks} from "../store/reducers/banksSlice";
 
 
 export const banksApi = createApi({
   reducerPath: 'banksApi',
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Banks"],
   endpoints: (builder) => ({
     fetchBanks: builder.query<BankProps[], void>({
