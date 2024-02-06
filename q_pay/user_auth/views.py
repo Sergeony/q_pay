@@ -79,21 +79,18 @@ class UserVerifyOTPView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         login_info = serializer.save()
 
-        # Установка refresh token в куки
-        refresh_token = login_info.get("refresh")
-        cookie_max_age = 3600 * 24 * 14  # 14 дней, например
         response = Response(
-            data={"access": login_info.get("access")},  # Возвращаем только access token в теле ответа
+            data={"access": login_info.get("access")},
             status=status.HTTP_200_OK
         )
         response.set_cookie(
-            'refresh', 
-            refresh_token, 
-            max_age=cookie_max_age,
-            # secure=True, # TODO: uncomment when HTTPS is used
-            httponly=True,  # Важно для безопасности, делает cookie недоступным для JavaScript на клиенте
-            samesite='None',  # Помогает предотвратить CSRF-атаки
-            path='/'  # Указывает, на каком пути должен отправляться cookie
+            key='refresh', 
+            value=login_info.get("refresh"), 
+            max_age=3600 * 24 * 1,
+            secure=True,
+            httponly=True,
+            samesite='None',
+            path='/auth/token/refresh/'
         )
         return response
 
