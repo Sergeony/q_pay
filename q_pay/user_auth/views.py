@@ -2,6 +2,9 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 from .service import get_user_type_by_invite_code
 from .serializers import *
@@ -69,20 +72,43 @@ class UserLoginView(GenericAPIView):
 
 
 class UserVerifyOTPView(GenericAPIView):
-    """
-    OTP verification view for user.
-    """
     serializer_class = UserVerifyOTPSerializer
 
-    def post(self, request: Request, *args, **kwargs) -> Response:
-        """
-        Verify OTP code and return refresh and access tokens.
-        """
+    def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         login_info = serializer.save()
 
-        return Response(
-            data=login_info,
+        response = Response(
+            data={"access": login_info.get("access")},
             status=status.HTTP_200_OK
         )
+        response.set_cookie(
+            key='refresh', 
+            value=login_info.get("refresh"), 
+            max_age=3600 * 24 * 1,
+            secure=True,
+            httponly=True,
+            samesite='None',
+            path='/auth/token/refresh/'
+        )
+        return response
+
+
+class UserTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        cookie_name = 'refresh'
+        print("MY COOKS:", request.COOKIES)
+        if cookie_name not in request.COOKIES:
+            raise InvalidToken('Refresh token is not provided in cookies')
+        refresh = request.COOKIES.get(cookie_name)
+
+        serializer_data = {'refresh': refresh}
+        serializer = TokenRefreshSerializer(data=serializer_data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
