@@ -1,7 +1,7 @@
 import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
-import {useGetInputCompletedTransactionsQuery} from "../../service/transactionsService";
+import {GetTransactionsRequestProps, useGetInputTransactionsQuery} from "../../service/transactionsService";
 import {formatDate, formatTime} from "../../utils";
 
 
@@ -203,8 +203,8 @@ interface InputCompletedTransactionsViewProps {
 }
 
 const InputCompletedTransactions = ({traderId}: InputCompletedTransactionsViewProps) => {
-  const params = traderId ? {trader_id: traderId} : {};
-  const {data: transactions} = useGetInputCompletedTransactionsQuery(params);
+  const params: GetTransactionsRequestProps = traderId ? {trader_id: traderId} : {statusGroup: 'completed'};
+  const {data: transactions} = useGetInputTransactionsQuery(params);
 
   return (
     <StyledTable>

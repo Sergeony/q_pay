@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import {NotificationBellIcon, SnowFlakeIcon, TetherIcon} from "../../UI/SVG";
 import {NavLink} from "react-router-dom";
 import Header from '../common/Header';
+import {RootState} from "../../store/store";
+import {useSelector} from "react-redux";
 
 
 const NavUl = styled.ul`
@@ -61,7 +63,26 @@ const NotificationBell = styled(NotificationBellIcon)`
 `;
 
 
+const Circle = styled.span`
+    border-radius: 50%;
+    height: 16px;
+    width: 16px;
+    text-align: center;
+    font-family: 'Mulish', serif;
+    font-size: 12px;
+    background-color: #9E68F7;
+    color: #FDFFF9;
+    position: absolute;
+    right: 0;
+    top: -10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
 const TraderHeader = () => {
+  const transactions = useSelector((state: RootState) => state.webSocket);
+
   return (
     <Header>
       <nav>
@@ -71,18 +92,24 @@ const TraderHeader = () => {
                      isActive={location.pathname.includes('/advertisements/')}
             >Объявления</TabLink>
           </li>
-          <li>
+          <li style={{position: 'relative'}}>
+            {transactions.inputTransactions.length > 0 && (
+              <Circle>{transactions.inputTransactions.length}</Circle>
+            )}
             <TabLink to={"/sell/active/"}
                      isActive={location.pathname.includes('/sell/')}
             >Продажа</TabLink>
           </li>
-          <li>
+          <li style={{position: 'relative'}}>
+            {transactions.outputTransactions.length > 0 && (
+              <Circle>{transactions.outputTransactions.length}</Circle>
+            )}
             <TabLink to={"/buy/active/"}
                      isActive={location.pathname.includes('/buy/')}
             >Покупка</TabLink>
           </li>
           <li style={{width: "284px"}}>
-            <TabLink to={"/logs/"}
+          <TabLink to={"/logs/"}
                      isActive={location.pathname.includes('/logs/')}
             >Логи уведомлений по АЗ</TabLink>
           </li>

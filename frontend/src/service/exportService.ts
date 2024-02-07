@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import {baseQuery, baseQueryWithReauth} from ".";
+import {baseQueryWithReauth} from ".";
 
 interface ExportProps {
   transactionsType: 'input' | 'output';

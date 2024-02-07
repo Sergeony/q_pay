@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import {RequisitesProps} from "../store/reducers/requisitesSlice";
-import {baseQuery, baseQueryWithReauth} from "./index";
+import {baseQueryWithReauth} from ".";
 
 export interface TransactionProps {
   id: string;
@@ -19,7 +19,8 @@ export interface TransactionProps {
   amount?: string;
 }
 
-interface GetCompletedTransactionsRequestProps {
+export interface GetTransactionsRequestProps {
+  statusGroup?: 'active' | 'completed' | 'disputed' | 'checking';
   trader_id?: number;
 }
 
@@ -32,31 +33,21 @@ export const transactionsApi = createApi({
   baseQuery: baseQueryWithReauth,
   tagTypes: ["Input", "Output"],
   endpoints: (builder) => ({
-    getInputCompletedTransactions: builder.query<TransactionProps[], GetCompletedTransactionsRequestProps>({
-      query: (params) => ({
-        url: 'api/v1/trader/transactions/input/completed/',
+    getInputTransactions: builder.query<TransactionProps[], GetTransactionsRequestProps>({
+      query: ({statusGroup, ...params}) => ({
+        url: `api/v1/trader/transactions/input/${statusGroup ? statusGroup + '/' : ''}`,
         params,
       }),
       providesTags: ["Input"],
     }),
-    getInputDisputedTransactions: builder.query<TransactionProps[], void>({
-      query: () => 'api/v1/trader/transactions/input/disputed/',
-      providesTags: ["Input"]
-    }),
-    getOutputCompletedTransactions: builder.query<TransactionProps[], GetCompletedTransactionsRequestProps>({
-      query: (params) => ({
-        url: 'api/v1/trader/transactions/output/completed/',
+    getOutputTransactions: builder.query<TransactionProps[], GetTransactionsRequestProps>({
+      query: ({statusGroup, ...params}) => ({
+        url: `api/v1/trader/transactions/output/${statusGroup ? statusGroup + '/' : ''}`,
         params,
       }),
       providesTags: ["Output"]
 
     }),
-    getOutputDisputedTransactions: builder.query<TransactionProps[], void>({
-      query: () => 'api/v1/trader/transactions/output/disputed/',
-      providesTags: ["Output"]
-
-    }),
-
     getMerchantInputTransactions: builder.query<TransactionProps[], GetMerchantTransactionsRequestProps>({
       query: (params) => ({
         url: 'api/v1/merchant/transactions/input/',
@@ -76,10 +67,8 @@ export const transactionsApi = createApi({
 });
 
 export const {
-  useGetInputCompletedTransactionsQuery,
-  useGetInputDisputedTransactionsQuery,
-  useGetOutputCompletedTransactionsQuery,
-  useGetOutputDisputedTransactionsQuery,
+  useGetInputTransactionsQuery,
+  useGetOutputTransactionsQuery,
 
   useGetMerchantInputTransactionsQuery,
   useGetMerchantOutputTransactionsQuery,

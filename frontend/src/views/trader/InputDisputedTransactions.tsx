@@ -2,7 +2,8 @@ import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
 import {
-  useGetInputDisputedTransactionsQuery
+  GetTransactionsRequestProps,
+  useGetInputTransactionsQuery
 } from "../../service/transactionsService";
 import {formatDate, formatTime} from "../../utils";
 
@@ -200,7 +201,8 @@ const StatusText = styled.span`
 `;
 
 const InputDisputedTransactions = () => {
-  const {data: transactions} = useGetInputDisputedTransactionsQuery();
+  const params: GetTransactionsRequestProps = {statusGroup: 'disputed'};
+  const {data: transactions} = useGetInputTransactionsQuery(params);
 
   return (
       <StyledTable>

@@ -80,7 +80,7 @@ export const authApi = createApi({
           const { data } = await queryFulfilled;
           localStorage.setItem('access', data.access);
           const decodedToken: DecodedToken = jwtDecode(data.access);
-          dispatch(setUser({ userType: decodedToken.user_type }));
+          dispatch(setUser({ userType: decodedToken.user_type, token: data.access }));
         } catch (error) {
           // Обработка ошибок
         }

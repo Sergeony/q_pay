@@ -86,9 +86,10 @@ const FileName = styled.span`
 
 interface IProps {
   onClose: () => void;
+  onClick: () => void;
 }
 
-const SubmitInputTransactionModal = ({onClose}: IProps) => {
+const SubmitOutputTransactionModal = ({onClose, onClick}: IProps) => {
   const [fileName, setFileName] = useState('');
 
   const handleFileChange = (event: any) => {
@@ -125,7 +126,8 @@ const SubmitInputTransactionModal = ({onClose}: IProps) => {
             </FileInputWrapper>
 
             <p>Допустимые форматы: <span>PDF, JPG, PNG</span></p>
-            <Button style={{width: "400px", marginTop: "16px"}}>Создать</Button>
+            <Button style={{width: "400px", marginTop: "16px"}}
+                    onClick={onClick}>Создать</Button>
           </Form>
         </Formik>
         <BackButton style={{marginTop: "8px"}} onClick={onClose}>Отменить</BackButton>
@@ -134,4 +136,4 @@ const SubmitInputTransactionModal = ({onClose}: IProps) => {
   );
 };
 
-export default SubmitInputTransactionModal;
+export default SubmitOutputTransactionModal;
