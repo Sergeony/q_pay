@@ -146,6 +146,10 @@ class InputTransactionsView(BaseTransactionView):
     transaction_model = InputTransaction
     transaction_serializer = InputTransactionSerializer
     valid_statuses = {
+        'active': [
+            InputTransaction.Status.PENDING_CLIENT_CONFIRMATION,
+            InputTransaction.Status.PENDING_TRADER_CONFIRMATION,
+        ],
         'completed': [
             InputTransaction.Status.CANCELLED,
             InputTransaction.Status.EXPIRED,
@@ -162,6 +166,9 @@ class OutputTransactionsView(BaseTransactionView):
     transaction_model = OutputTransaction
     transaction_serializer = OutputTransactionSerializer
     valid_statuses = {
+        'active': [
+            OutputTransaction.Status.PENDING_TRADER_CONFIRMATION,
+        ],
         'completed': [
             OutputTransaction.Status.MANUALLY_COMPLETED,
             OutputTransaction.Status.EXPIRED,
