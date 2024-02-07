@@ -1,9 +1,8 @@
 from django.urls import re_path
 
-from .consumers import *
+from .consumers import Consumer
 
 
 websocket_urlpatterns = [
-    re_path(r'api/v1/trader/transactions/input/active/', ActiveInputTransactionConsumer.as_asgi()),
-    re_path(r'api/v1/trader/transactions/output/active/', ActiveOutputTransactionConsumer.as_asgi()),
+    re_path(r'ws/trader/', Consumer.as_asgi()),
 ]

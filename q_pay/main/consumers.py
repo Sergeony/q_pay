@@ -8,23 +8,23 @@ from django.utils import timezone
 from main.models import InputTransaction, OutputTransaction
 
 
-class BaseTransactionConsumer(AsyncWebsocketConsumer):
-    transaction_model = None
-    group_name_prefix = None
-
+class Consumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.trader_id: int | None = None
-        self.group_name: str | None = None
+        self.group_name = None
+        self.user = None
 
     async def connect(self):
-        self.trader_id = self.scope["user"].id
-        self.group_name = f'{self.group_name_prefix}_transactions_{self.trader_id}'
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name
-        )
-        await self.accept()
+        self.user = self.scope["user"]
+        if self.user.is_authenticated:
+            self.group_name = f'user_{self.user.id}'
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name
+            )
+            await self.accept()
+        else:
+            await self.close()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -36,66 +36,65 @@ class BaseTransactionConsumer(AsyncWebsocketConsumer):
         transaction_data = event['transaction_data']
         await self.send(
             text_data=json.dumps({
-                'transaction_data': transaction_data
+                'action': 'new_transaction',
+                'transaction_data': transaction_data,
+                'transaction_type': 'input',
             })
         )
+
+    async def receive(self, text_data=None, bytes_data=None):
+        data = json.loads(text_data)
+        action = data.get('action')
+
+        if action == 'ping':
+            await self.update_last_seen()
+        elif action == 'update_transaction_status':
+            await self.update_transaction_status(data)
 
     async def update_transaction_status(self, data):
         transaction_id = data.get('transaction_id')
         new_status = data.get('new_status')
+        transaction_type = data.get('transaction_type', 'input')
 
-        if not await self.is_trader_authorized_for_transaction(transaction_id):
-            await self.send(text_data=json.dumps({"error": "Unauthorized"}))
+        if transaction_type == 'input':
+            transaction_model = InputTransaction
+        elif transaction_type == 'output':
+            transaction_model = OutputTransaction
+        else:
+            await self.send(text_data=json.dumps({"error": "Invalid transaction type"}))
             return
 
-        await self.change_transaction_status(transaction_id, new_status)
-
-        updated_transaction = await self.get_transaction_data(transaction_id)
-        await self.send(
-            text_data=json.dumps({
-                'transaction_data': updated_transaction
-            })
-        )
-
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        action = text_data_json.get('action')
-
-        if action == 'ping':
-            await self.update_last_seen()
+        if await self.is_trader_authorized_for_transaction(transaction_id, transaction_model):
+            await self.change_transaction_status(transaction_id, new_status, transaction_model)
+            updated_transaction = await self.get_transaction_data(transaction_id, transaction_model)
+            await self.send(text_data=json.dumps({
+                'action': 'updated_transaction',
+                'transaction_data': updated_transaction,
+                'transaction_type': transaction_type,
+            }))
+        else:
+            await self.send(text_data=json.dumps({"error": "Unauthorized"}))
 
     @database_sync_to_async
-    def update_last_seen(self):
-        """Обновляет время последнего посещения пользователя."""
-        user = self.scope["user"]
-        user.last_seen = timezone.now()
-        user.save()
+    def is_trader_authorized_for_transaction(self, transaction_id, transaction_model):
+        transaction = get_object_or_404(transaction_model, pk=transaction_id)
+        return transaction.trader.id == self.user.id
 
     @database_sync_to_async
-    def is_trader_authorized_for_transaction(self, transaction_id):
-        transaction = get_object_or_404(self.transaction_model, pk=transaction_id)
-        return transaction.trader_id.id == self.trader_id
-
-    @database_sync_to_async
-    def change_transaction_status(self, transaction_id, new_status):
-        transaction = get_object_or_404(self.transaction_model, pk=transaction_id)
+    def change_transaction_status(self, transaction_id, new_status, transaction_model):
+        transaction = get_object_or_404(transaction_model, pk=transaction_id)
         transaction.status = new_status
         transaction.save()
 
     @database_sync_to_async
-    def get_transaction_data(self, transaction_id):
-        transaction = self.transaction_model.objects.get(pk=transaction_id)
+    def get_transaction_data(self, transaction_id, transaction_model):
+        transaction = transaction_model.objects.get(pk=transaction_id)
         return {
-            "id": transaction.id,
+            "id": str(transaction.id),
             "status": transaction.get_status_display(),
         }
 
-
-class ActiveInputTransactionConsumer(BaseTransactionConsumer):
-    transaction_model = InputTransaction
-    group_name_prefix = 'active_input'
-
-
-class ActiveOutputTransactionConsumer(BaseTransactionConsumer):
-    transaction_model = OutputTransaction
-    group_name_prefix = 'active_output'
+    @database_sync_to_async
+    def update_last_seen(self):
+        self.user.last_seen = timezone.now()
+        self.user.save()
