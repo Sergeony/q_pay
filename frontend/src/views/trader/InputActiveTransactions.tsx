@@ -1,9 +1,15 @@
 import pumb from "../../assets/img/pumb.png";
 import privat from "../../assets/img/privat.png";
-import {AutomationIcon, TetherIcon} from "../../UI/SVG";
-import React from "react";
+import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {Button} from "../../UI/CommonUI";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../store/store";
+import {formatDate, formatTime} from "../../utils";
+import {webSocketService} from "../../service/webSocketService";
+import {moveTransaction} from "../../store/reducers/webSocketSlice";
+import {TransactionProps} from "../../service/transactionsService";
 
 
 const StyledTable = styled.table`
@@ -208,84 +214,138 @@ const SubmitTransactionWrapper = styled.div`
 
 
 const InputActiveTransactions = () => {
+  const handleConfirmTransaction = (transactionId: string) => {
+    webSocketService.sendMessageUpdateTransactionStatus(transactionId, 4, 'input');
+  };
+
+  const transactions = useSelector((state: RootState) => state.webSocket.inputTransactions);
+
 
   return (
-      <StyledTable>
-        <thead>
-        <Tr>
-          <HeadRow>
-            <Bank></Bank>
-            <TranID><TranIDTitle>ID Сделки</TranIDTitle></TranID>
-            <MyRate>Мой курс</MyRate>
-            <ExchangeRate>Курс биржи</ExchangeRate>
-            <Client>Клиент</Client>
-            <Reqs>Мои реквизиты</Reqs>
-            <Start>Создана</Start>
-            <End>Подтверждена</End>
-            <Status><StatusTitle>Статус</StatusTitle></Status>
-          </HeadRow>
-        </Tr>
-        </thead>
-        <tbody>
-        <BodyTr>
-          <StyledRow>
-            <Bank>
-              <img src={pumb} alt={"Bank"} width={32} height={32}/>
-              <Value>
-                <TetherIcon width={"24px"} height={"24px"}/>
-                <FirstLine>48,86₮</FirstLine>
-              </Value>
-            </Bank>
-            <TranID><span>d491d727-02b6-40f2-9dd3-144297526c24</span></TranID>
-            <MyRate>
-              <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
-                <SecondLine>3,75%</SecondLine>
-              </RateWrapper>
-            </MyRate>
-            <ExchangeRate>
-              <RateWrapper>
-                <FirstLine>38,74₴</FirstLine>
-                <SecondLine>BINANCE</SecondLine>
-              </RateWrapper>
-            </ExchangeRate>
-            <Client>
-              <RateWrapper>
-                <FirstLine>9999</FirstLine>
-                <SecondLine>0 l 0₮</SecondLine>
-              </RateWrapper>
-            </Client>
-            <Reqs>
-              <RateWrapper>
-                <FirstLine>Туда 1234</FirstLine>
-                <SecondLine>Соболенко С.</SecondLine>
-              </RateWrapper>
-            </Reqs>
-            <Start>
-              <RateWrapper>
-                <FirstLine>01:56</FirstLine>
-                <SecondLine>12.31.2024</SecondLine>
-              </RateWrapper>
-            </Start>
-            <End>
-              <RateWrapper>
-                <FirstLine>01:56</FirstLine>
-                <SecondLine>12.31.2024</SecondLine>
-              </RateWrapper>
-            </End>
-            <Status>
-              <AutomationIcon height={"24px"} width={"24px"} useGradient={true}/>
-              <StatusText>Автозакрытие</StatusText>
-            </Status>
-          </StyledRow>
-          <SubmitTransactionWrapper>
-            <Button style={{width: "284px"}}>Подтвердить</Button>
-            <Timer>14:59</Timer>
-          </SubmitTransactionWrapper>
-        </BodyTr>
-        </tbody>
-      </StyledTable>
+    <StyledTable>
+      <thead>
+      <Tr>
+        <HeadRow>
+          <Bank></Bank>
+          <TranID><TranIDTitle>ID Сделки</TranIDTitle></TranID>
+          <MyRate>Мой курс</MyRate>
+          <ExchangeRate>Курс биржи</ExchangeRate>
+          <Client>Клиент</Client>
+          <Reqs>Мои реквизиты</Reqs>
+          <Start>Создана</Start>
+          <End>Подтверждена</End>
+          <Status><StatusTitle>Статус</StatusTitle></Status>
+        </HeadRow>
+      </Tr>
+      </thead>
+      <tbody>
+      {transactions?.map((t, index) => {
+        return (
+          <TransactionRow key={t.id}
+                          onConfirm={handleConfirmTransaction}
+                          t={t}
+          />
+        )
+      })}
+      </tbody>
+    </StyledTable>
   );
+};
+
+
+interface RowProps {
+  t: TransactionProps;
+  onConfirm: (transactionId: string) => void;
+}
+
+const TransactionRow = ({ t, onConfirm }: RowProps) => {
+  const [remainingTime, setRemainingTime] = useState('');
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const updateRemainingTime = (timerId: number) => {
+      const currentTime = Number(new Date());
+      const createdAt = Number(new Date(t.created_at));
+      const timeDiff = Math.max(15 * 60 - Math.floor((currentTime - createdAt) / 1000), 0); // 15 минут в секундах
+      const minutes = Math.floor(timeDiff / 60);
+      const seconds = timeDiff % 60;
+      setRemainingTime(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+
+      if (timeDiff <= 0) {
+        clearInterval(timerId);
+        dispatch(moveTransaction({id: t.id, transactionType: 'input'}));
+      }
+    };
+
+    const timerId = setInterval(updateRemainingTime, 1000);
+    updateRemainingTime(timerId);
+
+    return () => clearInterval(timerId);
+  }, [t.created_at]);
+
+  const BankIcon = BankIcons[1] || null;
+
+  return (
+    <BodyTr>
+      <StyledRow>
+        <Bank>
+          <BankIcon width={32} height={32}/>
+          <Value>
+            <TetherIcon width={"24px"} height={"24px"}/>
+            <FirstLine>{(Number(t.actual_amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</FirstLine>
+          </Value>
+        </Bank>
+        <TranID><span>{t.id}</span></TranID>
+        <MyRate>
+          <RateWrapper>
+            <FirstLine>{t.trader_usdt_rate}₴</FirstLine>
+            <SecondLine>3,75%</SecondLine>
+          </RateWrapper>
+        </MyRate>
+        <ExchangeRate>
+          <RateWrapper>
+            <FirstLine>{t.exchange_usdt_rate}₴</FirstLine>
+            <SecondLine>BINANCE</SecondLine>
+          </RateWrapper>
+        </ExchangeRate>
+        <Client>
+          <RateWrapper>
+            <FirstLine>{t.merchant}</FirstLine>
+            <SecondLine>0 l 0₮</SecondLine>
+          </RateWrapper>
+        </Client>
+        <Reqs>
+          <RateWrapper>
+            <FirstLine>{t.requisites.title} {t.requisites.card_number}</FirstLine>
+            <SecondLine>{t.requisites.cardholder_name}</SecondLine>
+          </RateWrapper>
+        </Reqs>
+        <Start>
+          <RateWrapper>
+            <FirstLine>{formatTime(t.created_at)}</FirstLine>
+            <SecondLine>{formatDate(t.created_at)}</SecondLine>
+          </RateWrapper>
+        </Start>
+        <End>
+          <RateWrapper>
+            <FirstLine>-</FirstLine>
+          </RateWrapper>
+        </End>
+        <Status>
+          {t.automation_used && <AutomationIcon height={"24px"} width={"24px"} useGradient={true}/>}
+          <StatusText>Ожидание</StatusText>
+        </Status>
+      </StyledRow>
+      <SubmitTransactionWrapper>
+        <Button style={{width: "284px"}}
+                onClick={() => onConfirm(t.id)}
+        >
+          Подтвердить
+        </Button>
+        <Timer>{remainingTime}</Timer>
+      </SubmitTransactionWrapper>
+    </BodyTr>
+  )
 };
 
 export default InputActiveTransactions;

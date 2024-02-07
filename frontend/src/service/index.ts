@@ -1,7 +1,5 @@
 import {BaseQueryFn, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {jwtDecode} from "jwt-decode";
-import {setUser} from "../store/reducers/authSlice";
-import {authApi} from "./authService";
+import {refreshToken} from "../utils";
 
 export const hostUrl = 'http://localhost:8000'
 // export const hostUrl = 'http://ec2-16-16-56-239.eu-north-1.compute.amazonaws.com'
@@ -43,20 +41,9 @@ export const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
   if (result.error && result.error.status === 401) {
-    localStorage.removeItem('access');
-    const refreshResult = await baseQuery({
-      url: '/auth/token/refresh/',
-      method: 'POST',
-      credentials: 'include',
-    }, api, extraOptions);
-
-    if ((refreshResult.data as RefreshResponse).access) {
-      const token = (refreshResult.data as RefreshResponse).access;
-      localStorage.setItem('access', token);
-      const decodedToken: DecodedToken = jwtDecode(token);
-      api.dispatch(setUser({ userType: decodedToken.user_type }));
+    const token = await refreshToken(api);
+    if (token)
       result = await baseQuery(args, api, extraOptions);
-    }
   }
   return result;
 };

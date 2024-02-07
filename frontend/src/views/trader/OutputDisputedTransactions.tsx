@@ -3,7 +3,8 @@ import React from "react";
 import styled from "styled-components";
 import {formatDate, formatTime} from "../../utils";
 import {
-  useGetOutputDisputedTransactionsQuery
+  GetTransactionsRequestProps,
+  useGetOutputTransactionsQuery
 } from "../../service/transactionsService";
 
 
@@ -200,7 +201,8 @@ const StatusText = styled.span`
 `;
 
 const InputDisputedTransactions = () => {
-  const {data: transactions} = useGetOutputDisputedTransactionsQuery();
+  const params: GetTransactionsRequestProps = {statusGroup: 'disputed'};
+  const {data: transactions} = useGetOutputTransactionsQuery(params);
 
   return (
     <StyledTable>

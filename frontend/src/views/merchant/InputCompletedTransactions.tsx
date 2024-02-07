@@ -1,7 +1,7 @@
 import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
-import {useGetInputCompletedTransactionsQuery, useGetMerchantInputTransactionsQuery} from "../../service/transactionsService";
+import {useGetMerchantInputTransactionsQuery} from "../../service/transactionsService";
 import {formatDate, formatTime} from "../../utils";
 
 

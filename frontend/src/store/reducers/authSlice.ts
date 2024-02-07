@@ -7,6 +7,7 @@ interface userProps {
   email: string;
   password: string;
   userId: number;
+  token: string,
 }
 
 interface stateProps {
@@ -15,13 +16,14 @@ interface stateProps {
   error: string;
 }
 
-const initialState: stateProps = {
+export const initialState: stateProps = {
   auth: {
     userType: NaN,
     otpBase32: '',
     email: '',
     password: '',
     userId: NaN,
+    token: '',
   },
   loading: false,
   error: '',

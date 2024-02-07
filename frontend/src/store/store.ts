@@ -6,6 +6,7 @@ import authReducer from "../store/reducers/authSlice";
 import adminReducer from "../store/reducers/adminSlice";
 import advertisementsReducer from "../store/reducers/advertisementsSlice";
 import requisitesReducer from "../store/reducers/requisitesSlice";
+import webSocketReducer from "../store/reducers/webSocketSlice";
 import {banksApi} from "../service/banksService";
 import {requisitesApi} from "../service/requisitesService";
 import {exportApi} from "../service/exportService";
@@ -16,6 +17,7 @@ const store = configureStore({
   reducer: {
     theme: themeReducer,
     auth: authReducer,
+    webSocket: webSocketReducer,
     [authApi.reducerPath]: authApi.reducer,
     [banksApi.reducerPath]: banksApi.reducer,
     [requisitesApi.reducerPath]: requisitesApi.reducer,

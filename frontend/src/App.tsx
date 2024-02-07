@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import {ThemeProvider} from "styled-components";
 import {darkTheme, lightTheme} from "./styles/themes";
 import {RootState} from "./store/store";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import AdvertisementsPage from "./pages/trader/AdvertisementsPage";
 import {Route, Routes} from "react-router-dom";
 import RegistrationPage from "./pages/common/RegistrationPage";
@@ -20,9 +20,32 @@ import TraderStatsPage from "./pages/admin/TraderStatsPage";
 import MerchantsPage from './pages/admin/MerchantsPage';
 import MerchantStatsPage from './pages/admin/MerchantStatsPage';
 import PublicRoute from "./pages/common/PublicRoute";
+import {setUser} from "./store/reducers/authSlice";
+import {useGetInputTransactionsQuery, useGetOutputTransactionsQuery} from "./service/transactionsService";
+import {getUserTypeFromToken} from "./utils";
+import {webSocketService} from "./service/webSocketService";
+import {loadTransactions} from "./store/reducers/webSocketSlice";
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.value);
+  const auth = useSelector((state: RootState) => state.auth.auth);
+
+  const dispatch = useDispatch();
+  const {data: inputActiveTransactions} = useGetInputTransactionsQuery({statusGroup: 'active'});
+  const {data: outputActiveTransactions} = useGetOutputTransactionsQuery({statusGroup: 'active'});
+
+  useEffect(() => {
+    const token = localStorage.getItem('access');
+    dispatch(setUser({ token }));
+    const userType = getUserTypeFromToken();
+
+    if (userType == 1) {
+      dispatch(loadTransactions({transactions: inputActiveTransactions || [], transactionType: 'input'}));
+      dispatch(loadTransactions({transactions: outputActiveTransactions || [], transactionType: 'output'}));
+
+      webSocketService.connect(auth.token);
+    }
+  }, [inputActiveTransactions]);
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
