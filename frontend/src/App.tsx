@@ -25,6 +25,7 @@ import {useGetInputTransactionsQuery, useGetOutputTransactionsQuery} from "./ser
 import {getUserTypeFromToken} from "./utils";
 import {webSocketService} from "./service/webSocketService";
 import {loadTransactions} from "./store/reducers/webSocketSlice";
+import ClientBuyPage from "./pages/client/ClientBuyPage";
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.value);
@@ -51,6 +52,10 @@ function App() {
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <div className="App">
         <Routes>
+          <Route path={"/client/buy/*"}
+                 element={<ClientBuyPage/>}
+          />
+
           <Route path={"/sign-up/*"}
                  element={<PublicRoute Component={RegistrationPage} />}
           />

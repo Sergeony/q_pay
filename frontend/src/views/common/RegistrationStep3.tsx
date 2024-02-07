@@ -94,11 +94,10 @@ const RegistrationStep3 = () => {
         <RegistrationH2>Верификация</RegistrationH2>
       </div>
       <ThirdBlock>
-        <DescriptionDiv>
-          Введите только что сохраненный 16-значный ключ
-        </DescriptionDiv>
         <form onSubmit={formik.handleSubmit}>
-
+          <DescriptionDiv>
+            Введите только что сохраненный 16-значный ключ
+          </DescriptionDiv>
           <LoginFieldWrapper>
             <StyledContainer id="codeField" onClick={getTextFromClipboard}>
               <StyledPasteIcon/>

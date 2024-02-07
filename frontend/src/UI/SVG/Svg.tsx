@@ -22,6 +22,7 @@ const Svg: FunctionComponent<Props> = React.memo((props) => {
       viewBox={props.viewBox}
       fill={props.fill}
       className={props.className}
+      strokeWidth={props.strokeWidth}
     >
       {props.children}
     </svg>
@@ -34,6 +35,7 @@ Svg.propTypes = {
   width: PropTypes.string,
   height: PropTypes.string,
   xmlns: PropTypes.string,
+  strokeWidth: PropTypes.string,
   viewBox: PropTypes.string,
   fill: PropTypes.string,
   className: PropTypes.string,
