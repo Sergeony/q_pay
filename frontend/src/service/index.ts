@@ -2,7 +2,7 @@ import {BaseQueryFn, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {refreshToken} from "../utils";
 
 export const hostUrl = 'http://localhost:8000'
-// export const hostUrl = 'http://ec2-16-16-56-239.eu-north-1.compute.amazonaws.com'
+// export const hostUrl = 'http://ec2-16-16-56-239.eu-north-1.compute.amazonaws.com/api'
 const apiVersion = 'v1'
 export const baseUrl = `${hostUrl}`
 

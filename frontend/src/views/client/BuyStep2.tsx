@@ -59,7 +59,7 @@ const IconsWrapper = styled.div`
 
 const TetherIconWrapper = styled.div`
     position: absolute;
-    left: 58px;
+    left: 57px;
     top: 13px;
     fill: #9E68F7;
     stroke: none;

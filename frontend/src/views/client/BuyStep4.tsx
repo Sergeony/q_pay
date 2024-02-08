@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled from "styled-components";
 import {
-  Button,
   LoginFieldWrapper,
   StyledContainer,
   StyledCopyIcon,
@@ -9,7 +8,6 @@ import {
   StyledLabel,
 } from "../../UI/CommonUI";
 import {BankIcons} from "../../UI/SVG";
-import ConfirmTransactionModal from "./ConfirmTransactionModal";
 
 
 const ContentWrapper = styled.div`
@@ -41,12 +39,7 @@ const MerchantTitle = styled.h2`
 const Warning = styled.p`
     color: #F93D3D;
     font-size: 12px;
-    
-    margin-top: 32px;
-`;
-
-const Amount = styled.span`
-    color: #9E68F7;
+    margin-top: 16px;
 `;
 
 const Description = styled.p`
@@ -129,9 +122,10 @@ const DefaultField = styled(StyledField)`
 
 const ButtonsWrapper = styled.div`
     display: flex;
-    gap: 8px;
+    gap: 16px;
     margin-top: 32px;
     align-items: center;
+    justify-content: center;
 `;
 
 const CancelButton = styled.button`
@@ -147,13 +141,10 @@ const CancelButton = styled.button`
 `;
 
 
-const BuyStep3 = () => {
+const BuyStep4 = () => {
   const copyCode = async () => {
-    await navigator.clipboard.writeText("2342342342342324223");
+    await navigator.clipboard.writeText("@Qpay_crypto_support");
   };
-
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-
 
   const Bank = BankIcons[2];
 
@@ -188,32 +179,28 @@ const BuyStep3 = () => {
         </DL>
       </Article>
 
-      <Description>Отправьте <Amount>1345 UAH</Amount> по указаным продавцом реквизитам</Description>
+      <Description>Продавец оповещен, ожидайте подтверждения</Description>
+
+      <Warning>*Если продавец по какой-то причине не отпускает монеты, то следует открыть спор</Warning>
+
 
       <LoginFieldWrapper>
-        <StyledLabel>Реквизиты для перевода</StyledLabel>
+        <StyledLabel>Служба поддержки</StyledLabel>
         <StyledContainer id="codeField" onClick={copyCode}>
           <StyledCopyIcon/>
           <DefaultField type="text"
-                        value={"2342342342342324223"}
+                        value={"@Qpay_crypto_support"}
+                        readOnly
           />
         </StyledContainer>
       </LoginFieldWrapper>
 
-      <Warning>*Если Вы не подтвердите перевод в течении 15 минут, то сделка будет отменена автоматически!</Warning>
-
       <ButtonsWrapper>
-        <Button style={{width: '275px'}}
-                onClick={() => setModalIsOpen(true)}
-        >Подтвердить перевод</Button>
-        <CancelButton>Отменить сделку</CancelButton>
+        <CancelButton style={{width: '154px'}}>Отменить сделку</CancelButton>
+        <Timer>14:59</Timer>
       </ButtonsWrapper>
-
-      {
-        modalIsOpen && <ConfirmTransactionModal onClose={() => setModalIsOpen(false)}/>
-      }
     </ContentWrapper>
   );
 };
 
-export default BuyStep3;
+export default BuyStep4;
