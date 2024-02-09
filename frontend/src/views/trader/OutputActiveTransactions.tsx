@@ -286,9 +286,9 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
     <BodyTr>
       <StyledRow>
         <Bank>
-          <BankIcon width={32} height={32}/>
+          <BankIcon size={32}/>
           <Value>
-            <TetherIcon width={"24px"} height={"24px"}/>
+            <TetherIcon size={24}/>
             <FirstLine>{(Number(t.amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</FirstLine>
           </Value>
         </Bank>
@@ -323,7 +323,7 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
           </RateWrapper>
         </Start>
         <Status>
-          {t.automation_used && <AutomationIcon height={"24px"} width={"24px"} useGradient={true}/>}
+          {t.automation_used && <AutomationIcon size={24} useGradient={true}/>}
           <StatusText>Ожидание</StatusText>
         </Status>
       </StyledRow>

@@ -4,6 +4,7 @@ import {MoonIcon, SunIcon} from "../../UI/SVG";
 import DropDown from "./DropDown";
 import {useDispatch} from "react-redux";
 import {toggleTheme} from "../../store/reducers/themeSlice";
+import Logo from "./Logo";
 
 
 const HeaderContainer = styled.header`
@@ -13,45 +14,7 @@ const HeaderContainer = styled.header`
     display: flex;
     background-color: ${({theme}) => theme.header_background_color};
     border-bottom: ${({theme}) => theme.header_border};
-`;
-
-const LogoWrapper = styled.div`
-    margin-left: 210px;
-    display: flex;
-    font-family: 'Akony', serif;
-    align-items: center;
-`;
-
-const LogoQ = styled.div`
-    font-size: 59px;
-    font-weight: 700;
-    line-height: 65px;
-    letter-spacing: 0;
-    text-align: left;
-    color: ${({theme}) => theme.logo_q};
-`;
-
-const LogoPayAndUserTypeWrapper = styled.div`
-`;
-
-const LogoPay = styled.div`
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 18px;
-    letter-spacing: 0;
-    text-align: center;
-    color: #474A40;
-`;
-
-const LogoUserType = styled.div`
-    font-family: 'COMMIT-MONO', serif;
-    font-size: 12px;
-    font-style: italic;
-    font-weight: 700;
-    line-height: 13px;
-    letter-spacing: 0;
-    text-align: center;
-    color: #AFB4A8;
+    padding-left: 210px;
 `;
 
 
@@ -93,13 +56,7 @@ const Header = ({ children }: IProps) => {
 
   return (
     <HeaderContainer>
-      <LogoWrapper>
-        <LogoQ>Q</LogoQ>
-        <LogoPayAndUserTypeWrapper>
-          <LogoPay>pay</LogoPay>
-          <LogoUserType>CLIENT</LogoUserType>
-        </LogoPayAndUserTypeWrapper>
-      </LogoWrapper>
+      <Logo/>
 
       <ThemeToggleWrapper onClick={() => dispatch(toggleTheme())}>
         <ToggleCircle>

@@ -87,7 +87,7 @@ const MerchantHeader = () => {
             >Настройки</TabLink>
           </li>
           <li>
-            <TabLink to={"/balance/"}
+            <TabLink to={"/m/balance/"}
                      isActive={location.pathname.includes('/balance/')}
             >
               <BalancesWrapper>

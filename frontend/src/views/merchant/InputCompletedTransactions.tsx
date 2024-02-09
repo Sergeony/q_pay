@@ -230,11 +230,11 @@ const InputCompletedTransactions = ({merchantId}: InputCompletedTransactionsView
           <BodyTr key={index}>
             <StyledRow>
               <Bank>
-                <BankIcon width={32} height={32}/>
+                <BankIcon size={32}/>
                 <Values>
                   <UAHValue>
                     <BankIconWrapper>
-                      <BankIcon width={24} height={24}/>
+                      <BankIcon size={24}/>
                     </BankIconWrapper>
                     <span>{t.actual_amount}₴</span>
                   </UAHValue>
@@ -282,7 +282,7 @@ const InputCompletedTransactions = ({merchantId}: InputCompletedTransactionsView
                 </RateWrapper>
               </End>
               <Status>
-                {t.automation_used && <AutomationIcon height={"24px"} width={"24px"} useGradient={true}/>}
+                {t.automation_used && <AutomationIcon size={24} useGradient={true}/>}
                 <StatusText>{t.automation_used ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
               </Status>
             </StyledRow>

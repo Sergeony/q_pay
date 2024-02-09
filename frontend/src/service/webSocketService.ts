@@ -15,7 +15,8 @@ class WebSocketService {
     if (!token)
       return;
 
-    this.ws = new WebSocket(`ws://localhost:8000/ws/trader/?token=${token}`);
+    // this.ws = new WebSocket(`ws://ec2-16-16-56-239.eu-north-1.compute.amazonaws.com/api/ws/trader/?token=${token}`);
+    this.ws = new WebSocket(`ws://localhost:8000/api/ws/trader/?token=${token}`);
 
     this.ws.onopen = () => {
       this.startPing();

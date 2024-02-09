@@ -3,11 +3,8 @@ import styled from "styled-components";
 import {
   PageWrapper,
 } from "../../UI/CommonUI";
-import TraderHeader from "../../components/trader/TraderHeader";
-import {PlusIcon} from "../../UI/SVG";
 import {NavLink, Route, Routes, useLocation} from "react-router-dom";
 import General from "../../views/merchant/General";
-import Automatization from "../../views/trader/Automatization";
 import Integration from "../../views/merchant/Integration";
 import MerchantHeader from "../../components/merchant/MerchantHeader";
 
