@@ -225,7 +225,7 @@ const Requisites = ({traderId}: RequisitesViewProps) => {
                   <Values>
                     <UAHValue>
                       <BankIconWrapper>
-                        <BankIcon width={22} height={22}/>
+                        <BankIcon size={22}/>
                       </BankIconWrapper>
                       <span>{r.bank.title} UAH</span>
                     </UAHValue>

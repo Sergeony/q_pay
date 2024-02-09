@@ -152,3 +152,15 @@ export const BackButton = styled.a`
     text-align: left;
     text-underline-position: under;
 `;
+
+
+export const StyledH1 = styled.h1`
+    font-size: 28px;
+    font-weight: 700;
+`;
+
+export const StyledH3 = styled.h3`
+    font-family: Helvetica, serif;
+    font-size: 22px;
+    font-weight: 700;
+`;

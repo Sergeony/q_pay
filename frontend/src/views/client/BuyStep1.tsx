@@ -151,7 +151,7 @@ const BuyStep1 = () => {
                         <StyledCheck/>
                     </CheckWrapper>
                 }
-                <Value width={32} height={32}/>
+                <Value size={32}/>
               </Bank>
             ))}
           </Banks>

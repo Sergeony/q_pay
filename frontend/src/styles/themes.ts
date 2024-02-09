@@ -42,6 +42,20 @@ export const lightTheme = {
   toggle_span_background_color: '#0E1503',
   toggle_span: '#FDFFF9',
 
+  black: '#0F0021',
+  dark_grey: '#312739',
+  grey: '#46404B',
+  light_grey: '#AFAAB6',
+  extra_light_grey: '#E3E1E8',
+  white: '#F8F5FE',
+  accent: '#9E68F7',
+  dark_accent: '#6B48A4',
+  pale_accent: '#DDC8FF',
+  blue: '#3F9AEF',
+  light_blue: '#7FAED9',
+  gradient_blue: 'linear-gradient(135deg, rgba(63, 154, 239, 1) 31.21%, rgba(123, 255, 231, 1) 121.47%)',
+  yellow: '#F8E643',
+  red: '#F93D3D',
 };
 
 export const darkTheme = {
@@ -85,4 +99,19 @@ export const darkTheme = {
 
   toggle_span_background_color: '#474A40',
   toggle_span: '#0E1503',
+
+  black: '#0E1503',
+  dark_grey: '#23271D',
+  grey: '#474A40',
+  light_grey: '#AFB4A8',
+  extra_light_grey: '#E0E4D3',
+  white: '#FDFFF9',
+  accent: '#B7EF3F',
+  dark_accent: '#829F44',
+  pale_accent: '#E7F9C3',
+  blue: '#3F9AEF',
+  light_blue: '#7FAED9',
+  gradient_blue: 'linear-gradient(135deg, rgba(63, 154, 239, 1) 31.21%, rgba(123, 255, 231, 1) 121.47%)',
+  yellow: '#F8E643',
+  red: '#F93D3D',
 };

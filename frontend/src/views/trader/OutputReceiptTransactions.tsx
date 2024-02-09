@@ -227,7 +227,7 @@ const OutputActiveTransactions = () => {
           <Bank>
             <img src={pumb} alt={"Bank"} width={32} height={32}/>
             <Value>
-              <TetherIcon width={"24px"} height={"24px"}/>
+              <TetherIcon size={24}/>
               <FirstLine>48,86₮</FirstLine>
             </Value>
           </Bank>
@@ -262,7 +262,7 @@ const OutputActiveTransactions = () => {
             </RateWrapper>
           </Start>
           <Status>
-            <AutomationIcon height={"24px"} width={"24px"} useGradient={true}/>
+            <AutomationIcon size={24} useGradient={true}/>
             <StatusText>Автозакрытие</StatusText>
           </Status>
         </StyledRow>

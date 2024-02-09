@@ -169,7 +169,7 @@ const BuyStep4 = () => {
           </DItem>
           <DItem>
             <DT>Способ оплаты:</DT>
-            <DD><Bank width={24} height={24}/>ПриватБанк</DD>
+            <DD><Bank size={24}/>ПриватБанк</DD>
           </DItem>
 
           <DItem>

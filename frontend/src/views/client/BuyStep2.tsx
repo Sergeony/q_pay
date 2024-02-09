@@ -84,9 +84,9 @@ const BuyStep2 = () => {
 
         <AdvantageItem>
           <IconsWrapper>
-            <SearchIcon width={64} height={64} strokeWidth={0.5}/>
+            <SearchIcon size={64} strokeWidth={0.5}/>
             <TetherIconWrapper>
-              <TetherIcon  width={24} height={24}/>
+              <TetherIcon  size={24}/>
             </TetherIconWrapper>
           </IconsWrapper>
           <AdvantageDescription>Быстрый поиск Tether под вашу покупку</AdvantageDescription>
