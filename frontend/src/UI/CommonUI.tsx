@@ -159,8 +159,14 @@ export const StyledH1 = styled.h1`
     font-weight: 700;
 `;
 
-export const StyledH3 = styled.h3`
+export const StyledH3Bold = styled.h3`
     font-family: Helvetica, serif;
     font-size: 22px;
     font-weight: 700;
+`;
+
+export const StyledH2Regular = styled.h3`
+    font-family: Helvetica, serif;
+    font-size: 18px;
+    font-weight: 400;
 `;

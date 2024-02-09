@@ -34,6 +34,7 @@ const customStyles: StylesConfig<CustomOptionProps, boolean, GroupBase<CustomOpt
   container: (provided: any, state: any) => {
     return {
       width: 'inherit',
+      height: 'inherit',
     }
   },
   control: (provided: any, state: any) => {
@@ -54,6 +55,7 @@ const customStyles: StylesConfig<CustomOptionProps, boolean, GroupBase<CustomOpt
 
     gap: '8px',
     width: 'inherit',
+    height: 'inherit',
 
     fontFamily: 'Mulish, serif',
     fontSize: '14px',
@@ -152,15 +154,16 @@ const Option: React.FC<OptionProps<CustomOptionProps, false>> = (props) => {
 interface DropDownProps {
   options: CustomOptionProps[];
   width: string;
+  height?: string;
   label?: string;
   onChange?: (newValue: (MultiValue<CustomOptionProps> | SingleValue<CustomOptionProps>), actionMeta: ActionMeta<CustomOptionProps>) => void
   value: PropsValue<CustomOptionProps> | undefined;
 }
 
 
-const DropDown: React.FC<DropDownProps> = ({options, width, label, onChange, value}) => {
+const DropDown: React.FC<DropDownProps> = ({options, width, height, label, onChange, value}) => {
   return (
-    <div style={{width: width}}>
+    <div style={{width: width, height: height}}>
       {label && <StyledLabel>{label}</StyledLabel>}
       <Select options={options}
               styles={customStyles}
@@ -173,5 +176,9 @@ const DropDown: React.FC<DropDownProps> = ({options, width, label, onChange, val
     </div>
   );
 };
+
+DropDown.defaultProps = {
+  height: '34px'
+}
 
 export default DropDown;

@@ -26,6 +26,7 @@ import {getUserTypeFromToken} from "./utils";
 import {webSocketService} from "./service/webSocketService";
 import {loadTransactions} from "./store/reducers/webSocketSlice";
 import ClientBuyPage from "./pages/client/ClientBuyPage";
+import MerchantBalancePage from "./pages/merchant/MerchantBalancePage";
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.value);
@@ -84,6 +85,9 @@ function App() {
           />
           <Route path={"/m/settings/*"}
                  element={<PrivateRoute Component={MerchantSettingsPage} useTypes={[2]} />}
+          />
+          <Route path={"/m/balance/"}
+                 element={<PrivateRoute Component={MerchantBalancePage} useTypes={[2]} />}
           />
 
           <Route path={"/traders/"}
