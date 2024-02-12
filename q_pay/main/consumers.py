@@ -5,7 +5,7 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils import timezone
 
-from main.models import InputTransaction, OutputTransaction
+from main.models import Transaction
 
 
 class Consumer(AsyncWebsocketConsumer):
@@ -38,7 +38,6 @@ class Consumer(AsyncWebsocketConsumer):
             text_data=json.dumps({
                 'action': 'new_transaction',
                 'transaction_data': transaction_data,
-                'transaction_type': 'input',
             })
         )
 
@@ -54,19 +53,15 @@ class Consumer(AsyncWebsocketConsumer):
     async def update_transaction_status(self, data):
         transaction_id = data.get('transaction_id')
         new_status = data.get('new_status')
-        transaction_type = data.get('transaction_type', 'input')
+        transaction_type = data.get('transaction_type')
 
-        if transaction_type == 'input':
-            transaction_model = InputTransaction
-        elif transaction_type == 'output':
-            transaction_model = OutputTransaction
-        else:
+        if transaction_type not in ('input', 'output'):
             await self.send(text_data=json.dumps({"error": "Invalid transaction type"}))
             return
 
-        if await self.is_trader_authorized_for_transaction(transaction_id, transaction_model):
-            await self.change_transaction_status(transaction_id, new_status, transaction_model)
-            updated_transaction = await self.get_transaction_data(transaction_id, transaction_model)
+        if await self.is_trader_authorized_for_transaction(transaction_id):
+            await self.change_transaction_status(transaction_id, new_status)
+            updated_transaction = await self.get_transaction_data(transaction_id)
             await self.send(text_data=json.dumps({
                 'action': 'updated_transaction',
                 'transaction_data': updated_transaction,
@@ -76,19 +71,19 @@ class Consumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({"error": "Unauthorized"}))
 
     @database_sync_to_async
-    def is_trader_authorized_for_transaction(self, transaction_id, transaction_model):
-        transaction = get_object_or_404(transaction_model, pk=transaction_id)
+    def is_trader_authorized_for_transaction(self, transaction_id):
+        transaction = get_object_or_404(Transaction, pk=transaction_id)
         return transaction.trader.id == self.user.id
 
     @database_sync_to_async
-    def change_transaction_status(self, transaction_id, new_status, transaction_model):
-        transaction = get_object_or_404(transaction_model, pk=transaction_id)
+    def change_transaction_status(self, transaction_id, new_status):
+        transaction = get_object_or_404(Transaction, pk=transaction_id)
         transaction.status = new_status
         transaction.save()
 
     @database_sync_to_async
-    def get_transaction_data(self, transaction_id, transaction_model):
-        transaction = transaction_model.objects.get(pk=transaction_id)
+    def get_transaction_data(self, transaction_id):
+        transaction = Transaction.objects.get(pk=transaction_id)
         return {
             "id": str(transaction.id),
             "status": transaction.get_status_display(),

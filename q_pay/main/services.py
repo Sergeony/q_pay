@@ -1,11 +1,29 @@
 from typing import List
 
 import openpyxl
+from django.db.models.enums import ChoicesMeta
+from rest_framework import status
+from rest_framework.request import Request
+from rest_framework.response import Response
 
-from .models import BaseTransaction, User
+from .models import User, Transaction
 
 
-def create_transactions_excel(transactions, transaction_type='input'):
+def get_user_id(request: Request) -> int | Response:
+    """
+    Get user_id from request user if it's one of trader, merchant or
+    from query params if it's admin
+    otherwise  raise exception
+    """
+    if request.user.user_type != User.Type.ADMIN:
+        return request.user.id
+
+    user_id = request.query_params.get('user_id')
+    if user_id is None:
+        return Response(data={"error": "user id were not provided"}, status=status.HTTP_400_BAD_REQUEST, exception=True)
+
+
+def create_transactions_excel(transactions: List[Transaction], transaction_type='input'):
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
     worksheet.title = 'Transactions'
@@ -28,33 +46,49 @@ def create_transactions_excel(transactions, transaction_type='input'):
 
         if transaction_type == 'input':
             worksheet.cell(row=row_num, column=3).value = transaction.merchant.id
-            worksheet.cell(row=row_num, column=4).value = transaction.requisites.bank.title
-            worksheet.cell(row=row_num, column=5).value = transaction.requisites.card_number
+            worksheet.cell(row=row_num, column=4).value = transaction.trader_bank_details.bank.title
+            worksheet.cell(row=row_num, column=5).value = transaction.trader_bank_details.card_number
             worksheet.cell(row=row_num, column=6).value = transaction.claimed_amount
             worksheet.cell(row=row_num, column=7).value = transaction.actual_amount or 0
         elif transaction_type == 'output':
-            worksheet.cell(row=row_num, column=3).value = transaction.amount
-            worksheet.cell(row=row_num, column=4).value = transaction.bank.title if transaction.bank else 'N/A'
-            worksheet.cell(row=row_num, column=5).value = transaction.card_number
+            worksheet.cell(row=row_num, column=3).value = transaction.claimed_amount
+            if transaction.trader_bank_details:
+                value = transaction.trader_bank_details.bank.title
+            else:
+                value = 'N/A'
+            worksheet.cell(row=row_num, column=4).value = value
+            worksheet.cell(row=row_num, column=5).value = transaction.client_card_number
 
         worksheet.cell(row=row_num, column=8).value = transaction.created_at.strftime('%Y-%m-%d %H:%M:%S')
 
     return workbook
 
 
-def get_eligible_trader_ids_for_transactions(transactions: List[BaseTransaction]) -> List[str]:
+def get_eligible_trader_ids_for_transactions(transactions: List[Transaction]) -> List[str]:
     eligible_trader_ids = User.objects.filter(
-        user_type=User.UserTypes.TRADER,
-        is_activated=True
+        user_type=User.Type.TRADER,
+        is_active=True
     ).values_list('id', flat=True)
 
     for transaction in transactions:
         eligible_trader_ids = eligible_trader_ids.filter(
-            advertisements__is_activated=True,
-            advertisements__requisites_id__bank_id=transaction.requisites.bank,
+            advertisements__is_active=True,
+            advertisements__bank_id=transaction.trader_bank_details.bank,
         ).values_list('id', flat=True)
 
         if not eligible_trader_ids:
             break
 
     return list(eligible_trader_ids)
+
+
+def get_value_by_label(choices_class: ChoicesMeta, label: str) -> int | Response:
+    """
+    Get int value from choices by label
+    otherwise raise exception
+    """
+    for choice in choices_class.choices:
+        if label == choice[1]:
+            return choice[0]
+
+    return Response(data={"error": f"Invalid {choices_class}"}, status=status.HTTP_400_BAD_REQUEST, exception=True)

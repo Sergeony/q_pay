@@ -2,13 +2,12 @@ from rest_framework import serializers
 
 from .models import (
     Bank,
-    Requisites,
-    Advertisement,
-    InputTransaction,
-    OutputTransaction,
-    Transfer,
     MerchantIntegrations,
-    User
+    User,
+    BankDetails,
+    Ad,
+    Transaction,
+    MerchantWithdrawal,
 )
 
 
@@ -19,107 +18,42 @@ class BanksSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'title', 'icon_url']
 
 
-class RequisitesSerializer(serializers.ModelSerializer):
+class BankDetailsSerializer(serializers.ModelSerializer):
     bank = BanksSerializer(read_only=True)
     bank_id = serializers.IntegerField(write_only=True)
 
     class Meta:
-        model = Requisites
-        fields = [
-            'id', 'title', 'card_number', 'cardholder_name', 'bank', 'bank_id',
-            'is_activated', 'automation_used',
-            'daily_limit', 'weekly_limit', 'monthly_limit',
-            'daily_turnover', 'weekly_turnover', 'monthly_turnover'
-        ]
-        read_only_fields = [
-            'id', 'bank', 'bank_id', 'daily_turnover', 'weekly_turnover', 'monthly_turnover'
-        ]
-
-    def update(self, instance, validated_data):
-        updatable_fields = [
-            'is_activated', 'automation_used', 'title'
-        ]
-
-        for field in updatable_fields:
-            if field in validated_data:
-                setattr(instance, field, validated_data[field])
-
-        instance.save()
-        return instance
+        model = BankDetails
+        fields = ['id', 'title', 'card_number', 'cardholder_name', 'bank', 'bank_id',
+                  'is_active', 'use_automation',
+                  'daily_limit', 'weekly_limit', 'monthly_limit',
+                  'start_daily_turnover', 'start_weekly_turnover', 'start_monthly_turnover',
+                  ]
 
 
-class RequisitesForAdvertisementsSerializer(serializers.ModelSerializer):
+class AdSerializer(serializers.ModelSerializer):
+    bank_details = BankDetailsSerializer(many=True, read_only=True)
     bank = BanksSerializer(read_only=True)
-    last_four_card_number = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_last_four_card_number(obj):
-        return obj.card_number[-4:]
+    bank_id = serializers.IntegerField(write_only=True)
 
     class Meta:
-        model = Requisites
-        fields = ['id', 'title', 'last_four_card_number', 'bank', 'automation_used']
+        model = Ad
+        fields = ['id', 'bank', 'bank_id', 'created_at', 'updated_at', 'is_active', 'bank_details']
 
 
-class AdvertisementsSerializer(serializers.ModelSerializer):
-    requisites = RequisitesForAdvertisementsSerializer(read_only=True)
-    requisites_id = serializers.IntegerField(write_only=True)
+class TransactionSerializer(serializers.ModelSerializer):
+    trader_bank_details = BankDetailsSerializer(read_only=True)
 
     class Meta:
-        model = Advertisement
-        fields = ['id', 'trader_usdt_rate', 'exchange_usdt_rate', 'requisites', 'requisites_id', 'created_at', 'is_activated']
-        extra_kwargs = {
-            'created_at': {'read_only': True},
-            'id': {'read_only': True},
-            'exchange_usdt_rate': {'read_only': True},
-            'trader_usdt_rate': {'read_only': True},
-        }
-
-    def create(self, validated_data):
-        requisites_id = validated_data.pop('requisites_id')
-        requisites = Requisites.objects.get(id=requisites_id)
-        return Advertisement.objects.create(**validated_data, requisites=requisites, exchange_usdt_rate=20.0, trader_usdt_rate=22.0)
-
-    def update(self, instance, validated_data):
-        updatable_fields = [
-            'is_activated',
-        ]
-
-        for field in updatable_fields:
-            if field in validated_data:
-                setattr(instance, field, validated_data[field])
-
-        instance.save()
-        return instance
+        model = Transaction
+        fields = ['id', 'type', 'trader', 'merchant', 'status', 'claimed_amount',
+                  'actual_amount', 'trader_fee', 'admin_fee', 'created_at', 'updated_at', 'expiry_time',
+                  'trader_bank_details', 'client_card_number']
 
 
-class InputTransactionSerializer(serializers.ModelSerializer):
-    requisites = RequisitesForAdvertisementsSerializer(read_only=True)
-    
+class MerchantWithdrawalSerializer(serializers.ModelSerializer):
     class Meta:
-        model = InputTransaction
-        fields = ['id', 'status', 'trader', 'merchant', 'created_at',
-                  'confirmed_at', 'finished_at', 'requisites', 'trader_usdt_rate',
-                  'exchange_usdt_rate', 'automation_used', 'claimed_amount', 'actual_amount']
-        read_only_fields = ['id', 'created_at', 'confirmed_at', 'finished_at',
-                            'trader_usdt_rate', 'exchange_usdt_rate', 'automation_used']
-
-
-class OutputTransactionSerializer(serializers.ModelSerializer):
-    requisites = RequisitesForAdvertisementsSerializer(read_only=True)
-    
-    class Meta:
-        model = OutputTransaction
-        fields = ['id', 'status', 'trader', 'merchant', 'created_at',
-                  'confirmed_at', 'finished_at', 'requisites', 'trader_usdt_rate',
-                  'exchange_usdt_rate', 'automation_used', 'amount', 'bank', 'card_number', 'receipt_url']
-        read_only_fields = ['id', 'created_at', 'confirmed_at', 'finished_at',
-                            'trader_usdt_rate', 'exchange_usdt_rate', 'automation_used']
-
-
-class TransferSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Transfer
+        model = MerchantWithdrawal
         fields = ['id', 'status', 'wallet_address', 'amount', 'merchant', 'admin', 'created_at', 'finished_at']
         read_only_fields = ['id', 'status', 'merchant', 'admin', 'created_at', 'finished_at']
 
@@ -133,12 +67,12 @@ class MerchantIntegrationsSerializer(serializers.ModelSerializer):
 
 class UserInfoSerializer(serializers.ModelSerializer):
     is_online = serializers.SerializerMethodField()
-    total_transactions = serializers.IntegerField()
+    total_transactions = serializers.IntegerField(read_only=True)
     balance = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'is_online', 'total_transactions', 'balance', 'is_activated']
+        fields = ['id', 'email', 'is_online', 'total_transactions', 'balance', 'is_active']
 
     @staticmethod
     def get_is_online(obj):
@@ -153,16 +87,16 @@ class UserInfoSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['is_activated']
+        fields = ['is_active']
 
     def update(self, instance, validated_data):
-        instance.is_activated = validated_data.get('is_activated', instance.is_active)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.save()
         return instance
 
 
 class InviteCodeSerializer(serializers.Serializer):
-    user_type = serializers.ChoiceField(choices=User.UserTypes.choices)
+    user_type = serializers.ChoiceField(choices=User.Type.choices)
 
 
 class TransactionRedirectSerializer(serializers.Serializer):
@@ -172,19 +106,15 @@ class TransactionRedirectSerializer(serializers.Serializer):
 
     @staticmethod
     def validate_new_trader_id(value):
-        if not User.objects.filter(id=value, user_type=User.UserTypes.TRADER, is_deleted=False).exists():
+        if not User.objects.filter(id=value, user_type=User.Type.TRADER, is_deleted=False).exists():
             raise serializers.ValidationError("Trader with the specified ID was not found.")
         return value
 
     def validate_transaction_ids(self, values):
         transaction_type = self.initial_data.get('transaction_type')
 
-        if transaction_type == 'input':
-            if not InputTransaction.objects.filter(id__in=values).exists():
-                raise serializers.ValidationError("Some of the specified input transactions were not found.")
-        elif transaction_type == 'output':
-            if not OutputTransaction.objects.filter(id__in=values).exists():
-                raise serializers.ValidationError("Some of the specified output transactions were not found.")
+        if not Transaction.objects.filter(id__in=values, type=transaction_type).exists():
+            raise serializers.ValidationError(f"Some of the specified {transaction_type} transactions were not found.")
 
         return values
 
@@ -197,4 +127,4 @@ class ChangePasswordSerializer(serializers.Serializer):
 class UserSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['language', 'tz_offset_minutes', 'is_light_theme']
+        fields = ['language', 'timezone', 'is_light_theme', 'is_active']

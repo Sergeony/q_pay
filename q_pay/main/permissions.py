@@ -9,8 +9,8 @@ class IsTraderOrAdminReadOnly(BasePermission):
     def has_permission(self, request, view):
         user_type = request.auth.payload.get('user_type')
         return (
-            user_type == User.UserTypes.TRADER or
-            (user_type == User.UserTypes.ADMIN and request.method in SAFE_METHODS)
+                user_type == User.Type.TRADER or
+                (user_type == User.Type.ADMIN and request.method in SAFE_METHODS)
         )
 
 
@@ -20,6 +20,12 @@ class IsMerchantOrAdminReadOnly(BasePermission):
     def has_permission(self, request, view):
         user_type = request.auth.payload.get('user_type')
         return (
-            user_type == User.UserTypes.MERCHANT or
-            (user_type == User.UserTypes.ADMIN and request.method in SAFE_METHODS)
+                user_type == User.Type.MERCHANT or
+                (user_type == User.Type.ADMIN and request.method in SAFE_METHODS)
         )
+
+
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        user_type = request.auth.payload.get('user_type')
+        return user_type == User.Type.ADMIN
