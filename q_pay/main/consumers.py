@@ -5,7 +5,7 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils import timezone
 
-from main.models import Transaction
+from main.models import Payment
 
 
 class Consumer(AsyncWebsocketConsumer):
@@ -32,12 +32,12 @@ class Consumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    async def send_new_transaction_alert(self, event):
-        transaction_data = event['transaction_data']
+    async def send_new_payment_alert(self, event):
+        payment_data = event['payment_data']
         await self.send(
             text_data=json.dumps({
-                'action': 'new_transaction',
-                'transaction_data': transaction_data,
+                'action': 'new_payment',
+                'payment_data': payment_data,
             })
         )
 
@@ -47,46 +47,46 @@ class Consumer(AsyncWebsocketConsumer):
 
         if action == 'ping':
             await self.update_last_seen()
-        elif action == 'update_transaction_status':
-            await self.update_transaction_status(data)
+        elif action == 'update_payment_status':
+            await self.update_payment_status(data)
 
-    async def update_transaction_status(self, data):
-        transaction_id = data.get('transaction_id')
+    async def update_payment_status(self, data):
+        payment_id = data.get('payment_id')
         new_status = data.get('new_status')
-        transaction_type = data.get('transaction_type')
+        payment_type = data.get('payment_type')
 
-        if transaction_type not in ('input', 'output'):
-            await self.send(text_data=json.dumps({"error": "Invalid transaction type"}))
+        if payment_type not in ('input', 'output'):
+            await self.send(text_data=json.dumps({"error": "Invalid payment type"}))
             return
 
-        if await self.is_trader_authorized_for_transaction(transaction_id):
-            await self.change_transaction_status(transaction_id, new_status)
-            updated_transaction = await self.get_transaction_data(transaction_id)
+        if await self.is_trader_authorized_for_payment(payment_id):
+            await self.change_payment_status(payment_id, new_status)
+            updated_payment = await self.get_payment_data(payment_id)
             await self.send(text_data=json.dumps({
-                'action': 'updated_transaction',
-                'transaction_data': updated_transaction,
-                'transaction_type': transaction_type,
+                'action': 'updated_payment',
+                'payment_data': updated_payment,
+                'payment_type': payment_type,
             }))
         else:
             await self.send(text_data=json.dumps({"error": "Unauthorized"}))
 
     @database_sync_to_async
-    def is_trader_authorized_for_transaction(self, transaction_id):
-        transaction = get_object_or_404(Transaction, pk=transaction_id)
-        return transaction.trader.id == self.user.id
+    def is_trader_authorized_for_payment(self, payment_id):
+        payment = get_object_or_404(Payment, pk=payment_id)
+        return payment.trader.id == self.user.id
 
     @database_sync_to_async
-    def change_transaction_status(self, transaction_id, new_status):
-        transaction = get_object_or_404(Transaction, pk=transaction_id)
-        transaction.status = new_status
-        transaction.save()
+    def change_payment_status(self, payment_id, new_status):
+        payment = get_object_or_404(Payment, pk=payment_id)
+        payment.status = new_status
+        payment.save()
 
     @database_sync_to_async
-    def get_transaction_data(self, transaction_id):
-        transaction = Transaction.objects.get(pk=transaction_id)
+    def get_payment_data(self, payment_id):
+        payment = Payment.objects.get(pk=payment_id)
         return {
-            "id": str(transaction.id),
-            "status": transaction.get_status_display(),
+            "id": str(payment.id),
+            "status": payment.get_status_display(),
         }
 
     @database_sync_to_async

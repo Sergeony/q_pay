@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
-from .service import get_user_type_by_invite_code
+from .services import get_user_type_by_invite_code
 from .serializers import *
 
 

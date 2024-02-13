@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .models import User, Transaction
+from .models import User, Payment
 
 
 def get_user_id(request: Request) -> int | Response:
@@ -23,57 +23,57 @@ def get_user_id(request: Request) -> int | Response:
         return Response(data={"error": "user id were not provided"}, status=status.HTTP_400_BAD_REQUEST, exception=True)
 
 
-def create_transactions_excel(transactions: List[Transaction], transaction_type='input'):
+def create_payments_excel(payments: List[Payment], payment_type='input'):
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
     worksheet.title = 'Transactions'
 
-    if transaction_type == 'input':
+    if payment_type == 'input':
         columns = ['Transaction ID', 'Status', 'Merchant', 'Bank', 'Requisites', 'Claimed Amount', 'Actual Amount',
                    'Date']
-    elif transaction_type == 'output':
+    elif payment_type == 'output':
         columns = ['Transaction ID', 'Status', 'Amount', 'Bank', 'Card Number', 'Receipt URL', 'Date']
     else:
-        raise ValueError("Invalid transaction type. Must be 'input' or 'output'.")
+        raise ValueError("Invalid payment type. Must be 'input' or 'output'.")
 
     for col_num, column_title in enumerate(columns, 1):
         cell = worksheet.cell(row=1, column=col_num)
         cell.value = column_title
 
-    for row_num, transaction in enumerate(transactions, 2):
-        worksheet.cell(row=row_num, column=1).value = str(transaction.id)
-        worksheet.cell(row=row_num, column=2).value = transaction.get_status_display()
+    for row_num, payment in enumerate(payments, 2):
+        worksheet.cell(row=row_num, column=1).value = str(payment.id)
+        worksheet.cell(row=row_num, column=2).value = payment.get_status_display()
 
-        if transaction_type == 'input':
-            worksheet.cell(row=row_num, column=3).value = transaction.merchant.id
-            worksheet.cell(row=row_num, column=4).value = transaction.trader_bank_details.bank.title
-            worksheet.cell(row=row_num, column=5).value = transaction.trader_bank_details.card_number
-            worksheet.cell(row=row_num, column=6).value = transaction.claimed_amount
-            worksheet.cell(row=row_num, column=7).value = transaction.actual_amount or 0
-        elif transaction_type == 'output':
-            worksheet.cell(row=row_num, column=3).value = transaction.claimed_amount
-            if transaction.trader_bank_details:
-                value = transaction.trader_bank_details.bank.title
+        if payment_type == 'input':
+            worksheet.cell(row=row_num, column=3).value = payment.merchant.id
+            worksheet.cell(row=row_num, column=4).value = payment.trader_bank_details.bank.title
+            worksheet.cell(row=row_num, column=5).value = payment.trader_bank_details.card_number
+            worksheet.cell(row=row_num, column=6).value = payment.amount
+            worksheet.cell(row=row_num, column=7).value = payment.amount_credit or 0
+        elif payment_type == 'output':
+            worksheet.cell(row=row_num, column=3).value = payment.amount
+            if payment.trader_bank_details:
+                value = payment.trader_bank_details.bank.title
             else:
                 value = 'N/A'
             worksheet.cell(row=row_num, column=4).value = value
-            worksheet.cell(row=row_num, column=5).value = transaction.client_card_number
+            worksheet.cell(row=row_num, column=5).value = payment.client_card_number
 
-        worksheet.cell(row=row_num, column=8).value = transaction.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        worksheet.cell(row=row_num, column=8).value = payment.created_at.strftime('%Y-%m-%d %H:%M:%S')
 
     return workbook
 
 
-def get_eligible_trader_ids_for_transactions(transactions: List[Transaction]) -> List[str]:
+def get_eligible_trader_ids_for_payments(payments: List[Payment]) -> List[str]:
     eligible_trader_ids = User.objects.filter(
         user_type=User.Type.TRADER,
         is_active=True
     ).values_list('id', flat=True)
 
-    for transaction in transactions:
+    for payment in payments:
         eligible_trader_ids = eligible_trader_ids.filter(
             advertisements__is_active=True,
-            advertisements__bank_id=transaction.trader_bank_details.bank,
+            advertisements__bank_id=payment.trader_bank_details.bank,
         ).values_list('id', flat=True)
 
         if not eligible_trader_ids:

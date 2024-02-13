@@ -1,4 +1,5 @@
 import uuid
+from datetime import timedelta
 
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
@@ -45,7 +46,7 @@ class User(AbstractBaseUser):
         def __repr__(self):
             return 'user language'
 
-    user_type = models.PositiveSmallIntegerField(choices=Type.choices)
+    type = models.PositiveSmallIntegerField(choices=Type.choices)
     email = models.EmailField(max_length=150, unique=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -107,93 +108,93 @@ class BankDetails(models.Model):
     daily_limit = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     weekly_limit = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     monthly_limit = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    start_daily_turnover = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        blank=True,
-        null=True,
-        default=0.00
-    )
-    start_weekly_turnover = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        blank=True,
-        null=True,
-        default=0.00
-    )
-    start_monthly_turnover = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        blank=True,
-        null=True,
-        default=0.00
-    )
+    start_daily_turnover = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, default=0.00)
+    start_weekly_turnover = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, default=0.00)
+    start_monthly_turnover = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, default=0.00)
 
     class Meta:
         unique_together = ('trader', 'title')
 
 
-class TransactionRequest(models.Model):
-    class Type(models.IntegerChoices):
-        BATCH = 1, _("batch")
-        INDIVIDUAL = 2, _("individual")
-
-        def __repr__(self):
-            return 'transaction request type'
-
+class Payment(models.Model):
     class Status(models.IntegerChoices):
-        PROCESSING = 1, _("processing")
-        COMPLETED = 2, _("completed")
-        FAILED = 3, _("failed")
+        REJECTED = 1, _("rejected")
+        PENDING = 2, _("pending")
+        CANCELLED = 3, _("cancelled")
+        REVIEWING = 4, _("reviewing")
+        DISPUTING = 5, _("disputing")
+        COMPLETED = 6, _("completed")
+        FAILED = 7, _("failed")
+        REFUND = 8, _("refund")
+        PARTIALLY_PAID = 9, _("partially_paid")
 
         def __repr__(self):
-            return 'transaction request status'
-
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    request_type = models.PositiveSmallIntegerField(choices=Type.choices)
-    status = models.PositiveSmallIntegerField(choices=Status.choices)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-
-class Transaction(models.Model):
-    class Status(models.IntegerChoices):
-        PENDING = 1, _("pending")
-        COMPLETED = 2, _("completed")
-        DISPUTED = 3, _("disputed")
-        EXPIRED = 4, _("expired")
-        CANCELLED = 5, _("cancelled")
-        CHECKING = 6, _("checking")
-
-        def __repr__(self):
-            return 'transaction status'
+            return 'payment status'
 
     class Type(models.IntegerChoices):
         INPUT = 1, _("input")
         OUTPUT = 2, _("output")
 
         def __repr__(self):
-            return 'transaction type'
+            return 'payment type'
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    request = models.OneToOneField(
-        to=TransactionRequest,
-        on_delete=models.PROTECT,
-        related_name='transactions'
-    )
-    type = models.PositiveSmallIntegerField(choices=Type.choices)
-    trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='trader_transactions')
-    merchant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='merchant_transactions')
+    class Currency(models.IntegerChoices):
+        UAH = 1, _("uah")
+
+        def __repr__(self):
+            return 'payment currency'
+
+    payment_id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    order_id = models.CharField(max_length=255, editable=False)
+    type = models.PositiveSmallIntegerField(choices=Type.choices, editable=False, db_index=True)
+    trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='trader_payments', editable=False)
+    merchant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='merchant_payments', editable=False)
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.PENDING)
-    claimed_amount = models.DecimalField(max_digits=9, decimal_places=2, editable=False)
-    actual_amount = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
-    trader_fee = models.PositiveSmallIntegerField()  # TODO: implement trader_fee
-    admin_fee = models.PositiveSmallIntegerField()  # TODO: implement admin_fee
+    amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+    amount_debit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    amount_credit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    commission = models.PositiveSmallIntegerField(editable=False)  # TODO: implement get commission
+    currency = models.PositiveSmallIntegerField(choices=Currency.choices, default=Currency.UAH, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    expiry_time = models.DateTimeField()  # TODO: implement expiry date
+    completed_at = models.DateTimeField(blank=True, null=True)
+    lifetime = models.DurationField(default=timedelta(minutes=15))  # TODO: implement lifetime
     trader_bank_details = models.ForeignKey(BankDetails, on_delete=models.PROTECT)
     client_card_number = models.CharField(max_length=19, null=True, blank=True)
+    client_id = models.CharField(max_length=255)
+    client_ip = models.GenericIPAddressField()
+
+    def __str__(self):
+        return self.payment_id
+
+
+class PaymentStatusHistory(models.Model):
+    payment = models.ForeignKey(Payment, on_delete=models.CASCADE, related_name='status_history')
+    status = models.PositiveSmallIntegerField(choices=Payment.Status.choices)
+    amount_credit = models.DecimalField(max_digits=10, decimal_places=2)
+    changed_at = models.DateTimeField(auto_now_add=True)
+    changed_by = models.CharField(max_length=255, blank=True, null=True)
+
+
+class Refund(models.Model):
+    class Status(models.IntegerChoices):
+        REQUESTED = 1, _("requested")
+        PENDING = 2, _("pending")
+        COMPLETED = 3, _("completed")
+        FAILED = 4, _("failed")
+
+    payment = models.OneToOneField(Payment, on_delete=models.PROTECT, editable=False, related_name='refund')
+    status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.REQUESTED)
+    requested_at = models.DateTimeField(auto_now=True, editable=False)
+
+    completed_at = models.DateTimeField(null=True, blank=True)
+    client_card_number = models.CharField(max_length=19)
+    client_bank = models.ForeignKey(Bank, on_delete=models.PROTECT, null=True, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+
+
+class PrevPaymentTrader(models.Model):
+    trader = models.ForeignKey(User, on_delete=models.PROTECT)
+    payment = models.ForeignKey(Payment, on_delete=models.PROTECT)
 
 
 class TraderDeposit(models.Model):
@@ -243,7 +244,7 @@ class BalanceHistory(models.Model):
     class ChangeReason(models.IntegerChoices):
         PENDING = 1, _("Deposit")
         COMPLETED = 2, _("Withdrawal")
-        DISPUTED = 3, _("Transaction")
+        DISPUTED = 3, _("Payment")
         CORRECTION = 4, _("Correction")
 
         def __repr__(self):
@@ -254,25 +255,16 @@ class BalanceHistory(models.Model):
     new_balance = models.DecimalField(max_digits=12, decimal_places=2)
     change_reason = models.PositiveSmallIntegerField(choices=ChangeReason.choices)
     created_at = models.DateTimeField(auto_now_add=True)
-    transaction = models.ForeignKey(
-        to=Transaction,
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
+    payment = models.ForeignKey(to=Payment, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.email} balance change on {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
 class MerchantIntegrations(models.Model):
-    merchant = models.ForeignKey(User, on_delete=models.PROTECT)
-    site_url = models.CharField(max_length=255, unique=True)
-    success_url = models.CharField(max_length=255, unique=True)
-    failed_url = models.CharField(max_length=255, unique=True)
+    merchant = models.OneToOneField(User, on_delete=models.PROTECT, related_name='integrations')
+    result_url = models.CharField(max_length=255, unique=True)
     callback_url = models.CharField(max_length=255, unique=True)
 
-
-class PrevTransactionTrader(models.Model):
-    trader = models.ForeignKey(User, on_delete=models.PROTECT)
-    transaction = models.ForeignKey(Transaction, on_delete=models.PROTECT)
+    public_key = models.CharField(max_length=255, unique=True)
+    private_key = models.CharField(max_length=255)

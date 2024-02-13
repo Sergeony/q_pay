@@ -15,13 +15,13 @@ from rest_framework import status
 
 from .models import (
     Bank,
-    MerchantWithdrawal,
     MerchantIntegrations,
     User,
-    PrevTransactionTrader,
     BankDetails,
     Ad,
-    Transaction,
+    Payment,
+    MerchantWithdrawal,
+    PrevPaymentTrader
 )
 from .serializers import (
     BanksSerializer,
@@ -34,12 +34,12 @@ from .serializers import (
     ChangePasswordSerializer,
     BankDetailsSerializer,
     AdSerializer,
-    TransactionSerializer,
-    TransactionRedirectSerializer,
+    PaymentSerializer,
+    PaymentRedirectSerializer,
 )
 from .services import (
-    create_transactions_excel,
-    get_eligible_trader_ids_for_transactions,
+    create_payments_excel,
+    get_eligible_trader_ids_for_payments,
     get_user_id,
     get_value_by_label
 )
@@ -124,86 +124,86 @@ class AdView(APIView):
         return Response(data={"detail": "Ad successfully deleted."}, status=status.HTTP_204_NO_CONTENT)
 
 
-class TraderTransactionListView(APIView):
+class TraderPaymentListView(APIView):
     permission_classes = [IsAuthenticated, IsTraderOrAdminReadOnly]
     valid_statuses = {
         'active': [
-            Transaction.Status.PENDING,
+            Payment.Status.PENDING,
         ],
         'completed': [
-            Transaction.Status.COMPLETED,
-            Transaction.Status.EXPIRED,
-            Transaction.Status.CANCELLED,
+            Payment.Status.COMPLETED,
+            Payment.Status.FAILED,
+            Payment.Status.CANCELLED,
         ],
         'checking': [
-            Transaction.Status.CHECKING
+            Payment.Status.REVIEWING
         ],
         'disputed': [
-            Transaction.Status.DISPUTED
+            Payment.Status.DISPUTING
         ]
     }
 
-    def get(self, request, transaction_type_label, status_group):
+    def get(self, request, payment_type_label, status_group):
         if status_group not in self.valid_statuses:
             return Response(data={"error": "Invalid status group"}, status=status.HTTP_400_BAD_REQUEST, exception=True)
 
         trader_id = get_user_id(request)
-        transaction_type = get_value_by_label(Transaction.Type, transaction_type_label)
+        payment_type = get_value_by_label(Payment.Type, payment_type_label)
 
-        transactions = Transaction.objects.filter(
+        payments = Payment.objects.filter(
             trader_id=trader_id,
-            type=transaction_type,
+            type=payment_type,
             status__in=self.valid_statuses[status_group]
         )
 
-        serializer = TransactionSerializer(transactions, many=True)
+        serializer = PaymentSerializer(payments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ExportTransactionsView(APIView):
+class ExportPaymentsView(APIView):
     permission_classes = [IsAuthenticated, IsTraderOrAdminReadOnly]
 
-    def get(self, request, transaction_type_label):
+    def get(self, request, payment_type_label):
         trader_id = get_user_id(request)
-        transaction_type = get_value_by_label(Transaction.Type, transaction_type_label)
+        payment_type = get_value_by_label(Payment.Type, payment_type_label)
 
-        transactions = Transaction.objects.filter(trader_id=trader_id, type=transaction_type)
+        payments = Payment.objects.filter(trader=trader_id, type=payment_type)
 
         bank_id = request.query_params.get('bank')
         bank_details_id = request.query_params.get('bank_details')
         date_from = request.query_params.get('from')
         date_to = request.query_params.get('to')
-        transaction_status_label = request.query_params.get('status')
+        payment_status_label = request.query_params.get('status')
 
         if status:
-            transaction_status = get_value_by_label(Transaction.Status, transaction_status_label)
-            transactions = transactions.filter(trader_bank_details_id__bank_id=bank_id)
+            payment_status = get_value_by_label(Payment.Status, payment_status_label)
+            payments = payments.filter(trader_bank_details_id__bank_id=bank_id)
         if bank_id:
-            transactions = transactions.filter(trader_bank_details_id__bank_id=bank_id)
+            payments = payments.filter(trader_bank_details_id__bank_id=bank_id)
         if bank_details_id:
-            transactions = transactions.filter(trader_bank_details_id=bank_details_id)
+            payments = payments.filter(trader_bank_details_id=bank_details_id)
         if date_from:
-            transactions = transactions.filter(created_at__gte=date_from)
+            payments = payments.filter(created_at__gte=date_from)
         if date_to:
-            transactions = transactions.filter(created_at__lte=date_to)
+            payments = payments.filter(created_at__lte=date_to)
 
-        workbook = create_transactions_excel(transactions, transaction_type_label)
+        workbook = create_payments_excel(payments, payment_type_label)
 
         response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="transactions.xlsx"'
+        response['Content-Disposition'] = 'attachment; filename="payments.xlsx"'
         workbook.save(response)
         return response
 
 
-class MerchantTransactionsView(APIView):
+class MerchantPaymentsView(APIView):
     permission_classes = [IsAuthenticated, IsMerchantOrAdminReadOnly]
 
-    def get(self, request, transaction_type_label):
+    def get(self, request, payment_type_label):
         merchant_id = get_user_id(request)
-        transaction_type = get_value_by_label(Transaction.Type, transaction_type_label)
+        payment_type = get_value_by_label(Payment.Type, payment_type_label)
 
-        transactions = Transaction.objects.filter(merchant_id=merchant_id, type=transaction_type)
-        serializer = TransactionSerializer(transactions, many=True)
+        payments = Payment.objects.filter(merchant=merchant_id, type=payment_type)
+        serializer = PaymentSerializer(payments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -244,13 +244,13 @@ class AdminUsersView(APIView):
 
     def get(self, request, user_type):
         if user_type == 'traders':
-            related_name = 'trader_transactions'
+            related_name = 'trader_payments'
         elif user_type == 'merchants':
-            related_name = 'merchant_transactions'
+            related_name = 'merchant_payments'
         else:
             return Response(data={'error': 'Invalid user type'}, status=status.HTTP_400_BAD_REQUEST)
 
-        users = User.objects.filter(is_deleted=False).annotate(total_transactions=Count(f'{related_name}'))
+        users = User.objects.filter(is_deleted=False).annotate(total_payments=Count(f'{related_name}'))
         serializer = UserInfoSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -297,44 +297,44 @@ class ActiveTradersListView(APIView):
         return Response(active_traders, status=status.HTTP_200_OK)
 
 
-class TransactionsRedirectView(APIView):
+class PaymentsRedirectView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
-    def patch(self, request, transaction_type_label, *args, **kwargs):
-        serializer = TransactionRedirectSerializer(
+    def patch(self, request, payment_type_label, *args, **kwargs):
+        serializer = PaymentRedirectSerializer(
             data=request.data,
-            ontext={'transaction_type': transaction_type_label}
+            context={'payment_type': payment_type_label}
         )
         serializer.is_valid(raise_exception=True)
 
-        transaction_ids = serializer.validated_data['transaction_ids']
+        payment_ids = serializer.validated_data['payment_ids']
         new_trader_id = serializer.validated_data['new_trader_id']
 
-        transaction_type = get_value_by_label(Transaction.Type, transaction_type_label)
-        transactions = Transaction.objects.filter(
-            type=transaction_type,
-            pk__in=transaction_ids,
-            status=Transaction.Status.PENDING
+        payment_type = get_value_by_label(Payment.Type, payment_type_label)
+        payments = Payment.objects.filter(
+            type=payment_type,
+            pk__in=payment_ids,
+            status=Payment.Status.PENDING
         )
-        eligible_trader_ids = get_eligible_trader_ids_for_transactions(transactions)
+        eligible_trader_ids = get_eligible_trader_ids_for_payments(payments)
 
         if new_trader_id not in eligible_trader_ids:
             return Response(
-                data={'error': 'Trader is not eligible for specified transactions'},
+                data={'error': 'Trader is not eligible for specified payments'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         with db_transaction.atomic():
-            for transaction in transactions:
-                PrevTransactionTrader.objects.create(
-                    trader_id=transaction.trader_id,
-                    transaction_id=transaction.id
+            for payment in payments:
+                PrevPaymentTrader.objects.create(
+                    trader=payment.trader.id,
+                    payment=payment.id
                 )
-                transaction.trader_id = new_trader_id
-                transaction.save()
+                payment.trader.id = new_trader_id
+                payment.save()
 
         return Response(
-            data={'detail': f'Transactions were successfully redirected to trader {new_trader_id}'},
+            data={'detail': f'Payments were successfully redirected to trader {new_trader_id}'},
             status=status.HTTP_200_OK
         )
 
@@ -357,26 +357,26 @@ class UserStatsView(APIView):
         else:
             related_name = 'merchant'
 
-        transactions = Transaction.objects.filter(**{related_name: pk})
+        payments = Payment.objects.filter(**{related_name: pk})
 
         if time_filter:
-            transactions = transactions.filter(created_at__gte=time_filter)
+            payments = payments.filter(created_at__gte=time_filter)
 
-        summary = transactions.aggregate(
+        summary = payments.aggregate(
             total_successful=Count('id', filter=Q(
-                status=Transaction.Status.COMPLETED)),
+                status=Payment.Status.COMPLETED)),
             total_unsuccessful=Count('id', filter=Q(
-                status__in=[Transaction.Status.CANCELLED, Transaction.Status.DISPUTED])),
+                status__in=[Payment.Status.CANCELLED, Payment.Status.DISPUTING])),
             total_input_amount=Sum('claimed_amount', filter=Q(
-                status=Transaction.Status.COMPLETED,
-                type=Transaction.Type.INPUT,
+                status=Payment.Status.COMPLETED,
+                type=Payment.Type.INPUT,
             )),
             total_output_amount=Sum('claimed_amount', filter=Q(
-                status=Transaction.Status.COMPLETED,
-                type=Transaction.Type.OUTPUT)),
+                status=Payment.Status.COMPLETED,
+                type=Payment.Type.OUTPUT)),
         )
 
-        daily_input_stats = transactions.annotate(date=TruncDay('created_at')).values('date').annotate(
+        daily_input_stats = payments.annotate(date=TruncDay('created_at')).values('date').annotate(
             count=Count('id')).order_by('date')
 
         combined_daily_stats = {}
@@ -388,7 +388,7 @@ class UserStatsView(APIView):
             'total_unsuccessful': summary['total_unsuccessful'],
             'total_input_amount': summary['total_input_amount'] or 0,
             'total_output_amount': summary['total_output_amount'] or 0,
-            'daily_transaction_counts': [{'date': date, 'count': count} for date, count in combined_daily_stats.items()]
+            'daily_payment_counts': [{'date': date, 'count': count} for date, count in combined_daily_stats.items()]
         }
 
         return Response(final_stats, status=status.HTTP_200_OK)

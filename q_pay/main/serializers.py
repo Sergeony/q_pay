@@ -6,7 +6,7 @@ from .models import (
     User,
     BankDetails,
     Ad,
-    Transaction,
+    Payment,
     MerchantWithdrawal,
 )
 
@@ -41,16 +41,6 @@ class AdSerializer(serializers.ModelSerializer):
         fields = ['id', 'bank', 'bank_id', 'created_at', 'updated_at', 'is_active', 'bank_details']
 
 
-class TransactionSerializer(serializers.ModelSerializer):
-    trader_bank_details = BankDetailsSerializer(read_only=True)
-
-    class Meta:
-        model = Transaction
-        fields = ['id', 'type', 'trader', 'merchant', 'status', 'claimed_amount',
-                  'actual_amount', 'trader_fee', 'admin_fee', 'created_at', 'updated_at', 'expiry_time',
-                  'trader_bank_details', 'client_card_number']
-
-
 class MerchantWithdrawalSerializer(serializers.ModelSerializer):
     class Meta:
         model = MerchantWithdrawal
@@ -61,25 +51,25 @@ class MerchantWithdrawalSerializer(serializers.ModelSerializer):
 class MerchantIntegrationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = MerchantIntegrations
-        fields = ['id', 'merchant', 'site_url', 'success_url', 'failed_url', 'callback_url']
-        read_only_fields = ['id', 'merchant']
+        fields = ['id', 'merchant', 'result_url', 'callback_url', 'private_key', 'public_key']
+        read_only_fields = ['id', 'merchant', 'public_key', 'private_key']
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
     is_online = serializers.SerializerMethodField()
-    total_transactions = serializers.IntegerField(read_only=True)
+    total_payments = serializers.IntegerField(read_only=True)
     balance = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'is_online', 'total_transactions', 'balance', 'is_active']
+        fields = ['id', 'email', 'is_online', 'total_payments', 'balance', 'is_active']
 
     @staticmethod
     def get_is_online(obj):
         return obj.is_online
 
     @staticmethod
-    def get_balance(obj):
+    def get_balance():
         # TODO: implement
         return 1000
 
@@ -99,26 +89,6 @@ class InviteCodeSerializer(serializers.Serializer):
     user_type = serializers.ChoiceField(choices=User.Type.choices)
 
 
-class TransactionRedirectSerializer(serializers.Serializer):
-    transaction_ids = serializers.ListField(child=serializers.UUIDField(), allow_empty=False)
-    new_trader_id = serializers.IntegerField(min_value=1)
-    transaction_type = serializers.ChoiceField(choices=['input', 'output'])
-
-    @staticmethod
-    def validate_new_trader_id(value):
-        if not User.objects.filter(id=value, user_type=User.Type.TRADER, is_deleted=False).exists():
-            raise serializers.ValidationError("Trader with the specified ID was not found.")
-        return value
-
-    def validate_transaction_ids(self, values):
-        transaction_type = self.initial_data.get('transaction_type')
-
-        if not Transaction.objects.filter(id__in=values, type=transaction_type).exists():
-            raise serializers.ValidationError(f"Some of the specified {transaction_type} transactions were not found.")
-
-        return values
-
-
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
@@ -128,3 +98,31 @@ class UserSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['language', 'timezone', 'is_light_theme', 'is_active']
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    trader_bank_details = BankDetailsSerializer(read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = "__all__"
+
+
+class PaymentRedirectSerializer(serializers.Serializer):
+    payment_ids = serializers.ListField(child=serializers.UUIDField(), allow_empty=False)
+    new_trader_id = serializers.IntegerField(min_value=1)
+    payment_type = serializers.ChoiceField(choices=['input', 'output'])
+
+    @staticmethod
+    def validate_new_trader_id(value):
+        if not User.objects.filter(id=value, user_type=User.Type.TRADER, is_deleted=False).exists():
+            raise serializers.ValidationError("Trader with the specified ID was not found.")
+        return value
+
+    def validate_payment_ids(self, values):
+        payment_type = self.initial_data.get('payment_type')
+
+        if not Payment.objects.filter(id__in=values, type=payment_type).exists():
+            raise serializers.ValidationError(f"Some of the specified {payment_type} payments were not found.")
+
+        return values
