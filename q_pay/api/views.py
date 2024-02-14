@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from main.models import Payment
 from main.serializers import PaymentSerializer, PaymentUpdateSerializer
+from main.services import notify_trader_with_new_payment
 from .services import (
     get_eligible_traders,
     get_best_trader, get_trader_bank_details
@@ -52,4 +53,7 @@ class PaymentAPIView(APIView):
         serializer = PaymentSerializer(data=combined_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        notify_trader_with_new_payment(serializer.data['payment_id'])
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)

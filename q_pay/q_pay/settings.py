@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'channels',
+    'django_celery_beat',
+    'django_celery_results',
 
     'user_auth',
     'main',
@@ -236,3 +238,27 @@ REDIS_DB = env("REDIS_DB")
 
 
 API_REQUEST_TIME_TIMEOUT = timezone.timedelta(seconds=30)
+
+
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+CELERY_RESULT_BACKEND = f'django-db'
+CELERY_CACHE_BACKEND = 'default'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}

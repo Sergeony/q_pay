@@ -5,7 +5,9 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils import timezone
 
-from main.models import Payment
+from main.models import Payment, MerchantIntegrations
+from api.tasks import notify_merchant_with_new_payment_status
+from main.serializers import PaymentSerializer, MerchantIntegrationsSerializer
 
 
 class Consumer(AsyncWebsocketConsumer):
@@ -53,19 +55,16 @@ class Consumer(AsyncWebsocketConsumer):
     async def update_payment_status(self, data):
         payment_id = data.get('payment_id')
         new_status = data.get('new_status')
-        payment_type = data.get('payment_type')
-
-        if payment_type not in ('input', 'output'):
-            await self.send(text_data=json.dumps({"error": "Invalid payment type"}))
-            return
 
         if await self.is_trader_authorized_for_payment(payment_id):
             await self.change_payment_status(payment_id, new_status)
-            updated_payment = await self.get_payment_data(payment_id)
+            (updated_payment_data, merchant_id) = await self.get_payment_data(payment_id)
+            integration_data = await self.get_integration_data(merchant_id)
+            notify_merchant_with_new_payment_status(updated_payment_data, integration_data)
+
             await self.send(text_data=json.dumps({
                 'action': 'updated_payment',
-                'payment_data': updated_payment,
-                'payment_type': payment_type,
+                'payment_data': updated_payment_data,
             }))
         else:
             await self.send(text_data=json.dumps({"error": "Unauthorized"}))
@@ -84,10 +83,14 @@ class Consumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_payment_data(self, payment_id):
         payment = Payment.objects.get(pk=payment_id)
-        return {
-            "id": str(payment.id),
-            "status": payment.get_status_display(),
-        }
+        serializer = PaymentSerializer(payment)
+        return serializer.data, payment.merchant.id
+
+    @database_sync_to_async
+    def get_integration_data(self, merchant_id: int):
+        integration = MerchantIntegrations.objects.get(merchant_id=merchant_id)
+        serializer = MerchantIntegrationsSerializer(integration)
+        return serializer.data
 
     @database_sync_to_async
     def update_last_seen(self):

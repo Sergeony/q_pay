@@ -1,12 +1,15 @@
 from typing import List
 
 import openpyxl
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.db.models.enums import ChoicesMeta
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .models import User, Payment
+from .serializers import PaymentSerializer
 
 
 def get_user_id(request: Request) -> int | Response:
@@ -92,3 +95,16 @@ def get_value_by_label(choices_class: ChoicesMeta, label: str) -> int | Response
             return choice[0]
 
     return Response(data={"error": f"Invalid {choices_class}"}, status=status.HTTP_400_BAD_REQUEST, exception=True)
+
+
+def notify_trader_with_new_payment(payment_id: str):
+    payment = Payment.objects.get(pk=payment_id)
+    serializer = PaymentSerializer(payment)
+
+    channel_layer = get_channel_layer()
+    group_name = f'user_{payment.trader.id}'
+    message = {
+        'type': 'send_new_payment_alert',
+        'payment_data': serializer.data,
+    }
+    async_to_sync(channel_layer.group_send)(group_name, message)

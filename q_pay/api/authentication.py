@@ -8,12 +8,14 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 
 from main.models import MerchantIntegrations
+from user_auth.authentication import JWTAuthentication
 
 
 class SignatureAuthentication(BaseAuthentication):
     def authenticate(self, request):
         if not re.match(r'^/api/v\d+/', request.path):
-            return None, None
+            jwt_auth = JWTAuthentication()
+            return jwt_auth.authenticate(request)
 
         authorization_header = request.headers.get('Authorization')
         timestamp = request.headers.get('X-Timestamp')
