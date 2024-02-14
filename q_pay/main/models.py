@@ -23,7 +23,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('user_type', User.Type.ADMIN)
+        extra_fields.setdefault('type', User.Type.ADMIN)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self._create_user(email, password, **extra_fields)
@@ -105,12 +105,12 @@ class BankDetails(models.Model):
         default=None
     )
     is_deleted = models.BooleanField(default=False)  # TODO: move soft delete from views here
-    daily_limit = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    weekly_limit = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    monthly_limit = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
-    start_daily_turnover = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, default=0.00)
-    start_weekly_turnover = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, default=0.00)
-    start_monthly_turnover = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, default=0.00)
+    daily_limit = models.DecimalField(max_digits=12, decimal_places=2)
+    weekly_limit = models.DecimalField(max_digits=12, decimal_places=2)
+    monthly_limit = models.DecimalField(max_digits=12, decimal_places=2)
+    current_daily_turnover = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    current_weekly_turnover = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    current_monthly_turnover = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
 
     class Meta:
         unique_together = ('trader', 'title')
@@ -144,22 +144,24 @@ class Payment(models.Model):
         def __repr__(self):
             return 'payment currency'
 
-    payment_id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    order_id = models.CharField(max_length=255, editable=False)
-    type = models.PositiveSmallIntegerField(choices=Type.choices, editable=False, db_index=True)
-    trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='trader_payments', editable=False)
-    merchant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='merchant_payments', editable=False)
+    payment_id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    order_id = models.CharField(max_length=255)
+    type = models.PositiveSmallIntegerField(choices=Type.choices, db_index=True)
+    trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='trader_payments')
+    merchant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='merchant_payments')
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.PENDING)
-    amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     amount_debit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     amount_credit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    commission = models.PositiveSmallIntegerField(editable=False)  # TODO: implement get commission
-    currency = models.PositiveSmallIntegerField(choices=Currency.choices, default=Currency.UAH, editable=False)
+    commission = models.PositiveSmallIntegerField()  # TODO: implement get commission
+    currency = models.PositiveSmallIntegerField(choices=Currency.choices, default=Currency.UAH)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(blank=True, null=True)
+    finished_at = models.DateTimeField(blank=True, null=True)
     lifetime = models.DurationField(default=timedelta(minutes=15))  # TODO: implement lifetime
     trader_bank_details = models.ForeignKey(BankDetails, on_delete=models.PROTECT)
     client_card_number = models.CharField(max_length=19, null=True, blank=True)
+    client_bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
     client_id = models.CharField(max_length=255)
     client_ip = models.GenericIPAddressField()
 
@@ -266,5 +268,5 @@ class MerchantIntegrations(models.Model):
     result_url = models.CharField(max_length=255, unique=True)
     callback_url = models.CharField(max_length=255, unique=True)
 
-    public_key = models.CharField(max_length=255, unique=True)
-    private_key = models.CharField(max_length=255)
+    api_key = models.CharField(max_length=255, unique=True)
+    secret_key = models.CharField(max_length=255)

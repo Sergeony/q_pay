@@ -1,77 +1,55 @@
-import base64
-import json
-
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from main.models import User, MerchantIntegrations, Payment
-from main.serializers import PaymentSerializer
-from .services import verify_signature
+from main.models import Payment
+from main.serializers import PaymentSerializer, PaymentUpdateSerializer
+from .services import (
+    get_eligible_traders,
+    get_best_trader, get_trader_bank_details
+)
 
 
-class RequestAPIView(APIView):
-    def post(self, request):
-        encoded_data = request.data.get('data')
-        decoded_data = base64.b64decode(encoded_data).decode()
-        data = json.loads(decoded_data)
-
-        public_key = data.get('public_key')
-        if not public_key:
-            return Response(data={"error": "Public key is missing"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            integration = MerchantIntegrations.objects.get(public_key=public_key)
-        except MerchantIntegrations.DoesNotExist:
-            return Response(data={"error": "Invalid public key"}, status=status.HTTP_404_NOT_FOUND)
-
-        signature = request.data.get('signature')
-        is_signature_valid = verify_signature(integration.private_key, encoded_data, signature)
-
-        if not is_signature_valid:
-            return Response(data={"error": "Invalid signature"}, status=status.HTTP_403_FORBIDDEN)
-
-        merchant = integration.merchant
-        action = data.get('action')
-        if action == 'payment':
-            return self.handle_payment(data)
-        elif action == 'status':
-            return self.handle_status(data, merchant)
-        elif action == 'update':
-            return self.handle_update(data, merchant)
-        elif action == 'reports':
-            return self.handle_reports(merchant)
+class PaymentAPIView(APIView):
+    def get(self, request, order_id=None):
+        if order_id:
+            payment = get_object_or_404(Payment, order_id=order_id, merchant=request.user)
+            serializer = PaymentSerializer(payment)
         else:
-            return Response({"error": "Unknown action"}, status=400)
+            payments = Payment.objects.filter(merchant=request.user)
+            serializer = PaymentSerializer(payments, many=True)
 
-    @staticmethod
-    def handle_payment(data):
-        serializer = PaymentSerializer(data=data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, order_id):
+        payment = get_object_or_404(Payment, order_id=order_id, merchant=request.user)
+        serializer = PaymentUpdateSerializer(payment, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        client_bank = request.data.get('client_bank')
+        amount = request.data.get('amount')
+
+        eligible_traders = get_eligible_traders(client_bank, amount)
+        best_trader = get_best_trader(eligible_traders)
+        if best_trader is None:
+            return Response({"error": "No traders found"}, status=status.HTTP_404_NOT_FOUND)
+
+        trader_bank_details = get_trader_bank_details(best_trader.id, client_bank)
+        # TODO: implement requests in single db transaction
+
+        combined_data = {
+            **request.data,
+            'trader': best_trader.id,
+            'merchant': request.user.id,
+            'trader_bank_details': trader_bank_details.id,
+            'commission': 7,
+        }
+
+        serializer = PaymentSerializer(data=combined_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    @staticmethod
-    def handle_status(data, merchant: User):
-        payment_id = data.get('payment_id')
-        if payment_id:
-            payment = get_object_or_404(Payment, pk=payment_id, merchant=merchant)
-            serializer = PaymentSerializer(payment)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({"error": "Payment id were not provided"}, status=status.HTTP_400_BAD_REQUEST)
-
-    @staticmethod
-    def handle_update(data, merchant: User):
-        payment_id = data.get('payment_id')
-        payment = get_object_or_404(Payment, pk=payment_id, merchant=merchant)
-        serializer = PaymentSerializer(payment, data=data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @staticmethod
-    def handle_reports(merchant: User):
-        payments = Payment.objects.filter(merchant=merchant)
-        serializer = PaymentSerializer(payments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -293,7 +293,7 @@ class ActiveTradersListView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
     def get(self, request, *args, **kwargs):
-        active_traders = User.objects.filter(is_active=True, user_type=User.Type.TRADER).values('id', 'email')
+        active_traders = User.objects.filter(is_active=True, type=User.Type.TRADER).values('id', 'email')
         return Response(active_traders, status=status.HTTP_200_OK)
 
 

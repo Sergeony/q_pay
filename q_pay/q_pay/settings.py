@@ -11,11 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 from pathlib import Path
 import os
-from datetime import timedelta
 
 import environ
 import redis
-
+from django.utils import timezone
 
 env = environ.Env()
 ENV_DIR = Path(__file__).resolve().parent.parent.parent
@@ -169,14 +168,15 @@ EMAIL_PORT = env("EMAIL_PORT")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'api.authentication.SignatureAuthentication',
         'user_auth.authentication.JWTAuthentication',
     ),
 }
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=180),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timezone.timedelta(minutes=180),
+    "REFRESH_TOKEN_LIFETIME": timezone.timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
@@ -203,8 +203,8 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=180),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_LIFETIME": timezone.timedelta(minutes=180),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timezone.timedelta(days=1),
 
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
@@ -225,11 +225,14 @@ CHANNEL_LAYERS = {
 }
 
 
-USER_ONLINE_TIMEOUT = timedelta(seconds=5)
+USER_ONLINE_TIMEOUT = timezone.timedelta(seconds=5)
 
 
-INVITE_CODE_LIFETIME = timedelta(minutes=30)
+INVITE_CODE_LIFETIME = timezone.timedelta(minutes=30)
 
 REDIS_HOST = env("REDIS_HOST")
 REDIS_PORT = env("REDIS_PORT")
 REDIS_DB = env("REDIS_DB")
+
+
+API_REQUEST_TIME_TIMEOUT = timezone.timedelta(seconds=30)

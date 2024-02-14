@@ -7,11 +7,11 @@ from main.models import User
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    user_type = serializers.IntegerField()
+    type = serializers.IntegerField()
 
     class Meta:
         model = User
-        fields = ("id", "email", "password", "user_type")
+        fields = ("id", "email", "password", "type")
         extra_kwargs = {
             "password": {"write_only": True},
         }
@@ -23,7 +23,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         otp_base32 = pyotp.random_base32()
         user_info = {
             "email": email,
-            "user_type": user_type,
+            "type": user_type,
             "otp_base32": otp_base32,
         }
         user = User.objects.create(**user_info)
@@ -71,7 +71,7 @@ class UserLoginSerializer(serializers.Serializer):
                 return {}
 
         refresh = RefreshToken.for_user(user)
-        refresh['user_type'] = user.user_type
+        refresh['user_type'] = user.type
         return {
             "refresh": str(refresh),
             "access": str(refresh.access_token),

@@ -27,7 +27,7 @@ class BankDetailsSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'card_number', 'cardholder_name', 'bank', 'bank_id',
                   'is_active', 'use_automation',
                   'daily_limit', 'weekly_limit', 'monthly_limit',
-                  'start_daily_turnover', 'start_weekly_turnover', 'start_monthly_turnover',
+                  'current_daily_turnover', 'current_weekly_turnover', 'current_monthly_turnover',
                   ]
 
 
@@ -51,8 +51,8 @@ class MerchantWithdrawalSerializer(serializers.ModelSerializer):
 class MerchantIntegrationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = MerchantIntegrations
-        fields = ['id', 'merchant', 'result_url', 'callback_url', 'private_key', 'public_key']
-        read_only_fields = ['id', 'merchant', 'public_key', 'private_key']
+        fields = ['id', 'merchant', 'result_url', 'callback_url', 'api_key', 'secret_key']
+        read_only_fields = ['id', 'merchant', 'api_key', 'secret_key']
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -101,11 +101,24 @@ class UserSettingsSerializer(serializers.ModelSerializer):
 
 
 class PaymentSerializer(serializers.ModelSerializer):
-    trader_bank_details = BankDetailsSerializer(read_only=True)
-
     class Meta:
         model = Payment
         fields = "__all__"
+        read_only_fields = ['payment_id', 'amount_credit', 'amount_debit',
+                            'completed_at', 'finished_at', 'created_at']
+        extra_kwargs = {
+            'trader': {'write_only': True},
+            'merchant': {'write_only': True},
+        }
+
+
+class PaymentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        exclude = ['trader', 'merchant']
+        read_only_fields = ['order_id', 'type', 'amount', 'currency', 'client_card_number', 'client_bank', 'client_id',
+                            'client_ip', 'trader_bank_details', 'payment_id', 'amount_credit', 'amount_debit',
+                            'completed_at', 'finished_at', 'created_at', 'lifetime', 'commission']
 
 
 class PaymentRedirectSerializer(serializers.Serializer):
@@ -115,7 +128,7 @@ class PaymentRedirectSerializer(serializers.Serializer):
 
     @staticmethod
     def validate_new_trader_id(value):
-        if not User.objects.filter(id=value, user_type=User.Type.TRADER, is_deleted=False).exists():
+        if not User.objects.filter(id=value, type=User.Type.TRADER, is_deleted=False).exists():
             raise serializers.ValidationError("Trader with the specified ID was not found.")
         return value
 

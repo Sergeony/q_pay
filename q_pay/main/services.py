@@ -15,7 +15,7 @@ def get_user_id(request: Request) -> int | Response:
     from query params if it's admin
     otherwise  raise exception
     """
-    if request.user.user_type != User.Type.ADMIN:
+    if request.user.type != User.Type.ADMIN:
         return request.user.id
 
     user_id = request.query_params.get('user_id')
@@ -66,7 +66,7 @@ def create_payments_excel(payments: List[Payment], payment_type='input'):
 
 def get_eligible_trader_ids_for_payments(payments: List[Payment]) -> List[str]:
     eligible_trader_ids = User.objects.filter(
-        user_type=User.Type.TRADER,
+        type=User.Type.TRADER,
         is_active=True
     ).values_list('id', flat=True)
 
