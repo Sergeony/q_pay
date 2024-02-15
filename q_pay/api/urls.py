@@ -2,6 +2,6 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('payments/', PaymentAPIView.as_view()),
-    path('payments/<str:order_id>/', PaymentAPIView.as_view()),
+    path('transactions/', TransactionAPIView.as_view()),
+    path('transactions/<str:order_id>/', TransactionAPIView.as_view()),
 ]

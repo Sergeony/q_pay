@@ -5,9 +5,9 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils import timezone
 
-from main.models import Payment, MerchantIntegrations
-from api.tasks import notify_merchant_with_new_payment_status
-from main.serializers import PaymentSerializer, MerchantIntegrationsSerializer
+from main.models import Transaction, MerchantIntegrations
+from api.tasks import notify_merchant_with_new_transaction_status
+from main.serializers import TransactionSerializer, MerchantIntegrationsSerializer
 
 
 class Consumer(AsyncWebsocketConsumer):
@@ -34,12 +34,12 @@ class Consumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    async def send_new_payment_alert(self, event):
-        payment_data = event['payment_data']
+    async def send_new_transaction_alert(self, event):
+        transaction_data = event['transaction_data']
         await self.send(
             text_data=json.dumps({
-                'action': 'new_payment',
-                'payment_data': payment_data,
+                'action': 'new_transaction',
+                'transaction_data': transaction_data,
             })
         )
 
@@ -49,42 +49,53 @@ class Consumer(AsyncWebsocketConsumer):
 
         if action == 'ping':
             await self.update_last_seen()
-        elif action == 'update_payment_status':
-            await self.update_payment_status(data)
+        elif action == 'update_transaction_status':
+            await self.update_transaction_status(data)
 
-    async def update_payment_status(self, data):
-        payment_id = data.get('payment_id')
+    async def update_transaction_status(self, data):
+        transaction_id = data.get('transaction_id')
         new_status = data.get('new_status')
 
-        if await self.is_trader_authorized_for_payment(payment_id):
-            await self.change_payment_status(payment_id, new_status)
-            (updated_payment_data, merchant_id) = await self.get_payment_data(payment_id)
+        if await self.is_trader_authorized_for_transaction(transaction_id):
+            await self.change_transaction_status(transaction_id, new_status)
+            (updated_transaction_data, merchant_id) = await self.get_transaction_data(transaction_id)
             integration_data = await self.get_integration_data(merchant_id)
-            notify_merchant_with_new_payment_status(updated_payment_data, integration_data)
+            notify_merchant_with_new_transaction_status(updated_transaction_data, integration_data)
 
             await self.send(text_data=json.dumps({
-                'action': 'updated_payment',
-                'payment_data': updated_payment_data,
+                'action': 'updated_transaction',
+                'transaction_data': updated_transaction_data,
             }))
         else:
             await self.send(text_data=json.dumps({"error": "Unauthorized"}))
 
     @database_sync_to_async
-    def is_trader_authorized_for_payment(self, payment_id):
-        payment = get_object_or_404(Payment, pk=payment_id)
-        return payment.trader.id == self.user.id
+    def is_trader_authorized_for_transaction(self, transaction_id):
+        transaction = get_object_or_404(Transaction, pk=transaction_id)
+        return transaction.trader.id == self.user.id
 
     @database_sync_to_async
-    def change_payment_status(self, payment_id, new_status):
-        payment = get_object_or_404(Payment, pk=payment_id)
-        payment.status = new_status
-        payment.save()
+    def change_transaction_status(self, transaction_id, new_status):
+        transaction = get_object_or_404(Transaction, pk=transaction_id)
+        transaction.status = new_status
+        transaction.save()
+
+        # if new_status == Transaction.Status.DISPUTING:
+        #     # Отправка уведомления администратору (реализуйте это в соответствии с вашими требованиями)
+        #     pass
+        # elif new_status == Transaction.Status.COMPLETED:
+        #     transaction.finished_at = timezone.now()
+        # transaction.save()
+        # # Запись истории статуса
+        # TransactionStatusHistory.objects.create(transaction=transaction, status=new_status, amount_credit=transaction.amount_credit,
+        #                                     changed_by="trader")
+        # return transaction
 
     @database_sync_to_async
-    def get_payment_data(self, payment_id):
-        payment = Payment.objects.get(pk=payment_id)
-        serializer = PaymentSerializer(payment)
-        return serializer.data, payment.merchant.id
+    def get_transaction_data(self, transaction_id):
+        transaction = Transaction.objects.get(pk=transaction_id)
+        serializer = TransactionSerializer(transaction)
+        return serializer.data, transaction.merchant.id
 
     @database_sync_to_async
     def get_integration_data(self, merchant_id: int):

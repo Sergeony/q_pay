@@ -71,7 +71,7 @@ class User(AbstractBaseUser):
 
 class Bank(models.Model):
     title = models.CharField(max_length=100, unique=True)
-    icon_url = models.ImageField(upload_to='bank_icons/', unique=True)
+    icon_url = models.URLField(max_length=1024, unique=True)
 
     def __str__(self):
         return self.title
@@ -116,7 +116,7 @@ class BankDetails(models.Model):
         unique_together = ('trader', 'title')
 
 
-class Payment(models.Model):
+class Transaction(models.Model):
     class Status(models.IntegerChoices):
         REJECTED = 1, _("rejected")
         PENDING = 2, _("pending")
@@ -129,26 +129,26 @@ class Payment(models.Model):
         PARTIALLY_PAID = 9, _("partially_paid")
 
         def __repr__(self):
-            return 'payment status'
+            return 'transaction status'
 
     class Type(models.IntegerChoices):
         INPUT = 1, _("input")
         OUTPUT = 2, _("output")
 
         def __repr__(self):
-            return 'payment type'
+            return 'transaction type'
 
     class Currency(models.IntegerChoices):
         UAH = 1, _("uah")
 
         def __repr__(self):
-            return 'payment currency'
+            return 'transaction currency'
 
-    payment_id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     order_id = models.CharField(max_length=255)
     type = models.PositiveSmallIntegerField(choices=Type.choices, db_index=True)
-    trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='trader_payments')
-    merchant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='merchant_payments')
+    trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='trader_transactions')
+    merchant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='merchant_transactions')
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.PENDING)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     amount_debit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -164,14 +164,16 @@ class Payment(models.Model):
     client_bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
     client_id = models.CharField(max_length=255)
     client_ip = models.GenericIPAddressField()
+    use_automation = models.BooleanField(default=False)
+    receipt_url = models.URLField(max_length=1024, null=True, blank=True, unique=True)
 
     def __str__(self):
-        return self.payment_id
+        return self.id
 
 
-class PaymentStatusHistory(models.Model):
-    payment = models.ForeignKey(Payment, on_delete=models.CASCADE, related_name='status_history')
-    status = models.PositiveSmallIntegerField(choices=Payment.Status.choices)
+class TransactionStatusHistory(models.Model):
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='status_history')
+    status = models.PositiveSmallIntegerField(choices=Transaction.Status.choices)
     amount_credit = models.DecimalField(max_digits=10, decimal_places=2)
     changed_at = models.DateTimeField(auto_now_add=True)
     changed_by = models.CharField(max_length=255, blank=True, null=True)
@@ -184,7 +186,7 @@ class Refund(models.Model):
         COMPLETED = 3, _("completed")
         FAILED = 4, _("failed")
 
-    payment = models.OneToOneField(Payment, on_delete=models.PROTECT, editable=False, related_name='refund')
+    transaction = models.OneToOneField(Transaction, on_delete=models.PROTECT, editable=False, related_name='refund')
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.REQUESTED)
     requested_at = models.DateTimeField(auto_now=True, editable=False)
 
@@ -194,13 +196,13 @@ class Refund(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
 
 
-class PrevPaymentTrader(models.Model):
+class PrevTransactionTrader(models.Model):
     trader = models.ForeignKey(User, on_delete=models.PROTECT)
-    payment = models.ForeignKey(Payment, on_delete=models.PROTECT)
+    transaction = models.ForeignKey(Transaction, on_delete=models.PROTECT)
 
 
 class TraderDeposit(models.Model):
-    blockchain_transaction_id = models.CharField(max_length=255, unique=True)
+    blockchain_transaction = models.CharField(max_length=255, unique=True)
     trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='deposits', null=True, blank=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     note = models.TextField(null=True, blank=True)
@@ -244,9 +246,9 @@ class Balance(models.Model):
 
 class BalanceHistory(models.Model):
     class ChangeReason(models.IntegerChoices):
-        PENDING = 1, _("Deposit")
-        COMPLETED = 2, _("Withdrawal")
-        DISPUTED = 3, _("Payment")
+        PENDING = 1, _("Pending")
+        COMPLETED = 2, _("Completed")
+        DISPUTED = 3, _("Disputed")
         CORRECTION = 4, _("Correction")
 
         def __repr__(self):
@@ -257,7 +259,7 @@ class BalanceHistory(models.Model):
     new_balance = models.DecimalField(max_digits=12, decimal_places=2)
     change_reason = models.PositiveSmallIntegerField(choices=ChangeReason.choices)
     created_at = models.DateTimeField(auto_now_add=True)
-    payment = models.ForeignKey(to=Payment, on_delete=models.PROTECT, null=True, blank=True)
+    transaction = models.ForeignKey(to=Transaction, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.email} balance change on {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"

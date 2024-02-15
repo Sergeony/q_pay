@@ -3,29 +3,29 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from main.models import Payment
-from main.serializers import PaymentSerializer, PaymentUpdateSerializer
-from main.services import notify_trader_with_new_payment
+from main.models import Transaction
+from main.serializers import TransactionSerializer, TransactionUpdateSerializer
+from main.services import notify_trader_with_new_transaction
 from .services import (
     get_eligible_traders,
     get_best_trader, get_trader_bank_details
 )
 
 
-class PaymentAPIView(APIView):
+class TransactionAPIView(APIView):
     def get(self, request, order_id=None):
         if order_id:
-            payment = get_object_or_404(Payment, order_id=order_id, merchant=request.user)
-            serializer = PaymentSerializer(payment)
+            transaction = get_object_or_404(Transaction, order_id=order_id, merchant=request.user)
+            serializer = TransactionSerializer(transaction)
         else:
-            payments = Payment.objects.filter(merchant=request.user)
-            serializer = PaymentSerializer(payments, many=True)
+            transactions = Transaction.objects.filter(merchant=request.user)
+            serializer = TransactionSerializer(transactions, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, order_id):
-        payment = get_object_or_404(Payment, order_id=order_id, merchant=request.user)
-        serializer = PaymentUpdateSerializer(payment, data=request.data, partial=True)
+        transaction = get_object_or_404(Transaction, order_id=order_id, merchant=request.user)
+        serializer = TransactionUpdateSerializer(transaction, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -50,10 +50,10 @@ class PaymentAPIView(APIView):
             'commission': 7,
         }
 
-        serializer = PaymentSerializer(data=combined_data)
+        serializer = TransactionSerializer(data=combined_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        notify_trader_with_new_payment(serializer.data['payment_id'])
+        notify_trader_with_new_transaction(serializer.data['transaction_id'])
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)

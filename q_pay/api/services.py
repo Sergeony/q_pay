@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.db.models import Case, When, Avg, Count, F, Q, ExpressionWrapper, fields, QuerySet
 from django.db.models.functions import Coalesce
 
-from main.models import User, Payment, BankDetails
+from main.models import User, Transaction, BankDetails
 
 
 def get_eligible_traders(client_bank_id: int, amount: float) -> QuerySet[User]:
@@ -17,9 +17,9 @@ def get_eligible_traders(client_bank_id: int, amount: float) -> QuerySet[User]:
         ads__bank_details__weekly_limit__gte=F('ads__bank_details__current_weekly_turnover') + amount,
         ads__bank_details__monthly_limit__gte=F('ads__bank_details__current_monthly_turnover') + amount,
     ).annotate(
-        total_active_payments=Count(
-            'trader_payments',
-            filter=Q(trader_payments__status=Payment.Status.PENDING),
+        total_active_transactions=Count(
+            'trader_transactions',
+            filter=Q(trader_transactions__status=Transaction.Status.PENDING),
             distinct=True
         )
     ).distinct()
@@ -29,30 +29,30 @@ def get_eligible_traders(client_bank_id: int, amount: float) -> QuerySet[User]:
 
 def get_best_trader(eligible_traders: QuerySet[User]):
     trader = eligible_traders.annotate(
-        completed_payments=Count(
-            'trader_payments',
-            filter=Q(trader_payments__status=Payment.Status.COMPLETED),
+        completed_transactions=Count(
+            'trader_transactions',
+            filter=Q(trader_transactions__status=Transaction.Status.COMPLETED),
             distinct=True
         ),
-        failed_payments=Count(
-            'trader_payments',
-            filter=Q(trader_payments__status=Payment.Status.FAILED),
+        failed_transactions=Count(
+            'trader_transactions',
+            filter=Q(trader_transactions__status=Transaction.Status.FAILED),
             distinct=True
         ),
         success_rate=ExpressionWrapper(
-            F('completed_payments') / (F('failed_payments') + 1),  # Avoid zero division
+            F('completed_transactions') / (F('failed_transactions') + 1),  # Avoid zero division
             output_field=fields.DurationField(),
         ),
     ).annotate(
         avg_processing_time=Coalesce(Avg(
             Case(
                 When(
-                    trader_payments__type=Payment.Type.INPUT,
-                    then=F('trader_payments__completed_at') - F('trader_payments__finished_at')
+                    trader_transactions__type=Transaction.Type.INPUT,
+                    then=F('trader_transactions__completed_at') - F('trader_transactions__finished_at')
                 ),
                 When(
-                    trader_payments__type=Payment.Type.OUTPUT,
-                    then=F('trader_payments__completed_at') - F('trader_payments__created_at')
+                    trader_transactions__type=Transaction.Type.OUTPUT,
+                    then=F('trader_transactions__completed_at') - F('trader_transactions__created_at')
                 ),
                 default=timedelta(seconds=0),
                 output_field=fields.DurationField(),
@@ -60,9 +60,9 @@ def get_best_trader(eligible_traders: QuerySet[User]):
             distinct=True
         ), timedelta(seconds=0)),
     ).filter(
-        total_active_payments__lt=5
+        total_active_transactions__lt=5
     ).order_by(
-        'total_active_payments', '-success_rate', 'avg_processing_time'
+        'total_active_transactions', '-success_rate', 'avg_processing_time'
     ).first()
 
     return trader

@@ -5,18 +5,21 @@ from urllib.parse import urlparse
 
 import httpx
 from celery import shared_task
+from django.db.models import F
 from django.utils import timezone
+
+from main.models import Transaction
 
 
 logger = logging.getLogger(__name__)
 
 
 @shared_task(bind=True, max_retries=4)
-def notify_merchant_with_new_payment_status(self, payment_data, integration_data):
+def notify_merchant_with_new_transaction_status(self, transaction_data, integration_data):
     timestamp = str(int(timezone.now().timestamp()))
     method = "POST"
     path = urlparse((integration_data['callback_url'])).path
-    body = payment_data if payment_data else ''
+    body = transaction_data if transaction_data else ''
     data_string = f"{timestamp}{method}{path}{body}"
 
     hmac_signature = hmac.new(integration_data['secret_key'].encode(), data_string.encode(), hashlib.sha512).hexdigest()
@@ -24,7 +27,7 @@ def notify_merchant_with_new_payment_status(self, payment_data, integration_data
     try:
         response = httpx.post(
             integration_data['callback_url'],
-            json=payment_data,
+            json=transaction_data,
             headers={
                 'Authorization': f'Bearer {integration_data["api_key"]}',
                 'X-Timestamp': timestamp,
@@ -40,3 +43,12 @@ def notify_merchant_with_new_payment_status(self, payment_data, integration_data
         logger.error(f"Callback URL not found: {integration_data['callback_url']}")
     except Exception as e:
         logger.error(f"Unexpected error when notifying merchant: {str(e)}")
+
+#
+# @shared_task
+# def check_pending_transactions():
+#     now = timezone.now()
+#     pending_transactions = Transaction.objects.filter(status=Transaction.Status.PENDING, created_at__lte=now - F('lifetime'))
+#     for transaction in pending_transactions:
+#         # Здесь вызовите функцию обновления статуса на disputing и отправьте уведомления
+#         pass

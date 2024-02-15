@@ -6,7 +6,7 @@ from .models import (
     User,
     BankDetails,
     Ad,
-    Payment,
+    Transaction,
     MerchantWithdrawal,
 )
 
@@ -57,12 +57,12 @@ class MerchantIntegrationsSerializer(serializers.ModelSerializer):
 
 class UserInfoSerializer(serializers.ModelSerializer):
     is_online = serializers.SerializerMethodField()
-    total_payments = serializers.IntegerField(read_only=True)
+    total_transactions = serializers.IntegerField(read_only=True)
     balance = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'is_online', 'total_payments', 'balance', 'is_active']
+        fields = ['id', 'email', 'is_online', 'total_transactions', 'balance', 'is_active']
 
     @staticmethod
     def get_is_online(obj):
@@ -100,11 +100,11 @@ class UserSettingsSerializer(serializers.ModelSerializer):
         fields = ['language', 'timezone', 'is_light_theme', 'is_active']
 
 
-class PaymentSerializer(serializers.ModelSerializer):
+class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Payment
+        model = Transaction
         fields = "__all__"
-        read_only_fields = ['payment_id', 'amount_credit', 'amount_debit',
+        read_only_fields = ['id', 'amount_credit', 'amount_debit',
                             'completed_at', 'finished_at', 'created_at']
         extra_kwargs = {
             'trader': {'write_only': True},
@@ -112,19 +112,18 @@ class PaymentSerializer(serializers.ModelSerializer):
         }
 
 
-class PaymentUpdateSerializer(serializers.ModelSerializer):
+class TransactionUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Payment
+        model = Transaction
         exclude = ['trader', 'merchant']
         read_only_fields = ['order_id', 'type', 'amount', 'currency', 'client_card_number', 'client_bank', 'client_id',
-                            'client_ip', 'trader_bank_details', 'payment_id', 'amount_credit', 'amount_debit',
+                            'client_ip', 'trader_bank_details', 'id', 'amount_credit', 'amount_debit',
                             'completed_at', 'finished_at', 'created_at', 'lifetime', 'commission']
 
 
-class PaymentRedirectSerializer(serializers.Serializer):
-    payment_ids = serializers.ListField(child=serializers.UUIDField(), allow_empty=False)
+class TransactionRedirectSerializer(serializers.Serializer):
+    transaction_ids = serializers.ListField(child=serializers.UUIDField(), allow_empty=False)
     new_trader_id = serializers.IntegerField(min_value=1)
-    payment_type = serializers.ChoiceField(choices=['input', 'output'])
 
     @staticmethod
     def validate_new_trader_id(value):
@@ -132,10 +131,9 @@ class PaymentRedirectSerializer(serializers.Serializer):
             raise serializers.ValidationError("Trader with the specified ID was not found.")
         return value
 
-    def validate_payment_ids(self, values):
-        payment_type = self.initial_data.get('payment_type')
-
-        if not Payment.objects.filter(id__in=values, type=payment_type).exists():
-            raise serializers.ValidationError(f"Some of the specified {payment_type} payments were not found.")
+    @staticmethod
+    def validate_transaction_ids(values):
+        if not Transaction.objects.filter(id__in=values).exists():
+            raise serializers.ValidationError(f"Some of the specified transactions were not found.")
 
         return values
