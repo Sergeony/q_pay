@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.db.models import Case, When, Avg, Count, F, Q, ExpressionWrapper, fields, QuerySet
 from django.db.models.functions import Coalesce
+from django.conf import settings
 
 from main.models import User, Transaction, BankDetails
 
@@ -47,11 +48,11 @@ def get_best_trader(eligible_traders: QuerySet[User]):
         avg_processing_time=Coalesce(Avg(
             Case(
                 When(
-                    trader_transactions__type=Transaction.Type.INPUT,
+                    trader_transactions__type=Transaction.Type.DEPOSIT,
                     then=F('trader_transactions__completed_at') - F('trader_transactions__finished_at')
                 ),
                 When(
-                    trader_transactions__type=Transaction.Type.OUTPUT,
+                    trader_transactions__type=Transaction.Type.WITHDRAWAL,
                     then=F('trader_transactions__completed_at') - F('trader_transactions__created_at')
                 ),
                 default=timedelta(seconds=0),
@@ -60,7 +61,7 @@ def get_best_trader(eligible_traders: QuerySet[User]):
             distinct=True
         ), timedelta(seconds=0)),
     ).filter(
-        total_active_transactions__lt=5
+        total_active_transactions__lt=settings.MAX_TRADER_ACTIVE_DEPOSIT_TRANSACTIONS
     ).order_by(
         'total_active_transactions', '-success_rate', 'avg_processing_time'
     ).first()
