@@ -33,10 +33,12 @@ class UserRegisterView(GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        modified_data = request.data.copy()
-        modified_data['user_type'] = user_type
-
-        serializer = self.get_serializer(data=modified_data)
+        combined_data = {
+            'email': request.data.get('email'),
+            'password': request.data.get('password'),
+            'type': user_type,
+        }
+        serializer = self.get_serializer(data=combined_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 

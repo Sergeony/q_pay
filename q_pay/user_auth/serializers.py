@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.utils import timezone
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.tokens import RefreshToken
 import pyotp
@@ -7,8 +8,6 @@ from main.models import User
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    type = serializers.IntegerField()
-
     class Meta:
         model = User
         fields = ("id", "email", "password", "type")
@@ -17,17 +16,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data: dict):
-        email = validated_data.get("email")
-        password = validated_data.get("password")
-        user_type = validated_data.get("user_type")
-        otp_base32 = pyotp.random_base32()
         user_info = {
-            "email": email,
-            "type": user_type,
-            "otp_base32": otp_base32,
+            "email": validated_data.get("email"),
+            "type": validated_data.get("type"),
+            "otp_base32": pyotp.random_base32(),
         }
         user = User.objects.create(**user_info)
-        user.set_password(password)
+        user.set_password(validated_data.get("password"))
         user.save()
 
         return user
@@ -70,6 +65,7 @@ class UserLoginSerializer(serializers.Serializer):
             else:
                 return {}
 
+        user.last_seen = timezone.now()
         refresh = RefreshToken.for_user(user)
         refresh['user_type'] = user.type
         return {
