@@ -1,8 +1,10 @@
 import uuid
 from datetime import timedelta
+from decimal import Decimal
 
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -28,6 +30,15 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self._create_user(email, password, **extra_fields)
 
+    def merchants(self):
+        return self.filter(type=User.Type.MERCHANT)  # TODO: replace regular sets with these one and the one down here
+
+    def traders(self):
+        return self.filter(type=User.Type.TRADER)
+
+    def admins(self):
+        return self.filter(type=User.Type.ADMIN)
+
 
 class User(AbstractBaseUser):
     class Type(models.IntegerChoices):
@@ -35,28 +46,22 @@ class User(AbstractBaseUser):
         MERCHANT = 2, _("merchant")
         ADMIN = 3, _("admin")
 
-        def __repr__(self):
-            return 'user type'
-
     class Language(models.IntegerChoices):
         ENGLISH = 1, _("english")
         RUSSIAN = 2, _("russian")
         UKRAINIAN = 3, _("ukrainian")
 
-        def __repr__(self):
-            return 'user language'
-
     type = models.PositiveSmallIntegerField(choices=Type.choices)
     email = models.EmailField(max_length=150, unique=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     timezone = models.CharField(max_length=50, default='UTC')
     last_seen = models.DateTimeField(default=None, null=True, blank=True)
-    last_login = None
     is_light_theme = models.BooleanField(default=True)
     language = models.PositiveSmallIntegerField(choices=Language.choices, default=Language.ENGLISH)
     is_deleted = models.BooleanField(default=False)  # TODO: move soft delete from views here
     otp_base32 = models.CharField(max_length=32)
+    last_login = None
 
     objects = UserManager()
 
@@ -73,9 +78,6 @@ class Bank(models.Model):
     title = models.CharField(max_length=100, unique=True)
     icon_url = models.URLField(max_length=1024, unique=True)
 
-    def __str__(self):
-        return self.title
-
 
 class Ad(models.Model):
     trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='ads')
@@ -91,7 +93,7 @@ class Ad(models.Model):
 class BankDetails(models.Model):
     trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='bank_details')
     title = models.CharField(max_length=50, default="")
-    card_number = models.CharField(max_length=19, unique=True)
+    card_number = models.CharField(max_length=19, unique=True)  # TODO: Add validation
     cardholder_name = models.CharField(max_length=100)
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT, null=True, blank=True)
     is_active = models.BooleanField(default=False)
@@ -116,6 +118,14 @@ class BankDetails(models.Model):
         unique_together = ('trader', 'title')
 
 
+class TransactionManager(models.Manager):
+    def deposits(self):
+        return self.filter(type=Transaction.Type.DEPOSIT)
+
+    def withdrawals(self):
+        return self.filter(type=Transaction.Type.WITHDRAWAL)
+
+
 class Transaction(models.Model):
     class Status(models.IntegerChoices):
         REJECTED = 1, _("rejected")
@@ -125,92 +135,89 @@ class Transaction(models.Model):
         DISPUTING = 5, _("disputing")
         COMPLETED = 6, _("completed")
         FAILED = 7, _("failed")
-        REFUND = 8, _("refund")
-        PARTIALLY_PAID = 9, _("partially_paid")
-
-        def __repr__(self):
-            return 'transaction status'
+        PARTIAL = 8, _("partially_paid")
+        REFUND_REQUESTED = 9, _("refund_requested")
+        REFUNDING = 10, _("refunding")
+        REFUNDED = 11, _('refunded')
+        REFUND_FAILED = 12, _("refund_failed")
+        REDIRECT = 13, _("REDIRECT")
 
     class Type(models.IntegerChoices):
-        INPUT = 1, _("input")
-        OUTPUT = 2, _("output")
-
-        def __repr__(self):
-            return 'transaction type'
+        DEPOSIT = 1, _("deposit")
+        WITHDRAWAL = 2, _("withdrawal")
 
     class Currency(models.IntegerChoices):
         UAH = 1, _("uah")
 
-        def __repr__(self):
-            return 'transaction currency'
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     order_id = models.CharField(max_length=255)
     type = models.PositiveSmallIntegerField(choices=Type.choices, db_index=True)
-    trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='trader_transactions')
+    trader = models.ForeignKey(
+        to=User,
+        on_delete=models.PROTECT,
+        related_name='trader_transactions',
+        blank=True,
+        null=True
+    )
     merchant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='merchant_transactions')
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.PENDING)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    amount_debit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    amount_credit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    commission = models.PositiveSmallIntegerField()  # TODO: implement get commission
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))]
+    )
+    actual_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.0,
+        validators=[MinValueValidator(Decimal('0.00'))]
+    )
+    trader_commission = models.PositiveSmallIntegerField(default=None, null=True, blank=True)
+    # TODO: implement get commission
+    service_commission = models.PositiveSmallIntegerField()
+    # TODO: implement get commission
     currency = models.PositiveSmallIntegerField(choices=Currency.choices, default=Currency.UAH)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(blank=True, null=True)
     finished_at = models.DateTimeField(blank=True, null=True)
     lifetime = models.DurationField(default=timedelta(minutes=15))  # TODO: implement lifetime
-    trader_bank_details = models.ForeignKey(BankDetails, on_delete=models.PROTECT)
+    trader_bank_details = models.ForeignKey(BankDetails, on_delete=models.PROTECT, null=True, blank=True)
     client_card_number = models.CharField(max_length=19, null=True, blank=True)
     client_bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
     client_id = models.CharField(max_length=255)
     client_ip = models.GenericIPAddressField()
     use_automation = models.BooleanField(default=False)
     receipt_url = models.URLField(max_length=1024, null=True, blank=True, unique=True)
+    old_trader: User = None
 
-    def __str__(self):
-        return self.id
+    objects = TransactionManager()
 
 
 class TransactionStatusHistory(models.Model):
     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='status_history')
     status = models.PositiveSmallIntegerField(choices=Transaction.Status.choices)
-    amount_credit = models.DecimalField(max_digits=10, decimal_places=2)
     changed_at = models.DateTimeField(auto_now_add=True)
-    changed_by = models.CharField(max_length=255, blank=True, null=True)
 
 
-class Refund(models.Model):
-    class Status(models.IntegerChoices):
-        REQUESTED = 1, _("requested")
-        PENDING = 2, _("pending")
-        COMPLETED = 3, _("completed")
-        FAILED = 4, _("failed")
-
-    transaction = models.OneToOneField(Transaction, on_delete=models.PROTECT, editable=False, related_name='refund')
-    status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.REQUESTED)
-    requested_at = models.DateTimeField(auto_now=True, editable=False)
-
-    completed_at = models.DateTimeField(null=True, blank=True)
-    client_card_number = models.CharField(max_length=19)
-    client_bank = models.ForeignKey(Bank, on_delete=models.PROTECT, null=True, blank=True)
-    amount = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
-
-
-class PrevTransactionTrader(models.Model):
+class PrevTransactionTraders(models.Model):
     trader = models.ForeignKey(User, on_delete=models.PROTECT)
     transaction = models.ForeignKey(Transaction, on_delete=models.PROTECT)
 
+    class Meta:
+        ordering = ['-transaction__created_at']
+        unique_together = ('trader', 'transaction')
+
 
 class TraderDeposit(models.Model):
-    blockchain_transaction = models.CharField(max_length=255, unique=True)
     trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='deposits', null=True, blank=True)
+    blockchain_transaction = models.CharField(max_length=255, unique=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     note = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class AdminWithdrawal(models.Model):
-    admin = models.ForeignKey(User, on_delete=models.PROTECT)
+    admin = models.ForeignKey(User, on_delete=models.PROTECT, related_name='admin_withdrawals')
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     wallet_address = models.CharField(max_length=255)
     note = models.TextField()
@@ -223,11 +230,8 @@ class MerchantWithdrawal(models.Model):
         COMPLETED = 2, _("completed")
         DECLINED = 3, _("declined")
 
-        def __repr__(self):
-            return 'merchant withdrawal status'
-
-    merchant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='withdrawals')
-    admin = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+    merchant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='merchant_withdrawals')
+    admin = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True, related_name='handled_withdrawals')
     amount = models.DecimalField(max_digits=12, decimal_places=4)
     wallet_address = models.CharField(max_length=255)
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.PENDING)
@@ -235,40 +239,36 @@ class MerchantWithdrawal(models.Model):
     finished_at = models.DateTimeField(null=True, blank=True)
 
 
+class ServiceBalance(models.Model):
+    balance = models.DecimalField(max_digits=19, decimal_places=2, default=0.00)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def get_singleton(cls):
+        obj, created = cls.objects.get_or_create(id=1)
+        return obj
+
+
 class Balance(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    active_balance = models.DecimalField(max_digits=19, decimal_places=2)
-    frozen_balance = models.DecimalField(max_digits=19, decimal_places=2, default=0.00)
-
-    def __str__(self):
-        return f"{self.user.email} Balance"
-
-
-class BalanceHistory(models.Model):
-    class ChangeReason(models.IntegerChoices):
-        PENDING = 1, _("Pending")
-        COMPLETED = 2, _("Completed")
-        DISPUTED = 3, _("Disputed")
-        CORRECTION = 4, _("Correction")
-
-        def __repr__(self):
-            return 'balance history change reason'
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='balance_histories')
-    balance_change = models.DecimalField(max_digits=12, decimal_places=2)
-    new_balance = models.DecimalField(max_digits=12, decimal_places=2)
-    change_reason = models.PositiveSmallIntegerField(choices=ChangeReason.choices)
-    created_at = models.DateTimeField(auto_now_add=True)
-    transaction = models.ForeignKey(to=Transaction, on_delete=models.PROTECT, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.user.email} balance change on {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+    user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='balance')
+    active_balance = models.DecimalField(
+        max_digits=19,
+        decimal_places=2,
+        default=0.00,
+        validators=[MinValueValidator(Decimal('0.00'))]
+    )
+    frozen_balance = models.DecimalField(
+        max_digits=19,
+        decimal_places=2,
+        default=0.00,
+        validators=[MinValueValidator(Decimal('0.00'))]
+    )
+    update_at = models.DateTimeField(auto_now=True)
 
 
 class MerchantIntegrations(models.Model):
     merchant = models.OneToOneField(User, on_delete=models.PROTECT, related_name='integrations')
     result_url = models.CharField(max_length=255, unique=True)
     callback_url = models.CharField(max_length=255, unique=True)
-
     api_key = models.CharField(max_length=255, unique=True)
     secret_key = models.CharField(max_length=255)

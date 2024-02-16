@@ -21,7 +21,7 @@ from .models import (
     Ad,
     Transaction,
     MerchantWithdrawal,
-    PrevTransactionTrader
+    PrevTransactionTraders
 )
 from .serializers import (
     BanksSerializer,
@@ -39,10 +39,9 @@ from .serializers import (
 )
 from .services import (
     create_transactions_excel,
-    get_eligible_trader_ids_for_transactions,
-    get_user_id,
-    get_value_by_label
+    get_eligible_trader_ids_for_transactions
 )
+from .utils import get_value_by_label, get_user_id
 from .permissions import IsTraderOrAdminReadOnly, IsMerchantOrAdminReadOnly, IsAdmin
 from q_pay.redis_client import get_redis_client
 
@@ -70,7 +69,7 @@ class BankDetailsView(APIView):
             serializer = BankDetailsSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(trader=request.user)
-        except IntegrityError as e:
+        except IntegrityError:
             return Response(data={'error': 'Bank details already exist'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -104,7 +103,7 @@ class AdView(APIView):
             serializer = AdSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(trader=request.user)
-        except IntegrityError as e:
+        except IntegrityError:
             return Response(data={'error': 'Ad already exists'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -118,7 +117,7 @@ class AdView(APIView):
     def delete(self, request, pk):
         try:
             instance = get_object_or_404(Ad, pk=pk)
-        except Http404 as e:
+        except Http404:
             return Response(data={'error': 'Ads not found'})
         instance.delete()
         return Response(data={"detail": "Ad successfully deleted."}, status=status.HTTP_204_NO_CONTENT)
@@ -254,7 +253,7 @@ class AdminUsersView(APIView):
         serializer = UserInfoSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, user_type, pk):
+    def delete(self, request, pk):
         user = get_object_or_404(User, pk=pk)
         if user.is_deleted:
             return Response(data={'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -262,7 +261,7 @@ class AdminUsersView(APIView):
         user.save()
         return Response(data={"detail": f"user successfully deleted."}, status=status.HTTP_204_NO_CONTENT)
 
-    def patch(self, request, user_type, pk):
+    def patch(self, request, pk):
         user = get_object_or_404(User, pk=pk)
         serializer = UserUpdateSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -322,7 +321,7 @@ class TransactionsRedirectView(APIView):
 
         with db_transaction.atomic():
             for transaction in transactions:
-                PrevTransactionTrader.objects.create(
+                PrevTransactionTraders.objects.create(
                     trader=transaction.trader.id,
                     transaction=transaction.id
                 )
@@ -365,11 +364,11 @@ class UserStatsView(APIView):
                 status__in=[Transaction.Status.CANCELLED, Transaction.Status.DISPUTING])),
             total_input_amount=Sum('claimed_amount', filter=Q(
                 status=Transaction.Status.COMPLETED,
-                type=Transaction.Type.INPUT,
+                type=Transaction.Type.DEPOSIT,
             )),
             total_output_amount=Sum('claimed_amount', filter=Q(
                 status=Transaction.Status.COMPLETED,
-                type=Transaction.Type.OUTPUT)),
+                type=Transaction.Type.WITHDRAWAL)),
         )
 
         daily_input_stats = transactions.annotate(date=TruncDay('created_at')).values('date').annotate(

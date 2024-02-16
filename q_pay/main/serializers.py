@@ -7,7 +7,7 @@ from .models import (
     BankDetails,
     Ad,
     Transaction,
-    MerchantWithdrawal,
+    MerchantWithdrawal, Balance,
 )
 
 
@@ -69,9 +69,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
         return obj.is_online
 
     @staticmethod
-    def get_balance():
-        # TODO: implement
-        return 1000
+    def get_balance(obj: User):  # TODO: optimize SQL queries and move it to separate serializer
+        balance = Balance.objects.get(user=obj)
+        return {
+            "active": balance.active_balance,
+            "frozen": balance.frozen_balance,
+        }
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -104,8 +107,7 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = "__all__"
-        read_only_fields = ['id', 'amount_credit', 'amount_debit',
-                            'completed_at', 'finished_at', 'created_at']
+        read_only_fields = ['actual_amount', 'completed_at', 'finished_at', 'created_at']
         extra_kwargs = {
             'trader': {'write_only': True},
             'merchant': {'write_only': True},
@@ -117,8 +119,8 @@ class TransactionUpdateSerializer(serializers.ModelSerializer):
         model = Transaction
         exclude = ['trader', 'merchant']
         read_only_fields = ['order_id', 'type', 'amount', 'currency', 'client_card_number', 'client_bank', 'client_id',
-                            'client_ip', 'trader_bank_details', 'id', 'amount_credit', 'amount_debit',
-                            'completed_at', 'finished_at', 'created_at', 'lifetime', 'commission']
+                            'client_ip', 'trader_bank_details', 'id', 'amount', 'actual_amount',
+                            'completed_at', 'finished_at', 'created_at', 'lifetime', 'trader_commission']
 
 
 class TransactionRedirectSerializer(serializers.Serializer):
