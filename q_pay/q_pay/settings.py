@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 from pathlib import Path
 import os
-from datetime import timedelta
 
 import environ
 import redis
-
+from celery.schedules import crontab
+from django.utils import timezone
 
 env = environ.Env()
 ENV_DIR = Path(__file__).resolve().parent.parent.parent
@@ -45,7 +45,6 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -59,6 +58,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'channels',
+    'django_celery_beat',
+    'django_celery_results',
 
     'user_auth',
     'main',
@@ -170,14 +171,15 @@ EMAIL_PORT = env("EMAIL_PORT")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.SignatureAuthentication',
+        'user_auth.authentication.JWTAuthentication',
     ),
 }
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=180),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timezone.timedelta(minutes=180),
+    "REFRESH_TOKEN_LIFETIME": timezone.timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
@@ -195,7 +197,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
-    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "USER_AUTHENTICATION_RULE": "user_auth.user_authentication_rule",
 
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
@@ -204,8 +206,8 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=180),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_LIFETIME": timezone.timedelta(minutes=180),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timezone.timedelta(days=1),
 
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
@@ -226,11 +228,48 @@ CHANNEL_LAYERS = {
 }
 
 
-USER_ONLINE_TIMEOUT = timedelta(seconds=5)
+USER_ONLINE_TIMEOUT = timezone.timedelta(seconds=5)
 
 
-INVITE_CODE_LIFETIME = timedelta(minutes=30)
+INVITE_CODE_LIFETIME = timezone.timedelta(minutes=30)
 
 REDIS_HOST = env("REDIS_HOST")
 REDIS_PORT = env("REDIS_PORT")
 REDIS_DB = env("REDIS_DB")
+
+
+API_REQUEST_TIME_TIMEOUT = timezone.timedelta(seconds=30)
+
+
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+CELERY_RESULT_BACKEND = f'django-db'
+CELERY_CACHE_BACKEND = 'default'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+CELERY_BEAT_SCHEDULE = {
+    'check_for_expired_transactions': {
+        'task': 'api.tasks.set_auto_dispute_on_transaction_expiring',
+        'schedule': timezone.timedelta(seconds=15),
+    },
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
+MAX_TRADER_ACTIVE_DEPOSIT_TRANSACTIONS = 5
+MAX_TRADER_ACTIVE_WITHDRAWAL_TRANSACTIONS = 5
+
+MAX_TRANSACTION_STATUS_UPDATE_ATTEMPTS = 3

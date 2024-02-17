@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
-from .service import get_user_type_by_invite_code
+from .services import get_user_type_by_invite_code
 from .serializers import *
 
 
@@ -33,10 +33,12 @@ class UserRegisterView(GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        modified_data = request.data.copy()
-        modified_data['user_type'] = user_type
-
-        serializer = self.get_serializer(data=modified_data)
+        combined_data = {
+            'email': request.data.get('email'),
+            'password': request.data.get('password'),
+            'type': user_type,
+        }
+        serializer = self.get_serializer(data=combined_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -48,7 +50,7 @@ class UserRegisterView(GenericAPIView):
 
 class UserLoginView(GenericAPIView):
     """
-    Login view for user.
+    Login first step for user.
     """
     serializer_class = UserLoginSerializer
 
@@ -59,20 +61,19 @@ class UserLoginView(GenericAPIView):
         """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-
-        data = {"user_id": user.id}
-        if user.last_seen is None:
-            data["otp_base32"] = user.otp_base32
+        login_info = serializer.save()
 
         return Response(
-            data=data,
+            data=login_info,
             status=status.HTTP_200_OK
         )
 
 
 class UserVerifyOTPView(GenericAPIView):
-    serializer_class = UserVerifyOTPSerializer
+    """
+    Login second step for user.
+    """
+    serializer_class = UserLoginSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -98,7 +99,6 @@ class UserVerifyOTPView(GenericAPIView):
 class UserTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         cookie_name = 'refresh'
-        print("MY COOKS:", request.COOKIES)
         if cookie_name not in request.COOKIES:
             raise InvalidToken('Refresh token is not provided in cookies')
         refresh = request.COOKIES.get(cookie_name)

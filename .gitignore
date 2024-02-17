@@ -8,3 +8,7 @@ __pycache__/
 
 # Envrinment
 *.env
+
+
+# DB dumps
+q_pay/db_dumps/
