@@ -139,3 +139,9 @@ class TransactionRedirectSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"Some of the specified transactions were not found.")
 
         return values
+
+
+class BalanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Balance
+        fields = ['active_balance', 'frozen_balance', 'update_at']

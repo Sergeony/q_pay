@@ -2,6 +2,7 @@ import logging
 import time
 
 from django.db.models.signals import pre_save, post_save
+from django.db.transaction import atomic
 from django.dispatch import receiver
 from django.db import transaction, OperationalError
 from django.utils import timezone
@@ -11,13 +12,17 @@ from main.services import (
     update_balances_on_successful_transaction,
     release_user_balance_for_transaction,
     update_balance_on_refunded_transaction,
-    freeze_user_balance_for_transaction, update_balances_on_redirect_transaction, notify_admins_about_new_transaction,
-    notify_trader_about_new_transaction,
+    freeze_user_balance_for_transaction,
+    update_balances_on_redirect_transaction,
+    notify_user_on_transaction_update,
+    notify_user_on_balance_update,
 )
 from main.models import (
     User,
     Balance,
-    Transaction, TransactionStatusHistory,
+    Transaction,
+    TransactionStatusHistory,
+    BalanceHistory,
 )
 from api.tasks import notify_merchant_with_new_transaction_status
 
@@ -33,8 +38,21 @@ def create_user_balance_on_user_create(sender, instance: User, created, **kwargs
     - It is intended for use by non-admin users only (traders and merchants).
     - The admin users have a separate balance storage logic.
     """
-    if instance.type != instance.Type.ADMIN and created:
-        Balance.objects.create(user=instance.id)
+    if created:
+        user = instance if instance.type != instance.Type.ADMIN else None
+        with atomic():
+            Balance.objects.create(user=user)
+            BalanceHistory.objects.create(
+                user=user,
+                new_active_balance=0.00,
+                new_frozen_balance=0.00,
+                change_reason=BalanceHistory.ChangeReason.CREATED
+            )
+
+
+@receiver(post_save, sender=Balance)
+def send_balance_on_balance_update(sender, instance: Balance, **kwargs):
+    notify_user_on_balance_update(instance)
 
 
 @receiver(post_save, sender=User)
@@ -64,10 +82,10 @@ def update_transaction_history_on_transaction_update(sender, instance: Transacti
         changed_at=timezone.now()
     )
     if instance.status == instance.Status.DISPUTING:
-        notify_admins_about_new_transaction(instance.id)
+        notify_user_on_transaction_update(instance, is_admin=True)
     if instance.trader:
-        notify_trader_about_new_transaction(instance.id)
-    notify_merchant_with_new_transaction_status(instance.id)
+        notify_user_on_transaction_update(instance)
+    notify_merchant_with_new_transaction_status(instance)
 
 
 @receiver(pre_save, sender=Transaction)
@@ -96,8 +114,7 @@ def handle_transaction_status_update(sender, instance: Transaction, **kwargs):
         try:
             with transaction.atomic():
                 sender_user = instance.trader if instance.type == instance.Type.DEPOSIT else instance.merchant
-                print("SENDER USER ID: ", sender_user.id)
-                sender_balance = Balance.objects.select_for_update().get(user=sender_user)
+                sender_balance = Balance.objects.get(user=sender_user)
                 if instance.Status == instance.Status.REDIRECT:
                     update_balances_on_redirect_transaction(sender_balance, instance)
                 elif instance.status == instance.Status.PENDING:
@@ -111,7 +128,6 @@ def handle_transaction_status_update(sender, instance: Transaction, **kwargs):
                     release_user_balance_for_transaction(sender_balance, instance)
                 elif instance.status == Transaction.Status.REFUNDED:
                     update_balance_on_refunded_transaction(sender_balance, instance)
-                sender_balance.save(update_fields=['active_balance', 'frozen_balance'])
                 break
         except OperationalError as e:
             message = f"Transaction ID: {instance.id} update failed after {attempt + 1} attempts."

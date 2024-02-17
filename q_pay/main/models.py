@@ -239,18 +239,8 @@ class MerchantWithdrawal(models.Model):
     finished_at = models.DateTimeField(null=True, blank=True)
 
 
-class ServiceBalance(models.Model):
-    balance = models.DecimalField(max_digits=19, decimal_places=2, default=0.00)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    @classmethod
-    def get_singleton(cls):
-        obj, created = cls.objects.get_or_create(id=1)
-        return obj
-
-
 class Balance(models.Model):
-    user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='balance')
+    user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='balance', null=True, blank=True)
     active_balance = models.DecimalField(
         max_digits=19,
         decimal_places=2,
@@ -264,6 +254,36 @@ class Balance(models.Model):
         validators=[MinValueValidator(Decimal('0.00'))]
     )
     update_at = models.DateTimeField(auto_now=True)
+
+
+class BalanceHistory(models.Model):
+    class ChangeReason(models.IntegerChoices):
+        CREATED = 0, _("Created")
+        CORRECTION = 1, _("Correction")
+        PAY_COMMISSION = 2, _("Commission")
+        FREEZE_FOR_REFUND = 3, _("Reserved to Refund")
+        RELEASE_AFTER_REFUND = 4, _("Release after Refund")
+        FREEZE_FOR_TRANSACTION = 5, _("Freeze for transaction")
+        RELEASE_AFTER_TRANSACTION = 6, _("Release for transaction")
+        RETURN_PENALTY = 7, _("Return penalty")
+        TAKE_AWAY_FOR_TRANSACTION = 8, _("Take away for transaction")
+        GIVE_AWAY_FOR_TRANSACTION = 9, _("Give away for transaction")
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='balance_histories', null=True, blank=True)
+    change_reason = models.PositiveSmallIntegerField(choices=ChangeReason.choices)
+    change_active_balance_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    change_frozen_balance_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    new_frozen_balance = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00'))]
+    )
+    new_active_balance = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00'))]
+    )
+    changed_at = models.DateTimeField(auto_now_add=True)
 
 
 class MerchantIntegrations(models.Model):

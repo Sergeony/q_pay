@@ -14,6 +14,7 @@ import os
 
 import environ
 import redis
+from celery.schedules import crontab
 from django.utils import timezone
 
 env = environ.Env()
@@ -244,7 +245,12 @@ CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
 CELERY_RESULT_BACKEND = f'django-db'
 CELERY_CACHE_BACKEND = 'default'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
-
+CELERY_BEAT_SCHEDULE = {
+    'check_for_expired_transactions': {
+        'task': 'api.tasks.set_auto_dispute_on_transaction_expiring',
+        'schedule': timezone.timedelta(seconds=15),
+    },
+}
 
 LOGGING = {
     'version': 1,

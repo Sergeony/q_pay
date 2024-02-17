@@ -15,8 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task(bind=True, max_retries=4)
-def notify_merchant_with_new_transaction_status(self, transaction_id: str):
-    transaction = Transaction.objects.get(pk=transaction_id)
+def notify_merchant_with_new_transaction_status(self, transaction: Transaction):
     integration = MerchantIntegrations.objects.get(merchant=transaction.merchant)
     transaction_data = TransactionSerializer(transaction).data
 
@@ -50,7 +49,7 @@ def notify_merchant_with_new_transaction_status(self, transaction_id: str):
 
 
 @shared_task
-def check_pending_transactions():
+def set_auto_dispute_on_transaction_expiring():
     now = timezone.now()
     pending_transactions = Transaction.objects.filter(
         status=Transaction.Status.PENDING,
