@@ -11,7 +11,7 @@ import KebabMenu from "../../components/common/KebabMenu";
 import Advertisements from '../../views/trader/Advertisements';
 import { RootState } from '../../store/store';
 import { useSelector } from 'react-redux';
-import Requisites from '../../views/trader/Requisites';
+import BankDetails from '../../views/trader/BankDetails';
 import OutputCompletedTransactions from '../../views/trader/OutputCompletedTransactions';
 import AdminHeader from '../../components/admin/AdminHeader';
 
@@ -134,7 +134,7 @@ const TraderStatsPage = () => {
                  element={<Advertisements traderId={userId}/>}
           />
           <Route path={'/requisites/'}
-                 element={<Requisites traderId={userId}/>}
+                 element={<BankDetails traderId={userId}/>}
           />
         </Routes>
       </ContentWrapper>

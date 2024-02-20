@@ -6,8 +6,8 @@ import DropDown from "../../components/common/DropDown";
 import {useFetchBanksQuery} from "../../service/banksService";
 import {BankProps} from "../../store/reducers/banksSlice";
 import {BankIcons} from "../../UI/SVG";
-import {useFetchRequisitesQuery} from "../../service/requisitesService";
-import {RequisitesProps} from "../../store/reducers/requisitesSlice";
+import {useFetchBankDetailsQuery} from "../../service/bankDetailsService";
+import {BankDetailsProps} from "../../store/reducers/bankDetailsSlice";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {useLazyExportTransactionsQuery} from "../../service/exportService";
@@ -48,7 +48,7 @@ interface FormValues {
 
 
 interface ExportProps {
-  transactionsType: 'input' | 'output';
+  transactionsType: 'deposit' | 'withdrawal';
 }
 
 const Export = ({transactionsType}: ExportProps) => {
@@ -72,7 +72,7 @@ const Export = ({transactionsType}: ExportProps) => {
         await exportInputTransactions({
           transactionsType,
           bank: values.bankId,
-          requisites: values.requisitesId,
+          bank_details: values.requisitesId,
           from: values.from ? values.from.toISOString() : "",
           to: values.to ? values.to.toISOString() : "",
         }).unwrap();
@@ -91,9 +91,9 @@ const Export = ({transactionsType}: ExportProps) => {
     formik.setFieldValue('bankId', selectedOption.value);
   };
 
-  const {data: requisites} = useFetchRequisitesQuery({});
+  const {data: requisites} = useFetchBankDetailsQuery({});
   const requisitesOptions = useMemo(() => {
-    return requisites?.map((r: RequisitesProps) => ({ label: `${r.title} ${r.cardholder_name}`, value: r.id })) || [];
+    return requisites?.map((r: BankDetailsProps) => ({ label: `${r.title} ${r.cardholder_name}`, value: r.id })) || [];
   }, [requisites]);
   const handleRequisitesChange = (selectedOption: any) => {
     formik.setFieldValue('requisitesId', selectedOption.value);

@@ -1,5 +1,3 @@
-import pumb from "../../assets/img/pumb.png";
-import privat from "../../assets/img/privat.png";
 import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React, {useEffect, useState} from "react";
 import styled from "styled-components";
@@ -8,8 +6,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store/store";
 import {formatDate, formatTime} from "../../utils";
 import {webSocketService} from "../../service/webSocketService";
-import {moveTransaction} from "../../store/reducers/webSocketSlice";
-import {TransactionProps} from "../../service/transactionsService";
+import {TransactionProps, TransactionStatus, TransactionType} from "../../service/transactionsService";
+import {updateTransaction} from "../../store/reducers/webSocketSlice";
 
 
 const StyledTable = styled.table`
@@ -212,14 +210,26 @@ const SubmitTransactionWrapper = styled.div`
     margin-top: 16px;
 `;
 
+const CancelButton = styled.button`
+  border: 1px solid #F93D3D;
+  border-radius: 16px;
+  padding: 11px 7px;
+  background: none;
+  color: #F93D3D;
+  font-size: 16px;
+  font-family: 'Mulish', serif;
+  font-weight: 700;
+`;
+
 
 const InputActiveTransactions = () => {
-  const handleConfirmTransaction = (transactionId: string) => {
-    webSocketService.sendMessageUpdateTransactionStatus(transactionId, 4, 'input');
+  const handleClick = (transactionId: string, status: TransactionStatus) => {
+    webSocketService.sendMessageChangeTransactionStatus(transactionId, status);
   };
 
-  const transactions = useSelector((state: RootState) => state.webSocket.inputTransactions);
-
+  const transactions = useSelector(
+      (state: RootState) => state.webSocket.transactions.filter(t => t.type == TransactionType.DEPOSIT)
+  );
 
   return (
     <StyledTable>
@@ -242,7 +252,7 @@ const InputActiveTransactions = () => {
       {transactions?.map((t, index) => {
         return (
           <TransactionRow key={t.id}
-                          onConfirm={handleConfirmTransaction}
+                          onClick={handleClick}
                           t={t}
           />
         )
@@ -255,10 +265,10 @@ const InputActiveTransactions = () => {
 
 interface RowProps {
   t: TransactionProps;
-  onConfirm: (transactionId: string) => void;
+  onClick: (transactionId: string, status: TransactionStatus) => void;
 }
 
-const TransactionRow = ({ t, onConfirm }: RowProps) => {
+const TransactionRow = ({ t, onClick }: RowProps) => {
   const [remainingTime, setRemainingTime] = useState('');
   const dispatch = useDispatch();
 
@@ -273,7 +283,8 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
 
       if (timeDiff <= 0) {
         clearInterval(timerId);
-        dispatch(moveTransaction({id: t.id, transactionType: 'input'}));
+        t.status = TransactionStatus.DISPUTING;
+        dispatch(updateTransaction(t));
       }
     };
 
@@ -292,19 +303,19 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
           <BankIcon size={32}/>
           <Value>
             <TetherIcon size={24}/>
-            <FirstLine>{(Number(t.actual_amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</FirstLine>
+            <FirstLine>{(Number(t.amount) / Number(t.amount)).toPrecision(4)}₮</FirstLine>
           </Value>
         </Bank>
         <TranID><span>{t.id}</span></TranID>
         <MyRate>
           <RateWrapper>
-            <FirstLine>{t.trader_usdt_rate}₴</FirstLine>
+            <FirstLine>{t.actual_amount}₴</FirstLine>
             <SecondLine>3,75%</SecondLine>
           </RateWrapper>
         </MyRate>
         <ExchangeRate>
           <RateWrapper>
-            <FirstLine>{t.exchange_usdt_rate}₴</FirstLine>
+            <FirstLine>{t.actual_amount}₴</FirstLine>
             <SecondLine>BINANCE</SecondLine>
           </RateWrapper>
         </ExchangeRate>
@@ -316,8 +327,8 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
         </Client>
         <Reqs>
           <RateWrapper>
-            <FirstLine>{t.requisites.title} {t.requisites.card_number}</FirstLine>
-            <SecondLine>{t.requisites.cardholder_name}</SecondLine>
+            <FirstLine>{t.trader_bank_details.title} {t.trader_bank_details.card_number}</FirstLine>
+            <SecondLine>{t.trader_bank_details.cardholder_name}</SecondLine>
           </RateWrapper>
         </Reqs>
         <Start>
@@ -332,16 +343,19 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
           </RateWrapper>
         </End>
         <Status>
-          {t.automation_used && <AutomationIcon size={24} useGradient={true}/>}
+          {t.use_automation && <AutomationIcon size={24} useGradient={true}/>}
           <StatusText>Ожидание</StatusText>
         </Status>
       </StyledRow>
       <SubmitTransactionWrapper>
         <Button style={{width: "284px"}}
-                onClick={() => onConfirm(t.id)}
+                onClick={() => onClick(t.id, TransactionStatus.COMPLETED)}
         >
           Подтвердить
         </Button>
+        <CancelButton onClick={() => onClick(t.id, TransactionStatus.FAILED)}>
+          Отменить сделку
+        </CancelButton>
         <Timer>{remainingTime}</Timer>
       </SubmitTransactionWrapper>
     </BodyTr>

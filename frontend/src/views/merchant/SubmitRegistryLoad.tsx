@@ -4,6 +4,7 @@ import {BackButton, Button} from "../../UI/CommonUI";
 import {Form, Formik} from 'formik';
 import * as Yup from "yup";
 import {CrossIcon, UploadIcon} from "../../UI/SVG";
+import { hostUrl } from '../../service';
 
 const RegistrationSchema = Yup.object().shape({
   receipt: Yup.mixed().required('File is required'),
@@ -84,18 +85,30 @@ const FileName = styled.span`
 
 interface IProps {
   onClose: () => void;
-  onClick: () => void;
 }
 
-const SubmitOutputTransactionModal = ({onClose, onClick}: IProps) => {
+const SubmitRegistryLoad = ({onClose}: IProps) => {
   const [fileName, setFileName] = useState('');
+  const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
     if (file) {
       setFileName(file.name);
+      setFile(file);
     }
   };
+
+  const handleSubmit = (event: any) => {
+    if (file === null)
+      return
+    const formData = new FormData();
+    formData.append("file", file);
+    fetch(`${hostUrl}/api/web/merchant/transactions/withdrawal/upload/`, {
+      method: 'POST',
+      body: formData,
+    })
+  }
 
   return (
     <PopupOverlay>
@@ -103,7 +116,7 @@ const SubmitOutputTransactionModal = ({onClose, onClick}: IProps) => {
         <CloseButton onClick={onClose}>
           <CrossIcon/>
         </CloseButton>
-        <Title>Прикрепите ваш чек оплаты</Title>
+        <Title></Title>
         <Formik
           initialValues={{email: '', password: ''}}
           validationSchema={RegistrationSchema}
@@ -114,7 +127,7 @@ const SubmitOutputTransactionModal = ({onClose, onClick}: IProps) => {
           <Form>
             <FileInputWrapper>
               <FileInput
-                name="receipt"
+                name="registry"
                 type="file"
                 onChange={handleFileChange}
                 id="file-upload"
@@ -123,15 +136,14 @@ const SubmitOutputTransactionModal = ({onClose, onClick}: IProps) => {
               <FileName title={fileName}>{fileName || "Выбрать файл"}</FileName>
             </FileInputWrapper>
 
-            <p>Допустимые форматы: <span>PDF, JPG, PNG</span></p>
+            <p>Допустимые форматы: <span>CSV, XLSX</span></p>
             <Button style={{width: "400px", marginTop: "16px"}}
-                    onClick={onClick}>Создать</Button>
+                    onClick={handleSubmit}>Выгрузить</Button>
           </Form>
         </Formik>
-        <BackButton style={{marginTop: "8px"}} onClick={onClose}>Отменить</BackButton>
       </PopupContainer>
     </PopupOverlay>
   );
 };
 
-export default SubmitOutputTransactionModal;
+export default SubmitRegistryLoad;

@@ -1,22 +1,53 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import {RequisitesProps} from "../store/reducers/requisitesSlice";
+import {BankDetailsProps} from "../store/reducers/bankDetailsSlice";
 import {baseQueryWithReauth} from ".";
+
+
+export enum TransactionType {
+  DEPOSIT = 1,
+  WITHDRAWAL = 2,
+}
+
+export enum TransactionStatus {
+  REJECTED = 1,
+  PENDING = 2,
+  CANCELLED = 3,
+  REVIEWING = 4,
+  DISPUTING = 5,
+  COMPLETED = 6,
+  FAILED = 7,
+  PARTIAL = 8,
+  REFUND_REQUESTED = 9,
+  REFUNDING = 10,
+  REFUNDED = 11,
+  REFUND_FAILED = 12,
+  REDIRECT = 13,
+}
+
 
 export interface TransactionProps {
   id: string;
-  status: number;
+  order_id: string;
+  type: TransactionType;
   trader: number;
   merchant: number;
+  status: TransactionStatus;
+  amount: number;
+  actual_amount: number;
+  trader_commission: string;
+  service_commission: string;
+  currency: number;
   created_at: string;
-  confirmed_at: string | null;
+  completed_at: string | null;
   finished_at: string | null;
-  requisites: RequisitesProps;
-  trader_usdt_rate: string;
-  exchange_usdt_rate: string;
-  automation_used: boolean;
-  claimed_amount?: string;
-  actual_amount?: string;
-  amount?: string;
+  lifetime: number;
+  trader_bank_details: BankDetailsProps;
+  client_card_number?: string;
+  client_bank: number;
+  client_id: string;
+  client_ip: string;
+  use_automation: boolean;
+  receipt_url?: string;
 }
 
 export interface GetTransactionsRequestProps {
@@ -31,46 +62,47 @@ interface GetMerchantTransactionsRequestProps {
 export const transactionsApi = createApi({
   reducerPath: 'transactionsApi',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Input", "Output"],
+  tagTypes: ["Deposit", "Withdrawal"],
   endpoints: (builder) => ({
-    getInputTransactions: builder.query<TransactionProps[], GetTransactionsRequestProps>({
+    getDepositTransactions: builder.query<TransactionProps[], GetTransactionsRequestProps>({
       query: ({statusGroup, ...params}) => ({
-        url: `api/v1/trader/transactions/input/${statusGroup ? statusGroup + '/' : ''}`,
+        url: `api/web/trader/transactions/deposit/${statusGroup ? statusGroup + '/' : ''}`,
         params,
       }),
-      providesTags: ["Input"],
+      providesTags: ["Deposit"],
     }),
-    getOutputTransactions: builder.query<TransactionProps[], GetTransactionsRequestProps>({
+    getWithdrawalTransactions: builder.query<TransactionProps[], GetTransactionsRequestProps>({
       query: ({statusGroup, ...params}) => ({
-        url: `api/v1/trader/transactions/output/${statusGroup ? statusGroup + '/' : ''}`,
+        url: `api/web/trader/transactions/withdrawal/${statusGroup ? statusGroup + '/' : ''}`,
         params,
       }),
-      providesTags: ["Output"]
+      providesTags: ["Withdrawal"]
 
     }),
-    getMerchantInputTransactions: builder.query<TransactionProps[], GetMerchantTransactionsRequestProps>({
+    getMerchantDepositTransactions: builder.query<TransactionProps[], GetMerchantTransactionsRequestProps>({
       query: (params) => ({
-        url: 'api/v1/merchant/transactions/input/',
+        url: 'api/web/merchant/transactions/deposit/',
         params
       }),
-      providesTags: ["Input"]
+      providesTags: ["Deposit"]
 
     }),
-    getMerchantOutputTransactions: builder.query<TransactionProps[], GetMerchantTransactionsRequestProps>({
+    getMerchantWithdrawalTransactions: builder.query<TransactionProps[], GetMerchantTransactionsRequestProps>({
         query: (params) => ({
-          url: 'api/v1/merchant/transactions/output/',
+          url: 'api/web/merchant/transactions/withdrawal/',
           params,
         }),
-        providesTags: ["Output"]
+        providesTags: ["Withdrawal"]
     }),
   }),
 });
 
 export const {
-  useGetInputTransactionsQuery,
-  useGetOutputTransactionsQuery,
-
-  useGetMerchantInputTransactionsQuery,
-  useGetMerchantOutputTransactionsQuery,
+  useGetDepositTransactionsQuery,
+  useGetWithdrawalTransactionsQuery,
+  useLazyGetDepositTransactionsQuery,
+  useLazyGetWithdrawalTransactionsQuery,
+  useGetMerchantDepositTransactionsQuery,
+  useGetMerchantWithdrawalTransactionsQuery,
 
 } = transactionsApi;

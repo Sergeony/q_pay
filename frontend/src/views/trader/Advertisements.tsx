@@ -3,10 +3,10 @@ import React from "react";
 import styled from "styled-components";
 import Switch from "../../components/common/Switch";
 import {
-  useDeleteAdvertisementMutation,
-  useFetchAdvertisementsQuery,
-  useToggleAdvertisementActivityMutation
-} from "../../service/advertisementsService";
+  useDeleteAdMutation,
+  useFetchAdsQuery,
+  useToggleAdActivityMutation
+} from "../../service/adsService";
 import KebabMenu from "../../components/common/KebabMenu";
 
 
@@ -53,12 +53,9 @@ const TranID = styled(StyledTd)`
     }
 `;
 
-const MyRate = styled(StyledTd)`
-    width: 25%;
-`;
 
 const ExchangeRate = styled(StyledTd)`
-    width: 25%;
+    width: 50%;
 `;
 
 
@@ -178,9 +175,9 @@ interface AdvertisementsViewProps {
 }
 
 const Advertisements = ({traderId}: AdvertisementsViewProps) => {
-  const params = traderId ? {trader_id: traderId} : {};
-  const {data: advertisements, error, isLoading} = useFetchAdvertisementsQuery(params);
-  const [deleteAdvertisement] = useDeleteAdvertisementMutation();
+  const params = traderId ? {user_id: traderId} : {};
+  const {data: advertisements, error, isLoading} = useFetchAdsQuery(params);
+  const [deleteAdvertisement] = useDeleteAdMutation();
 
   const handleDelete = (id: number) => {
     deleteAdvertisement(id)
@@ -193,10 +190,10 @@ const Advertisements = ({traderId}: AdvertisementsViewProps) => {
       });
   };
 
-  const [toggleActivity] = useToggleAdvertisementActivityMutation();
+  const [toggleActivity] = useToggleAdActivityMutation();
 
-  const handleToggle = (id: number, isActivated: boolean) => {
-    toggleActivity({ id, is_activated: isActivated });
+  const handleToggle = (id: number, isActive: boolean) => {
+    toggleActivity({ id, is_active: isActive });
   };
 
 
@@ -209,8 +206,7 @@ const Advertisements = ({traderId}: AdvertisementsViewProps) => {
         <Tr>
           <HeadRow>
             <TranID><TranIDTitle>Банк</TranIDTitle></TranID>
-            <MyRate>Мой курс</MyRate>
-            <ExchangeRate>Курс биржи</ExchangeRate>
+            <ExchangeRate>Реквизиты</ExchangeRate>
             <Activity>Активность</Activity>
             <Activity></Activity>
           </HeadRow>
@@ -218,7 +214,7 @@ const Advertisements = ({traderId}: AdvertisementsViewProps) => {
         </thead>
         <tbody>
         {advertisements?.map((a, index) => {
-          const BankIcon = BankIcons[a.requisites.bank.id] || null;
+          const BankIcon = BankIcons[a.bank.id] || null;
           return (
             <BodyTr key={index}>
               <StyledRow>
@@ -228,31 +224,25 @@ const Advertisements = ({traderId}: AdvertisementsViewProps) => {
                       <BankIconWrapper>
                         <BankIcon/>
                       </BankIconWrapper>
-                      <span>{a.requisites.bank.title} UAH</span>
+                      <span>{a.bank.title} UAH</span>
                     </UAHValue>
-                    <Value style={{gap: '4px', border: '1px solid #46404B', borderRadius: '8px', padding: '4px 8px', width: "fit-content"}}>
-                      {a.requisites.automation_used &&  <AutomationIcon/>}
-                      <CardIcon/>
-                      <SecondLine>{a.requisites.title} {a.requisites.last_four_card_number}</SecondLine>
-                    </Value>
                   </Values>
                 </Bank>
-                <MyRate>
-                  <RateWrapper>
-                    <FirstLine>{a.trader_usdt_rate}₴</FirstLine>
-                    <SecondLine>3,75%</SecondLine>
-                  </RateWrapper>
-                </MyRate>
                 <ExchangeRate>
                   <RateWrapper>
-                    <FirstLine>{a.exchange_usdt_rate}₴</FirstLine>
-                    <SecondLine>BINANCE</SecondLine>
+                      {a.bank_details.map((bd, index) => (
+                        <Value key={bd.id} style={{gap: '4px', border: '1px solid #46404B', borderRadius: '8px', padding: '4px 8px', width: "fit-content"}}>
+                          {bd.use_automation &&  <AutomationIcon/>}
+                          <CardIcon/>
+                          <SecondLine>{bd.title} {bd.last_four_card_number}</SecondLine>
+                        </Value>
+                      ))}
                   </RateWrapper>
                 </ExchangeRate>
                 <Activity>
                   <Switch size={'small'}
-                          isActivated={a.is_activated}
-                          onToggle={() => handleToggle(a.id, !a.is_activated)}/>
+                          isActivated={a.is_active}
+                          onToggle={() => handleToggle(a.id, !a.is_active)}/>
                 </Activity>
                 <Menu>
                   <KebabMenu showDelete={true}

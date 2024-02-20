@@ -5,11 +5,11 @@ import DropDown from "../../components/common/DropDown";
 import {useFormik} from 'formik';
 import * as Yup from "yup";
 import {BankIcons, CrossIcon} from "../../UI/SVG";
-import {useCreateAdvertisementMutation} from "../../service/advertisementsService";
+import {useCreateAdMutation} from "../../service/adsService";
 import {useFetchBanksQuery} from "../../service/banksService";
 import {BankProps} from "../../store/reducers/banksSlice";
-import {useFetchRequisitesQuery} from "../../service/requisitesService";
-import {RequisitesProps} from "../../store/reducers/requisitesSlice";
+import {useFetchBankDetailsQuery} from "../../service/bankDetailsService";
+import {BankDetailsProps} from "../../store/reducers/bankDetailsSlice";
 
 
 const PopupOverlay = styled.div`
@@ -61,19 +61,19 @@ interface IProps {
 }
 
 const CreateAdvertisementsModal = ({onClose}: IProps) => {
-  const [createAdvertisement] = useCreateAdvertisementMutation();
+  const [createAdvertisement] = useCreateAdMutation();
 
   const formik = useFormik({
     initialValues: {
-      requisitesId: NaN
+      bankDetailsId: NaN
     },
     validationSchema: Yup.object({
-      requisitesId: Yup.number().required('Required'),
+      bankDetailsId: Yup.number().required('Required'),
     }),
     onSubmit: async (values) => {
       try {
         await createAdvertisement({
-          requisites_id: values.requisitesId
+          bank_details_id: values.bankDetailsId
         });
 
         onClose();
@@ -90,14 +90,14 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
     return banks?.map((o: BankProps) => ({ label: o.title, value: o.id, icon: BankIcons[o.id] })) || [];
   }, [banks]);
 
-  const {data: requisites, error, isLoading} = useFetchRequisitesQuery({});
+  const {data: bankDetails, error, isLoading} = useFetchBankDetailsQuery({});
 
-  const requisitesOptions = useMemo(() => {
-    return requisites?.map((r: RequisitesProps) => ({ label: `${r.title} ${r.cardholder_name}`, value: r.id })) || [];
-  }, [requisites]);
+  const bankDetailsOptions = useMemo(() => {
+    return bankDetails?.map((r: BankDetailsProps) => ({ label: `${r.title} ${r.cardholder_name}`, value: r.id })) || [];
+  }, [bankDetails]);
 
-  const handleRequisitesChange = (selectedOption: any) => {
-    formik.setFieldValue('requisitesId', selectedOption.value);
+  const handleBankDetailsChange = (selectedOption: any) => {
+    formik.setFieldValue('bankDetailsId', selectedOption.value);
   };
 
 
@@ -111,16 +111,16 @@ const CreateAdvertisementsModal = ({onClose}: IProps) => {
           <form onSubmit={formik.handleSubmit}>
             <DropDown label={'Выберите банк'}
                       width={'100%'}
-                      value={{label: "Банк", value: ""}}
-                      options={[{label: "Банк", value: ""}, ...bankOptions]}
+                      value={undefined}
+                      options={[...bankOptions]}
             />
             <DropDown label={"Выберете Реквизиты"}
                       width={'100%'}
-                      options={[{label: "Реквизиты", value: ""}, ...requisitesOptions]}
-                      value={requisitesOptions.find(o => o.value === formik.values.requisitesId)}
-                      onChange={handleRequisitesChange}
+                      options={[{label: "Реквизиты", value: ""}, ...bankDetailsOptions]}
+                      value={bankDetailsOptions.find(o => o.value === formik.values.bankDetailsId)}
+                      onChange={handleBankDetailsChange}
             />
-            <Button style={{width: "400px", marginTop: "16px"}} type="submit">Создать</Button>
+            <Button style={{width: "400px", marginTop: "36px"}} type="submit">Создать</Button>
           </form>
           <BackButton style={{marginTop: "8px"}} onClick={onClose}>Отменить</BackButton>
       </PopupContainer>

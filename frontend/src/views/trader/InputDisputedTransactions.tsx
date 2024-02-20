@@ -3,7 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import {
   GetTransactionsRequestProps,
-  useGetInputTransactionsQuery
+  useGetDepositTransactionsQuery
 } from "../../service/transactionsService";
 import {formatDate, formatTime} from "../../utils";
 
@@ -202,7 +202,7 @@ const StatusText = styled.span`
 
 const InputDisputedTransactions = () => {
   const params: GetTransactionsRequestProps = {statusGroup: 'disputed'};
-  const {data: transactions} = useGetInputTransactionsQuery(params);
+  const {data: transactions} = useGetDepositTransactionsQuery(params);
 
   return (
       <StyledTable>
@@ -223,7 +223,7 @@ const InputDisputedTransactions = () => {
         </thead>
         <tbody>
         {transactions?.map((t, index) => {
-          const BankIcon = BankIcons[t.requisites.bank.id] || null;
+          const BankIcon = BankIcons[t.trader_bank_details.bank.id] || null;
           return (
         <BodyTr key={index}>
           <StyledRow>
@@ -238,20 +238,20 @@ const InputDisputedTransactions = () => {
                 </UAHValue>
                 <Value>
                   <TetherIcon/>
-                  <SecondLine>{(Number(t.actual_amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
+                  <SecondLine>{(Number(t.actual_amount) / Number(t.amount)).toPrecision(4)}₮</SecondLine>
                 </Value>
               </Values>
             </Bank>
             <TranID><span>{t.id}</span></TranID>
             <MyRate>
               <RateWrapper>
-                <FirstLine>{t.trader_usdt_rate}₴</FirstLine>
+                <FirstLine>{t.actual_amount}₴</FirstLine>
                 <SecondLine>3,75%</SecondLine>
               </RateWrapper>
             </MyRate>
             <ExchangeRate>
               <RateWrapper>
-                <FirstLine>{t.exchange_usdt_rate}₴</FirstLine>
+                <FirstLine>{t.amount}₴</FirstLine>
                 <SecondLine>BINANCE</SecondLine>
               </RateWrapper>
             </ExchangeRate>
@@ -263,8 +263,8 @@ const InputDisputedTransactions = () => {
             </Client>
             <Reqs>
               <RateWrapper>
-                <FirstLine>{t.requisites.title} {t.requisites.card_number}</FirstLine>
-                <SecondLine>{t.requisites.cardholder_name}</SecondLine>
+                <FirstLine>{t.trader_bank_details.title} {t.trader_bank_details.card_number}</FirstLine>
+                <SecondLine>{t.trader_bank_details.cardholder_name}</SecondLine>
               </RateWrapper>
             </Reqs>
             <Start>
@@ -279,8 +279,8 @@ const InputDisputedTransactions = () => {
               </RateWrapper>
             </End>
             <Status>
-              {t.automation_used && <AutomationIcon size={24} useGradient={true}/>}
-              <StatusText>{t.automation_used ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
+              {t.use_automation && <AutomationIcon size={24} useGradient={true}/>}
+              <StatusText>{t.use_automation ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
             </Status>
           </StyledRow>
         </BodyTr>

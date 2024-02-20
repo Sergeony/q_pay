@@ -5,6 +5,7 @@ import {NavLink} from "react-router-dom";
 import Header from '../common/Header';
 import {RootState} from "../../store/store";
 import {useSelector} from "react-redux";
+import {TransactionType} from "../../service/transactionsService";
 
 
 const NavUl = styled.ul`
@@ -45,12 +46,14 @@ const BalancesContainer = styled.div`
 `;
 
 const ActiveBalance = styled.span`
-    display: block;
+    display: flex;
+    align-items: center;
     color: ${({theme}) => theme.active_balance_text_color};
 `;
 
 const FrozenBalance = styled.span`
-    display: block;
+    display: flex;
+    align-items: center;
     background: ${({theme}) => theme.frozen_balance_text_color};
     background-clip: text;
     -webkit-background-clip: text;
@@ -81,7 +84,11 @@ const Circle = styled.span`
 `;
 
 const TraderHeader = () => {
-  const transactions = useSelector((state: RootState) => state.webSocket);
+  const transactions = useSelector((state: RootState) => state.webSocket.transactions);
+  const balance = useSelector((state: RootState) => state.balance.balance);
+
+  const depositTransactionsCount = transactions.filter(t => t.type == TransactionType.DEPOSIT);
+  const withdrawalTransactionsCount = transactions.filter(t => t.type == TransactionType.WITHDRAWAL);
 
   return (
     <Header>
@@ -93,16 +100,16 @@ const TraderHeader = () => {
             >Объявления</TabLink>
           </li>
           <li style={{position: 'relative'}}>
-            {transactions.inputTransactions.length > 0 && (
-              <Circle>{transactions.inputTransactions.length}</Circle>
+            {depositTransactionsCount.length > 0 && (
+              <Circle>{depositTransactionsCount.length}</Circle>
             )}
             <TabLink to={"/sell/active/"}
                      isActive={location.pathname.includes('/sell/')}
             >Продажа</TabLink>
           </li>
           <li style={{position: 'relative'}}>
-            {transactions.outputTransactions.length > 0 && (
-              <Circle>{transactions.outputTransactions.length}</Circle>
+            {withdrawalTransactionsCount.length > 0 && (
+              <Circle>{withdrawalTransactionsCount.length}</Circle>
             )}
             <TabLink to={"/buy/active/"}
                      isActive={location.pathname.includes('/buy/')}
@@ -124,8 +131,8 @@ const TraderHeader = () => {
             >
               <BalancesWrapper>
                 <BalancesContainer>
-                  <ActiveBalance>1 256 312 <TetherIcon/></ActiveBalance>
-                  <FrozenBalance>5 438 <SnowFlakeIcon/></FrozenBalance>
+                  <ActiveBalance>{balance.activeBalance}<TetherIcon/></ActiveBalance>
+                  <FrozenBalance>{balance.frozenBalance}<SnowFlakeIcon/></FrozenBalance>
                 </BalancesContainer>
               </BalancesWrapper>
             </TabLink>

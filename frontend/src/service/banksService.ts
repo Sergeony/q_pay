@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-import {baseQuery, baseQueryWithReauth} from ".";
+import {baseQueryWithReauth} from ".";
 import {BankProps, setBanks} from "../store/reducers/banksSlice";
 
 
@@ -10,7 +10,7 @@ export const banksApi = createApi({
   endpoints: (builder) => ({
     fetchBanks: builder.query<BankProps[], void>({
       query: () => ({
-        url: 'api/v1/banks/'
+        url: 'api/web/banks/'
       }),
       providesTags: ["Banks"],
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {

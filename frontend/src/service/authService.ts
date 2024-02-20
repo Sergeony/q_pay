@@ -20,12 +20,12 @@ interface LoginUserParams {
 }
 
 interface LoginUserResponseParams {
-  user_id: number;
   otp_base32?: string;
 }
 
 interface VerifyOtpParams {
-  user_id: number;
+  email: string;
+  password: string;
   otp: string;
 }
 
@@ -62,7 +62,7 @@ export const authApi = createApi({
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-          dispatch(setUser({ userId: data.user_id, otpBase32: data.otp_base32 }));
+          dispatch(setUser({ email: arg.email, password: arg.password, otpBase32: data.otp_base32 }));
         } catch (error) {
           // Обработка ошибок
         }
@@ -72,13 +72,12 @@ export const authApi = createApi({
       query: (body) => ({
         url: 'auth/verify-otp/',
         method: 'POST',
-        credentials: 'include',
         body
       }),
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-          localStorage.setItem('access', data.access);
+          sessionStorage.setItem('access', data.access);
           const decodedToken: DecodedToken = jwtDecode(data.access);
           dispatch(setUser({ userType: decodedToken.user_type, token: data.access }));
         } catch (error) {

@@ -1,7 +1,7 @@
 import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
-import {useGetMerchantOutputTransactionsQuery} from "../../service/transactionsService";
+import {useGetMerchantWithdrawalTransactionsQuery} from "../../service/transactionsService";
 import {formatDate, formatTime} from "../../utils";
 
 
@@ -204,7 +204,7 @@ interface OutputCompletedTransactionsViewProps {
 
 const OutputCompletedTransactions = ({merchantId}: OutputCompletedTransactionsViewProps) => {
   const params = merchantId ? {merchant_id: merchantId} : {};
-  const {data: transactions} = useGetMerchantOutputTransactionsQuery(params);
+  const {data: transactions} = useGetMerchantWithdrawalTransactionsQuery(params);
 
   return (
     <StyledTable>
@@ -225,7 +225,7 @@ const OutputCompletedTransactions = ({merchantId}: OutputCompletedTransactionsVi
       </thead>
       <tbody>
       {transactions?.map((t, index) => {
-        const BankIcon = BankIcons[t.requisites.bank.id] || null;
+        const BankIcon = BankIcons[t.trader_bank_details.bank.id] || null;
         return (
           <BodyTr key={index}>
             <StyledRow>
@@ -240,20 +240,20 @@ const OutputCompletedTransactions = ({merchantId}: OutputCompletedTransactionsVi
                   </UAHValue>
                   <Value>
                     <TetherIcon/>
-                    <SecondLine>{(Number(t.amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
+                    <SecondLine>{(Number(t.amount) / Number(t.amount)).toPrecision(4)}₮</SecondLine>
                   </Value>
                 </Values>
               </Bank>
               <TranID><span>{t.id}</span></TranID>
               <MyRate>
                 <RateWrapper>
-                  <FirstLine>{t.trader_usdt_rate}₴</FirstLine>
+                  <FirstLine>{t.amount}₴</FirstLine>
                   <SecondLine>3,75%</SecondLine>
                 </RateWrapper>
               </MyRate>
               <ExchangeRate>
                 <RateWrapper>
-                  <FirstLine>{t.exchange_usdt_rate}₴</FirstLine>
+                  <FirstLine>{t.amount}₴</FirstLine>
                   <SecondLine>BINANCE</SecondLine>
                 </RateWrapper>
               </ExchangeRate>
@@ -265,7 +265,7 @@ const OutputCompletedTransactions = ({merchantId}: OutputCompletedTransactionsVi
               </Client>
               <Reqs>
                 <RateWrapper>
-                  <FirstLine>{t.requisites.card_number}</FirstLine>
+                  <FirstLine>{t.client_card_number}</FirstLine>
                 </RateWrapper>
               </Reqs>
               <Start>
@@ -281,8 +281,8 @@ const OutputCompletedTransactions = ({merchantId}: OutputCompletedTransactionsVi
                 </RateWrapper>
               </End>
               <Status>
-                {t.automation_used && <AutomationIcon size={24} useGradient={true}/>}
-                <StatusText>{t.automation_used ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
+                {t.use_automation && <AutomationIcon size={24} useGradient={true}/>}
+                <StatusText>{t.use_automation ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
               </Status>
             </StyledRow>
           </BodyTr>

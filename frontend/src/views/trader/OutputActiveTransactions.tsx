@@ -7,8 +7,8 @@ import {webSocketService} from "../../service/webSocketService";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store/store";
 import {TransactionProps} from "../../service/transactionsService";
-import {moveTransaction} from "../../store/reducers/webSocketSlice";
 import {formatDate, formatTime} from "../../utils";
+import {updateTransaction} from "../../store/reducers/webSocketSlice";
 
 
 const StyledTable = styled.table`
@@ -210,10 +210,10 @@ const SubmitTransactionWrapper = styled.div`
 
 const OutputActiveTransactions = () => {
   const handleConfirmTransaction = (transactionId: string) => {
-    webSocketService.sendMessageUpdateTransactionStatus(transactionId, 4, 'output');
+    webSocketService.sendMessageChangeTransactionStatus(transactionId, 4);
   };
 
-  const transactions = useSelector((state: RootState) => state.webSocket.outputTransactions);
+  const transactions = useSelector((state: RootState) => state.webSocket.transactions);
 
 
   return (
@@ -270,7 +270,8 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
 
       if (timeDiff <= 0) {
         clearInterval(timerId);
-        dispatch(moveTransaction({id: t.id, transactionType: 'output'}));
+        t.status = 4;
+        dispatch(updateTransaction(t));
       }
     };
 
@@ -289,19 +290,19 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
           <BankIcon size={32}/>
           <Value>
             <TetherIcon size={24}/>
-            <FirstLine>{(Number(t.amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</FirstLine>
+            <FirstLine>{(Number(t.amount) / Number(t.actual_amount)).toPrecision(4)}₮</FirstLine>
           </Value>
         </Bank>
         <TranID><span>{t.id}</span></TranID>
         <MyRate>
           <RateWrapper>
-            <FirstLine>{t.trader_usdt_rate}₴</FirstLine>
+            <FirstLine>{t.amount}₴</FirstLine>
             <SecondLine>3,75%</SecondLine>
           </RateWrapper>
         </MyRate>
         <ExchangeRate>
           <RateWrapper>
-            <FirstLine>{t.exchange_usdt_rate}₴</FirstLine>
+            <FirstLine>{t.actual_amount}₴</FirstLine>
             <SecondLine>BINANCE</SecondLine>
           </RateWrapper>
         </ExchangeRate>
@@ -313,7 +314,7 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
         </Client>
         <Reqs>
           <RateWrapper>
-            <FirstLine style={{color: '#3F9AEF'}}>{t.requisites.card_number}</FirstLine>
+            <FirstLine style={{color: '#3F9AEF'}}>{t.trader_bank_details.card_number}</FirstLine>
           </RateWrapper>
         </Reqs>
         <Start>
@@ -323,7 +324,7 @@ const TransactionRow = ({ t, onConfirm }: RowProps) => {
           </RateWrapper>
         </Start>
         <Status>
-          {t.automation_used && <AutomationIcon size={24} useGradient={true}/>}
+          {t.use_automation && <AutomationIcon size={24} useGradient={true}/>}
           <StatusText>Ожидание</StatusText>
         </Status>
       </StyledRow>

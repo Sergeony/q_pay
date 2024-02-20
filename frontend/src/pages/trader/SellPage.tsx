@@ -120,7 +120,7 @@ const SellPage = () => {
                  element={<InputDisputedTransactions/>}
           />
           <Route path={'/export/'}
-                 element={<Export transactionsType={'input'}/>}
+                 element={<Export transactionsType={'deposit'}/>}
           />
         </Routes>
       </ContentWrapper>

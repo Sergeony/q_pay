@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import {NotificationBellIcon, SnowFlakeIcon, TetherIcon} from "../../UI/SVG";
 import {NavLink} from "react-router-dom";
 import Header from '../common/Header';
+import {useSelector} from "react-redux";
+import {RootState} from "../../store/store";
 
 
 const NavUl = styled.ul`
@@ -43,12 +45,14 @@ const BalancesContainer = styled.div`
 `;
 
 const ActiveBalance = styled.span`
-    display: block;
+    display: flex;
+    align-items: center;
     color: ${({theme}) => theme.active_balance_text_color};
 `;
 
 const FrozenBalance = styled.span`
-    display: block;
+    display: flex;
+    align-items: center;
     background: ${({theme}) => theme.frozen_balance_text_color};
     background-clip: text;
     -webkit-background-clip: text;
@@ -62,6 +66,8 @@ const NotificationBell = styled(NotificationBellIcon)`
 
 
 const AdminHeader = () => {
+  const balance = useSelector((state: RootState) => state.balance.balance);
+
   return (
     <Header>
       <nav>
@@ -87,8 +93,8 @@ const AdminHeader = () => {
             >
               <BalancesWrapper>
                 <BalancesContainer>
-                  <ActiveBalance>1 256 312 <TetherIcon/></ActiveBalance>
-                  <FrozenBalance>5 438 <SnowFlakeIcon/></FrozenBalance>
+                  <ActiveBalance>{balance.activeBalance}<TetherIcon/></ActiveBalance>
+                  <FrozenBalance>{balance.frozenBalance}<SnowFlakeIcon/></FrozenBalance>
                 </BalancesContainer>
               </BalancesWrapper>
             </TabLink>

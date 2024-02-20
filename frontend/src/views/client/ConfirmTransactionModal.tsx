@@ -83,9 +83,10 @@ const Description = styled.p`
 
 interface IProps {
   onClose: () => void;
+  onConfirm: () => void;
 }
 
-const ConfirmTransactionModal = ({onClose}: IProps) => {
+const ConfirmTransactionModal = ({onClose, onConfirm}: IProps) => {
 
   return (
     <PopupOverlay>
@@ -94,9 +95,9 @@ const ConfirmTransactionModal = ({onClose}: IProps) => {
           <CrossIcon/>
         </CloseButton>
         <Title>Вы уверены что выполнили условия сделки?</Title>
-        <Description>Вы уверены, что уже отправили <Amount>1 345 UAH</Amount> по указаным реквизитам?</Description>
+        {/*<Description>Вы уверены, что уже отправили <Amount>1 345 UAH</Amount> по указаным реквизитам?</Description>*/}
         <ButtonsWrapper>
-          <Button style={{width: '275px'}}>Подтвердить перевод</Button>
+          <Button style={{width: '275px'}} onClick={onConfirm}>Подтвердить перевод</Button>
           <CancelButton>Отменить сделку</CancelButton>
         </ButtonsWrapper>
       </PopupContainer>

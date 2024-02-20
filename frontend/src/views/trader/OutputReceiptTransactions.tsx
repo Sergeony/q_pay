@@ -1,9 +1,7 @@
 import pumb from "../../assets/img/pumb.png";
-import privat from "../../assets/img/privat.png";
 import {AutomationIcon, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
-import {Button} from "../../UI/CommonUI";
 
 
 const StyledTable = styled.table`
