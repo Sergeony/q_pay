@@ -18,13 +18,13 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'q_pay.settings')
 asgi_application = get_asgi_application()
 
 from main.middlewares import JwtAuthMiddlewareStack
-import main.routing
+import q_pay.routing
 
 application = ProtocolTypeRouter({
     "http": asgi_application,
     "websocket": JwtAuthMiddlewareStack(
         URLRouter(
-            main.routing.websocket_urlpatterns
+            q_pay.routing.websocket_urlpatterns
         )
     ),
 })

@@ -1,6 +1,21 @@
 from django.urls import path
 
-from .views import *
+from .views import (
+    BankDetailsView,
+    AdView,
+    ExportTransactionsView,
+    TraderTransactionListView,
+    MerchantTransactionsView,
+    MerchantWithdrawalView,
+    MerchantIntegrationsView,
+    CreateInviteCodeView,
+    TransactionsRedirectView,
+    AdminUsersView,
+    UserStatsView,
+    BankListView,
+    UserSettingsView,
+    ChangePasswordView,
+)
 
 
 urlpatterns = [
@@ -15,7 +30,7 @@ urlpatterns = [
     path('merchant/withdrawals/', MerchantWithdrawalView.as_view()),
     path('merchant/integrations/', MerchantIntegrationsView.as_view()),
 
-    # path('admin/traders/active/', ActiveTradersListView.as_view()),
+    # path('admin/traders/active/', ActiveTradersListView.as_view()),  # TODO: find out the purpose
     path('admin/invite/', CreateInviteCodeView.as_view()),
     path('admin/transactions/redirect/', TransactionsRedirectView.as_view()),
     path('admin/<str:user_type>/', AdminUsersView.as_view()),

@@ -16,6 +16,7 @@ from main.services import (
     update_balances_on_redirect_transaction,
     notify_user_on_transaction_update,
     notify_user_on_balance_update,
+    notify_client_on_transaction_update,
 )
 from main.models import (
     User,
@@ -86,6 +87,7 @@ def update_transaction_history_on_transaction_update(sender, instance: Transacti
     if instance.trader:
         notify_user_on_transaction_update(instance)
     notify_merchant_with_new_transaction_status(instance)
+    notify_client_on_transaction_update(instance)
 
 
 @receiver(pre_save, sender=Transaction)

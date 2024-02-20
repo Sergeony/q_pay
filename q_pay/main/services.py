@@ -16,7 +16,9 @@ from .models import (
 )
 from .serializers import (
     TransactionSerializer,
-    BalanceSerializer
+    BalanceSerializer,
+    APITransactionSerializer,
+    ClientTransactionStatusUpdateSerializer,
 )
 
 
@@ -126,6 +128,18 @@ def notify_user_on_balance_update(balance: Balance):
         'balance_data': balance_data,
     }
     async_to_sync(channel_layer.group_send)(group_name, message)
+
+
+def notify_client_on_transaction_update(transaction: Transaction):
+    transaction_data = APITransactionSerializer(transaction).data
+
+    channel_layer = get_channel_layer()
+    message = {
+        'type': 'send_transaction_to_client',
+        'transaction_data': transaction_data,
+    }
+    group_name = f'user_{transaction.merchant.id}'
+    async_to_sync(channel_layer.group_send)(group_name, message)  # TODO: check fixes to avoid warning
 
 
 def freeze_user_balance_for_transaction(user_balance: Balance, transaction: Transaction):
@@ -385,3 +399,16 @@ def settle_transaction(data):
             raise Exception("Admin has no permissions to set transactions to this status")
     else:
         raise Exception("Admin has no permissions to change status at this point")
+
+
+@database_sync_to_async
+def client_handle_transaction(user: User, data):
+    try:
+        transaction = Transaction.objects.get(order_id=data.pop('order_id'), merchant=user)
+    except Transaction.DoesNotExist:
+        raise Exception('Invalid order_id')
+
+    serializer = ClientTransactionStatusUpdateSerializer(transaction, data=data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return serializer.data
