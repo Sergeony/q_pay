@@ -253,7 +253,7 @@ class Balance(models.Model):
         default=0.00,
         validators=[MinValueValidator(Decimal('0.00'))]
     )
-    update_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class BalanceHistory(models.Model):

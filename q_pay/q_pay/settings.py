@@ -42,6 +42,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+# For custom headers, such as X-Signature, X-Timestamp, etc...
+CORS_ALLOW_HEADERS = ['*']
+
+
 CORS_ALLOW_CREDENTIALS = True
 
 
@@ -60,12 +64,14 @@ INSTALLED_APPS = [
     'channels',
     'django_celery_beat',
     'django_celery_results',
+    'silk',  # TODO: for performance testing
 
     'user_auth',
     'main',
 ]
 
 MIDDLEWARE = [
+    'silk.middleware.SilkyMiddleware',  # TODO: for performance testing
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -147,6 +153,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # TODO: for performance testing
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

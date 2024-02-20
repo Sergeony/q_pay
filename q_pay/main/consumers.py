@@ -1,6 +1,4 @@
-import json
-
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from main.models import User
 from main.services import (
@@ -8,11 +6,12 @@ from main.services import (
     handle_transaction,
     get_current_balance,
     get_active_transactions,
-    settle_transaction
+    settle_transaction,
+    client_handle_transaction
 )
 
 
-class Consumer(AsyncWebsocketConsumer):
+class Consumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.group_name = None
@@ -31,19 +30,19 @@ class Consumer(AsyncWebsocketConsumer):
             )
             await self.accept()
             balance_data = await get_current_balance(self.user)
-            await self.send(
-                text_data=json.dumps({
+            await self.send_json(
+                content={
                     'action': 'current_balance',
-                    'transaction_data': balance_data,
-                })
+                    'data': balance_data,
+                }
             )
             if self.user.type == User.Type.TRADER:
                 transactions_data = await get_active_transactions(self.user)
-                await self.send(
-                    text_data=json.dumps({
+                await self.send_json(
+                    content={
                         'action': 'active_transactions',
-                        'transaction_data': transactions_data,
-                    })
+                        'data': transactions_data,
+                    }
                 )
         else:
             await self.close()
@@ -54,34 +53,50 @@ class Consumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    async def receive(self, text_data=None, bytes_data=None):
-        data: dict = json.loads(text_data)
-        action = data.get('action')
+    async def receive_json(self, content, **kwargs):
+        action = content.get('action')
 
         try:
             if action == 'ping':
                 await update_last_seen(self.user)
             elif action == 'change_transaction_status':
-                await handle_transaction(self.user, data)
+                if self.user.type == User.Type.TRADER:
+                    await handle_transaction(self.user, content)
+                elif self.user.type == User.Type.MERCHANT:
+                    await client_handle_transaction(self.user, content)
             elif action == 'settle_transaction':
-                await settle_transaction(data)  # TODO:
+                await settle_transaction(content)  # TODO:
         except Exception as e:
-            await self.send(text_data=json.dumps({"error": f"{e}"}))
+            await self.send_json(
+                content={
+                    "action": "error",
+                    "data": f"{e}"
+                }
+            )
 
     async def send_transaction_to_user(self, event):
         transaction_data = event['transaction_data']
-        await self.send(
-            text_data=json.dumps({
+        await self.send_json(
+            content={
                 'action': 'updated_transaction_status',
-                'transaction_data': transaction_data,
-            })
+                'data': transaction_data,
+            }
         )
 
     async def send_balance_to_user(self, event):
         balance_data = event['balance_data']
-        await self.send(
-            text_data=json.dumps({
+        await self.send_json(
+            content={
                 'action': 'updated_balance',
-                'balance_data': balance_data
-            })
+                'data': balance_data
+            }
+        )
+
+    async def send_transaction_to_client(self, event):
+        transaction_data = event['transaction_data']
+        await self.send_json(
+            content={
+                'action': 'updated_transaction_status',
+                'data': transaction_data,
+            }
         )
