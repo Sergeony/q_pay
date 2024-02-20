@@ -11,9 +11,9 @@ from main.serializers import (
     ClientTransactionStatusUpdateSerializer
 )
 from api.services import (
-    get_eligible_traders,
-    get_best_trader,
-    get_trader_bank_details, get_client_ip
+    get_eligible_traders_and_bank_details,
+    get_best_trader_and_bank_details,
+    get_client_ip,
 )
 
 
@@ -43,9 +43,11 @@ class TransactionAPIView(APIView):
         client_bank = request.data.get('client_bank_id')
         amount = request.data.get('amount')
 
-        eligible_traders = get_eligible_traders(client_bank, amount)
+        eligible_traders = get_eligible_traders_and_bank_details(client_bank, amount, check_balance=True)
+        best_trader = get_best_trader_and_bank_details(eligible_traders)
+        # TODO: implement SQL queries in single db transaction
 
-        if not eligible_traders:
+        if not best_trader:
             serializer = APITransactionSerializer(
                 data={
                     **request.data,
@@ -62,17 +64,12 @@ class TransactionAPIView(APIView):
                 data={"error": "No eligible traders found or insufficient balance"},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-        best_trader = get_best_trader(eligible_traders)
-        trader_bank_details = get_trader_bank_details(best_trader.id, client_bank)
-        # TODO: implement SQL queries in single db transaction
-
         serializer = APITransactionSerializer(
             data={
                 **request.data,
                 'trader': best_trader.id,
                 'merchant': request.user.id,
-                'trader_bank_details_id': trader_bank_details.id,
+                'trader_bank_details_id': best_trader.eligible_bank_details_id,
                 'service_commission': 7,  # TODO: implement
                 'trader_commission': 3,
                 'client_ip': get_client_ip(request),

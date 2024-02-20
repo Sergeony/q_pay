@@ -1,34 +1,59 @@
 from datetime import timedelta
 
-from django.db.models import Case, When, Avg, Count, F, Q, ExpressionWrapper, fields, QuerySet
+from django.db.models import (
+    Case, When, Avg, Count, F, Q, ExpressionWrapper,
+    fields, QuerySet, OuterRef, Subquery, DecimalField,
+)
 from django.db.models.functions import Coalesce
 from django.conf import settings
 
-from main.models import User, Transaction, BankDetails
+from main.models import User, Transaction, BankDetails, Balance
 
 
-def get_eligible_traders(client_bank_id: int, amount: float) -> QuerySet[User]:
-    eligible_traders = User.objects.filter(
+def get_eligible_traders_and_bank_details(client_bank_id: int,
+                                          amount: float,
+                                          check_balance: bool = False) -> QuerySet[User]:
+    eligible_bank_details = BankDetails.objects.filter(
+        bank_id=client_bank_id,
+        is_active=True,
+        daily_limit__gte=F('current_daily_turnover') + amount,
+        weekly_limit__gte=F('current_weekly_turnover') + amount,
+        monthly_limit__gte=F('current_monthly_turnover') + amount,
+    )
+
+    eligible_traders_and_bank_details = User.objects.filter(
         is_active=True,
         type=User.Type.TRADER,
         ads__is_active=True,
         ads__bank=client_bank_id,
-        ads__bank_details__is_active=True,
-        ads__bank_details__daily_limit__gte=F('ads__bank_details__current_daily_turnover') + amount,
-        ads__bank_details__weekly_limit__gte=F('ads__bank_details__current_weekly_turnover') + amount,
-        ads__bank_details__monthly_limit__gte=F('ads__bank_details__current_monthly_turnover') + amount,
     ).annotate(
         total_active_transactions=Count(
             'trader_transactions',
-            filter=Q(trader_transactions__status=Transaction.Status.PENDING),
+            filter=Q(trader_transactions__status__in=[Transaction.Status.PENDING, Transaction.Status.REVIEWING]),
             distinct=True
+        ),
+        eligible_bank_details_id=Subquery(
+            eligible_bank_details.filter(trader_id=OuterRef('pk')).values('id')[:1]
         )
+    ).filter(
+        total_active_transactions__lt=settings.MAX_TRADER_ACTIVE_DEPOSIT_TRANSACTIONS,
+        eligible_bank_details_id__isnull=False
     ).distinct()
 
-    return eligible_traders
+    if check_balance:
+        eligible_traders_and_bank_details.annotate(
+            active_balance=Subquery(
+                Balance.objects.filter(
+                    user_id=OuterRef('pk')
+                ).values('active_balance')[:1],
+                output_field=DecimalField()
+            )
+        ).filter(active_balance__gte=amount)
+
+    return eligible_traders_and_bank_details
 
 
-def get_best_trader(eligible_traders: QuerySet[User]):
+def get_best_trader_and_bank_details(eligible_traders: QuerySet[User]):
     trader = eligible_traders.annotate(
         completed_transactions=Count(
             'trader_transactions',
@@ -60,21 +85,11 @@ def get_best_trader(eligible_traders: QuerySet[User]):
             ),
             distinct=True
         ), timedelta(seconds=0)),
-    ).filter(
-        total_active_transactions__lt=settings.MAX_TRADER_ACTIVE_DEPOSIT_TRANSACTIONS
     ).order_by(
         'total_active_transactions', '-success_rate', 'avg_processing_time'
     ).first()
 
     return trader
-
-
-def get_trader_bank_details(trader_id: int, client_bank_id: int):
-    bank_details = BankDetails.objects.filter(
-            trader=trader_id, is_active=True, bank=client_bank_id
-        ).order_by('?').first()
-
-    return bank_details
 
 
 def get_client_ip(request):

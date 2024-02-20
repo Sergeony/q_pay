@@ -5,6 +5,7 @@ from .views import (
     AdView,
     ExportTransactionsView,
     TraderTransactionListView,
+    FileUploadView,
     MerchantTransactionsView,
     MerchantWithdrawalView,
     MerchantIntegrationsView,
@@ -26,6 +27,7 @@ urlpatterns = [
     path('trader/transactions/export/<str:transaction_type_label>/', ExportTransactionsView.as_view()),
     path('trader/transactions/<str:transaction_type_label>/<str:status_group>/', TraderTransactionListView.as_view()),
 
+    path('merchant/transactions/withdrawal/upload/', FileUploadView.as_view()),
     path('merchant/transactions/<str:transaction_type_label>/', MerchantTransactionsView.as_view()),
     path('merchant/withdrawals/', MerchantWithdrawalView.as_view()),
     path('merchant/integrations/', MerchantIntegrationsView.as_view()),

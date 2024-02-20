@@ -1,3 +1,5 @@
+import logging
+from decimal import Decimal
 from typing import List
 
 import openpyxl
@@ -6,13 +8,15 @@ from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from django.db.transaction import atomic
 from django.utils import timezone
+from pandas import DataFrame
 
+from .exceptions import InsufficientBalanceError
 from .models import (
     User,
     Transaction,
     Balance,
     PrevTransactionTraders,
-    BalanceHistory
+    BalanceHistory,
 )
 from .serializers import (
     TransactionSerializer,
@@ -20,6 +24,10 @@ from .serializers import (
     APITransactionSerializer,
     ClientTransactionStatusUpdateSerializer,
 )
+from api.tasks import process_transaction_task
+
+
+logger = logging.getLogger(__name__)
 
 
 def create_transactions_excel(transactions: List[Transaction], transaction_type='input'):
@@ -146,8 +154,13 @@ def freeze_user_balance_for_transaction(user_balance: Balance, transaction: Tran
     """
     Freeze the stated transaction amount on the user's balance until the end of the transaction.
     """
-    user_balance.active_balance -= transaction.amount
-    user_balance.frozen_balance += transaction.amount
+    new_active_balance = user_balance.active_balance - transaction.amount
+    new_frozen_balance = user_balance.frozen_balance + transaction.amount
+    if new_active_balance < Decimal('0.00'):
+        raise InsufficientBalanceError("Insufficient balance to perform the transaction.")
+
+    user_balance.active_balance = new_active_balance
+    user_balance.frozen_balance = new_frozen_balance
     user_balance.save()
 
     BalanceHistory.objects.create(
@@ -182,6 +195,11 @@ def update_balances_on_successful_transaction(sender_balance: Balance, transacti
 
     Remove the stated amount from the sender's balance and transfer the net amount to the receiver's balance.
     """
+    amount_to_transfer = min(transaction.actual_amount, transaction.amount)
+    trader_commission_amount = transaction.trader_commission * amount_to_transfer / 100
+    service_commission_amount = transaction.service_commission * amount_to_transfer / 100
+    total_commission_amount = transaction.amount + service_commission_amount
+
     if transaction.status == Transaction.Status.PARTIAL:
         penalty_amount = transaction.amount - transaction.actual_amount
         sender_balance.active_balance += penalty_amount
@@ -207,9 +225,17 @@ def update_balances_on_successful_transaction(sender_balance: Balance, transacti
     elif transaction.status == Transaction.Status.COMPLETED:
         transaction.actual_amount = transaction.amount
 
-    amount_to_transfer = min(transaction.actual_amount, transaction.amount)
+    bank_details = transaction.trader_bank_details
+    if transaction.type == transaction.Type.DEPOSIT:
+        bank_details.current_daily_turnover += transaction.actual_amount
+        bank_details.current_weekly_turnover += transaction.actual_amount
+        bank_details.current_monthly_turnover += transaction.actual_amount
+    elif transaction.type == transaction.Type.WITHDRAWAL:
+        bank_details.current_daily_turnover += (transaction.actual_amount - total_commission_amount)  # TODO:consider it
+        bank_details.current_weekly_turnover += (transaction.actual_amount - total_commission_amount)
+        bank_details.current_monthly_turnover += (transaction.actual_amount - total_commission_amount)
+    bank_details.save()
 
-    service_commission_amount = transaction.service_commission * amount_to_transfer / 100
     service_balance = Balance.objects.select_for_update().get(user=None)
     service_balance.active_balance += service_commission_amount
     service_balance.save()
@@ -223,7 +249,6 @@ def update_balances_on_successful_transaction(sender_balance: Balance, transacti
 
     net_amount = amount_to_transfer - service_commission_amount
     if transaction.type == Transaction.Type.DEPOSIT:
-        trader_commission_amount = transaction.trader_commission * amount_to_transfer / 100
         sender_balance.active_balance += trader_commission_amount
         sender_balance.save()
         BalanceHistory.objects.create(
@@ -289,6 +314,11 @@ def update_balance_on_refunded_transaction(user_balance: Balance, transaction: T
         change_frozen_balance_amount=-refunded_amount,
         change_reason=BalanceHistory.ChangeReason.RELEASE_AFTER_REFUND
     )
+    bank_details = transaction.trader_bank_details
+    bank_details.current_daily_turnover += refunded_amount
+    bank_details.current_weekly_turnover += refunded_amount
+    bank_details.current_monthly_turnover += refunded_amount
+    bank_details.save()  # TODO: consider this logic for withdrawal transactions (count the commissions)
 
 
 def update_balances_on_redirect_transaction(sender_balance: Balance, transaction: Transaction):
@@ -412,3 +442,9 @@ def client_handle_transaction(user: User, data):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return serializer.data
+
+
+def process_transactions_from_df(merchant_id: int, transactions_df: DataFrame):
+    for index, transaction_data in transactions_df.iterrows():
+        transaction_dict = transaction_data.to_dict()
+        process_transaction_task.delay(transaction_dict, merchant_id)
