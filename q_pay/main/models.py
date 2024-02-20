@@ -184,8 +184,8 @@ class Transaction(models.Model):
     trader_bank_details = models.ForeignKey(BankDetails, on_delete=models.PROTECT, null=True, blank=True)
     client_card_number = models.CharField(max_length=19, null=True, blank=True)
     client_bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
-    client_id = models.CharField(max_length=255)
-    client_ip = models.GenericIPAddressField()
+    client_id = models.CharField(max_length=255, null=True, blank=True)
+    client_ip = models.GenericIPAddressField(blank=True, null=True)
     use_automation = models.BooleanField(default=False)
     receipt_url = models.URLField(max_length=1024, null=True, blank=True, unique=True)
     old_trader: User = None

@@ -1,12 +1,10 @@
 import logging
-import time
 
 from django.db.models.signals import pre_save, post_save
 from django.db.transaction import atomic
 from django.dispatch import receiver
 from django.db import transaction, OperationalError
 from django.utils import timezone
-from django.conf import settings
 
 from main.services import (
     update_balances_on_successful_transaction,
@@ -16,14 +14,14 @@ from main.services import (
     update_balances_on_redirect_transaction,
     notify_user_on_transaction_update,
     notify_user_on_balance_update,
-    notify_client_on_transaction_update,
-)
+    notify_client_on_transaction_update, )
+from main.exceptions import InsufficientBalanceError
 from main.models import (
     User,
     Balance,
     Transaction,
     TransactionStatusHistory,
-    BalanceHistory,
+    BalanceHistory, MerchantIntegrations,
 )
 from api.tasks import notify_merchant_with_new_transaction_status
 
@@ -32,12 +30,13 @@ logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=User)
-def create_user_balance_on_user_create(sender, instance: User, created, **kwargs):
+def setup_on_user_create(sender, instance: User, created, **kwargs):
     """
-    Create a new balance when a new user is created
+    Perform actions when a new user is created.
 
-    - It is intended for use by non-admin users only (traders and merchants).
-    - The admin users have a separate balance storage logic.
+    - Create a new balance for user. Admins have shared balance and set user as None on it.
+
+    - Create a new integration when a new merchant is created.
     """
     if created:
         user = instance if instance.type != instance.Type.ADMIN else None
@@ -49,22 +48,13 @@ def create_user_balance_on_user_create(sender, instance: User, created, **kwargs
                 new_frozen_balance=0.00,
                 change_reason=BalanceHistory.ChangeReason.CREATED
             )
+        if instance.type == instance.Type.MERCHANT:
+            MerchantIntegrations.objects.create(merchant=instance.id)
 
 
 @receiver(post_save, sender=Balance)
 def send_balance_on_balance_update(sender, instance: Balance, **kwargs):
     notify_user_on_balance_update(instance)
-
-
-@receiver(post_save, sender=User)
-def create_merchant_integrations_on_merchant_create(sender, instance: User, created, **kwargs):
-    """
-    Create a new integration when a new merchant is created
-
-    - It is intended for use by merchants only.
-    """
-    if instance.type == instance.Type.MERCHANT and created:
-        Balance.objects.create(user=instance.id)
 
 
 @receiver(post_save, sender=Transaction)
@@ -112,34 +102,30 @@ def handle_transaction_status_update(sender, instance: Transaction, **kwargs):
                            instance.Status.REFUND_FAILED]:
         return
 
-    for attempt in range(settings.MAX_TRANSACTION_STATUS_UPDATE_ATTEMPTS):
-        try:
-            with transaction.atomic():
-                sender_user = instance.trader if instance.type == instance.Type.DEPOSIT else instance.merchant
-                sender_balance = Balance.objects.get(user=sender_user)
-                if instance.Status == instance.Status.REDIRECT:
-                    update_balances_on_redirect_transaction(sender_balance, instance)
-                elif instance.status == instance.Status.PENDING:
-                    freeze_user_balance_for_transaction(sender_balance, instance)
-                elif instance.status in [instance.Status.COMPLETED,
-                                         instance.Status.PARTIAL,
-                                         instance.Status.REFUND_REQUESTED]:
-                    update_balances_on_successful_transaction(sender_balance, instance)
-                elif instance.status in [instance.Status.CANCELLED,
-                                         instance.Status.FAILED]:
-                    release_user_balance_for_transaction(sender_balance, instance)
-                elif instance.status == Transaction.Status.REFUNDED:
-                    update_balance_on_refunded_transaction(sender_balance, instance)
-                break
-        except OperationalError as e:
-            message = f"Transaction ID: {instance.id} update failed after {attempt + 1} attempts."
-            if attempt < settings.MAX_TRANSACTION_STATUS_UPDATE_ATTEMPTS - 1:
-                logger.warning(f"{message} Retrying...")
-                time.sleep(2 ** attempt)
-            else:
-                logger.critical(message)
-                raise OperationalError(message, e)
-        except ValueError as e:
-            message = f"Transaction ID: {instance.id} old trader was not found to perform redirect."
-            logger.error(message)
-            raise OperationalError(message, e)
+    try:
+        with transaction.atomic():
+            sender_user = instance.trader if instance.type == instance.Type.DEPOSIT else instance.merchant
+            sender_balance = Balance.objects.select_for_update().get(user=sender_user)
+            if instance.Status == instance.Status.REDIRECT:
+                update_balances_on_redirect_transaction(sender_balance, instance)
+            elif instance.status == instance.Status.PENDING:
+                print("BEFORE PENDING")
+                freeze_user_balance_for_transaction(sender_balance, instance)
+                print("AFTER PENDING")
+            elif instance.status in [instance.Status.COMPLETED,
+                                     instance.Status.PARTIAL,
+                                     instance.Status.REFUND_REQUESTED]:
+                update_balances_on_successful_transaction(sender_balance, instance)
+            elif instance.status in [instance.Status.CANCELLED,
+                                     instance.Status.FAILED]:
+                release_user_balance_for_transaction(sender_balance, instance)
+            elif instance.status == Transaction.Status.REFUNDED:
+                update_balance_on_refunded_transaction(sender_balance, instance)
+    except ValueError as e:
+        message = f"Transaction ID: {instance.id} old trader was not found to perform redirect."
+        logger.error(message)
+        raise OperationalError(message, e)
+    except InsufficientBalanceError as e:
+        message = f"Transaction ID: {instance.id}. {e}"
+        # logger.critical(message)
+        raise InsufficientBalanceError(message)

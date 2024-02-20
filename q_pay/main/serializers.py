@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.db.transaction import atomic
+import pandas as pd
 from rest_framework import serializers
 
 from .models import (
@@ -264,3 +265,22 @@ class ClientTransactionStatusUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("WITHDRAWAL transactions can only be updated to DISPUTE or COMPLETED.")
 
         return attrs
+
+
+class FileUploadSerializer(serializers.Serializer):
+    file = serializers.FileField()
+
+    @staticmethod
+    def validate_file(value) -> pd.DataFrame:
+        if not value.name.endswith(('.csv', '.xlsx')):
+            raise serializers.ValidationError(f"Unsupported file format.")
+
+        if value.name.endswith('.csv'):
+            df = pd.read_csv(value)
+        else:
+            df = pd.read_excel(value)
+
+        required_columns = ['order_id', 'amount', 'client_bank_id', 'client_card_number']
+        if not all(column in df.columns for column in required_columns):
+            raise serializers.ValidationError(f"Invalid file structure: missing columns.")
+        return df

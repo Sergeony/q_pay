@@ -36,10 +36,12 @@ from .serializers import (
     AdSerializer,
     TransactionSerializer,
     TransactionRedirectSerializer,
+    FileUploadSerializer,
 )
 from .services import (
     create_transactions_excel,
-    get_eligible_trader_ids_for_transactions
+    get_eligible_trader_ids_for_transactions,
+    process_transactions_from_df,
 )
 from .utils import get_value_by_label, get_user_id
 from .permissions import IsTraderOrAdminReadOnly, IsMerchantOrAdminReadOnly, IsAdmin
@@ -422,3 +424,15 @@ class UserSettingsView(APIView):
     def get(self, request):
         serializer = UserSettingsSerializer(request.user)
         return Response(data=serializer.data, status=status.HTTP_200_OK,)
+
+
+class FileUploadView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = FileUploadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        merchant_id = request.user.id
+        df = serializer.validated_data['file']
+        process_transactions_from_df(merchant_id, df)
+
+        return Response(data={'message': "success"}, status=status.HTTP_200_OK)
