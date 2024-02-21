@@ -3,10 +3,10 @@ import React from "react";
 import styled from "styled-components";
 import Switch from "../../components/common/Switch";
 import {
-  useDeleteRequisiteMutation,
-  useFetchRequisitesQuery,
-  useUpdateRequisiteMutation
-} from "../../service/requisitesService";
+  useDeleteBankDetailsMutation,
+  useFetchBankDetailsQuery,
+  useUpdateBankDetailsMutation
+} from "../../service/bankDetailsService";
 import KebabMenu from "../../components/common/KebabMenu";
 
 
@@ -177,10 +177,10 @@ interface RequisitesViewProps {
   traderId?: number;
 }
 
-const Requisites = ({traderId}: RequisitesViewProps) => {
-  const params = traderId ? {trader_id: traderId} : {};
-  const {data: requisites, error, isLoading} = useFetchRequisitesQuery(params);
-  const [deleteRequisites] = useDeleteRequisiteMutation();
+const BankDetails = ({traderId}: RequisitesViewProps) => {
+  const params = traderId ? {user_id: traderId} : {};
+  const {data: bankDetails, error, isLoading} = useFetchBankDetailsQuery(params);
+  const [deleteRequisites] = useDeleteBankDetailsMutation();
 
   const handleDelete = (id: number) => {
     deleteRequisites(id)
@@ -193,10 +193,10 @@ const Requisites = ({traderId}: RequisitesViewProps) => {
       });
   };
 
-  const [toggleActivity] = useUpdateRequisiteMutation();
+  const [toggleActivity] = useUpdateBankDetailsMutation();
 
-  const handleToggle = (id: number, isActivated: boolean) => {
-    toggleActivity({ id, is_activated: isActivated });
+  const handleToggle = (id: number, isActive: boolean) => {
+    toggleActivity({ id, is_active: isActive });
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -216,8 +216,8 @@ const Requisites = ({traderId}: RequisitesViewProps) => {
         </Tr>
         </thead>
         <tbody>
-        {requisites?.map((r, index) => {
-          const BankIcon = BankIcons[r.bank.id] || <CrossIcon/>;
+        {bankDetails?.map((bd, index) => {
+          const BankIcon = BankIcons[bd.bank.id] || <CrossIcon/>;
           return (
             <BodyTr key={index}>
               <StyledRow>
@@ -227,32 +227,32 @@ const Requisites = ({traderId}: RequisitesViewProps) => {
                       <BankIconWrapper>
                         <BankIcon size={22}/>
                       </BankIconWrapper>
-                      <span>{r.bank.title} UAH</span>
+                      <span>{bd.bank.title} UAH</span>
                     </UAHValue>
                   </Values>
                 </Bank>
                 <MyRate>
                   <RateWrapper>
-                    <FirstLine>{r.title}</FirstLine>
+                    <FirstLine>{bd.title}</FirstLine>
                   </RateWrapper>
                 </MyRate>
                 <ExchangeRate>
                   <RateWrapper>
-                    <FirstLine>{r.card_number}</FirstLine>
-                    <SecondLine>{r.cardholder_name}</SecondLine>
+                    <FirstLine>{bd.card_number}</FirstLine>
+                    <SecondLine>{bd.cardholder_name}</SecondLine>
                   </RateWrapper>
                 </ExchangeRate>
                 <Activity>
                   <Switch size={'small'}
-                          isActivated={r.is_activated}
-                          onToggle={() => handleToggle(r.id, !r.is_activated)}
+                          isActivated={bd.is_active}
+                          onToggle={() => handleToggle(bd.id, !bd.is_active)}
                   />
                 </Activity>
                 <Menu>
                   <KebabMenu showDelete={true}
                              showEdit={true}
                              onEdit={() => {alert("EDITING...")}}
-                             onDelete={() => handleDelete(r.id)}
+                             onDelete={() => handleDelete(bd.id)}
                   />
                 </Menu>
               </StyledRow>
@@ -264,4 +264,4 @@ const Requisites = ({traderId}: RequisitesViewProps) => {
   );
 };
 
-export default Requisites;
+export default BankDetails;

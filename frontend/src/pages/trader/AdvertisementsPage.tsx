@@ -8,9 +8,9 @@ import TabHeader from "../../components/common/TabHeader";
 import {PlusIcon} from "../../UI/SVG";
 
 import Advertisements from "../../views/trader/Advertisements";
-import Requisites from "../../views/trader/Requisites";
+import BankDetails from "../../views/trader/BankDetails";
 import {NavLink, Route, Routes, useLocation} from "react-router-dom";
-import CreateRequisitesModal from "../../views/trader/CreateRequisitesModal";
+import CreateBankDetailsModal from "../../views/trader/CreateBankDetailsModal";
 import CreateAdvertisementsModal from "../../views/trader/CreateAdvertisementsModal";
 
 
@@ -85,12 +85,12 @@ const AdvertisementPage = () => {
                  element={<Advertisements/>}
           />
           <Route path={'/requisites/'}
-                 element={<Requisites/>}
+                 element={<BankDetails/>}
           />
         </Routes>
 
         {
-          modalIsOpen && location.pathname.endsWith('/requisites/') && <CreateRequisitesModal onClose={() => setModalIsOpen(false)}/>
+          modalIsOpen && location.pathname.endsWith('/requisites/') && <CreateBankDetailsModal onClose={() => setModalIsOpen(false)}/>
         }
         {
           modalIsOpen && location.pathname.endsWith('/advertisements/') && <CreateAdvertisementsModal onClose={() => setModalIsOpen(false)}/>

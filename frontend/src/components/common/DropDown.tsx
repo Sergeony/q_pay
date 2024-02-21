@@ -28,6 +28,7 @@ const StyledLabel = styled.label`
     
     display: block;
     margin-bottom: 4px;
+    margin-top: 30px;
 `;
 
 const customStyles: StylesConfig<CustomOptionProps, boolean, GroupBase<CustomOptionProps>> = {

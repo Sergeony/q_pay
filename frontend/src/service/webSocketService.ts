@@ -1,10 +1,10 @@
 import store from '../store/store';
 import {
-  addTransaction,
-  moveTransaction,
-  updateTransactionStatus
+  updateTransaction,
+  loadTransactions,
 } from "../store/reducers/webSocketSlice";
 import {refreshToken} from "../utils";
+import {setBalance} from "../store/reducers/balanceSlice";
 
 
 class WebSocketService {
@@ -23,16 +23,25 @@ class WebSocketService {
     };
 
     this.ws.onmessage = (event) => {
-      const { action, transaction_data, transaction_type } = JSON.parse(event.data);
+      const { action, data } = JSON.parse(event.data);
       switch (action) {
-        case 'new_transaction':
-          store.dispatch(addTransaction({transactionData: transaction_data, transactionType: transaction_type}));
+        case 'updated_transaction_status':
+          store.dispatch(updateTransaction(data));
           break;
-        case 'updated_transaction':
-          store.dispatch(moveTransaction({id: transaction_data.id, transactionType: transaction_type}))
+        case 'updated_balance':
+          store.dispatch(setBalance(data));
+          break;
+        case 'current_balance':
+          store.dispatch(setBalance(data));
+          break;
+        case 'active_transactions':
+          store.dispatch(loadTransactions(data));
+          break;
+        case 'error':
+          alert(data.message);
           break;
         default:
-          console.log("Unknown action");
+          alert("Unknown action");
       }
     };
 
@@ -64,17 +73,28 @@ class WebSocketService {
     }
   }
 
-
-  sendMessageUpdateTransactionStatus(transactionId: string, newStatus: number, transactionType: 'input' | 'output') {
-    const message = {
-      action: 'update_transaction_status',
+  sendMessageChangeTransactionStatus(transactionId: string, newStatus: number, newActualAmount?: number) {
+    const message: any = {
+      action: 'change_transaction_status',
       transaction_id: transactionId,
       new_status: newStatus,
-      transaction_type: transactionType,
     };
+    if (newActualAmount) {
+      message["actual_amount"] = newActualAmount;
+    }
     this.sendMessage(message);
+  }
 
-    store.dispatch(updateTransactionStatus({id: transactionId, status: newStatus, transactionType: transactionType}));
+    sendMessageSettleTransactionStatus(transactionId: string, newStatus: number, newActualAmount?: number) {
+    const message: any = {
+      action: 'change_transaction_status',
+      transaction_id: transactionId,
+      new_status: newStatus,
+    };
+    if (newActualAmount) {
+      message["actual_amount"] = newActualAmount;
+    }
+    this.sendMessage(message);
   }
 
   startPing() {

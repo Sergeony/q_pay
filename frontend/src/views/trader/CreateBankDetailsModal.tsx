@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import {BankIcons, CrossIcon} from "../../UI/SVG";
 import {useFetchBanksQuery} from "../../service/banksService";
 import {BankProps} from "../../store/reducers/banksSlice";
-import {useCreateRequisiteMutation} from "../../service/requisitesService";
+import {useCreateBankDetailsMutation} from "../../service/bankDetailsService";
 
 
 const PopupOverlay = styled.div`
@@ -71,8 +71,8 @@ interface IProps {
   onClose: () => void;
 }
 
-const CreateRequisitesModal = ({onClose}: IProps) => {
-  const [createRequisites] = useCreateRequisiteMutation();
+const CreateBankDetailsModal = ({onClose}: IProps) => {
+  const [createBankDetails] = useCreateBankDetailsMutation();
 
   const formik = useFormik({
     initialValues: {
@@ -89,7 +89,7 @@ const CreateRequisitesModal = ({onClose}: IProps) => {
     }),
     onSubmit: async (values) => {
       try {
-        await createRequisites({
+        await createBankDetails({
           bank_id: values.bankId,
           title: values.title,
           card_number: values.cardNumber,
@@ -123,7 +123,7 @@ const CreateRequisitesModal = ({onClose}: IProps) => {
         <Title>Создание объявления</Title>
         <form onSubmit={formik.handleSubmit}>
          {/*TODO: move it to extranl styles */}
-        <div style={{marginBottom: "16px", display: "flex"}}>
+        <div style={{marginBottom: "16px"}}>
           <DropDown label={'Выберите банк'}
                     width={'100%'}
                     options={[{ label: "Банк", value: ""}, ...bankOptions]}
@@ -165,4 +165,4 @@ const CreateRequisitesModal = ({onClose}: IProps) => {
   );
 };
 
-export default CreateRequisitesModal;
+export default CreateBankDetailsModal;

@@ -27,7 +27,7 @@ export const formatDate = (stringDate: string | null) => {
 
 
 export const getUserTypeFromToken = () => {
-  const token = localStorage.getItem('access');
+  const token = sessionStorage.getItem('access');
   if (token) {
     const decodedToken: {user_type: number} = jwtDecode(token);
     return decodedToken.user_type;
@@ -47,7 +47,7 @@ export const  refreshToken = async (api: any)  => {
     .then(async (response) => {
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('access', data.access);
+        sessionStorage.setItem('access', data.access);
         return data.access;
       } else {
         console.error("Failed to refresh token");
@@ -64,4 +64,14 @@ export const formatRemainingTime = (remainingTimeInSeconds: number) => {
   const minutes = Math.floor(remainingTimeInSeconds / 60);
   const seconds = remainingTimeInSeconds % 60;
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
+
+export const formatTimerString = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+export const copyCodeToClipBoard = async (value: string) => {
+    await navigator.clipboard.writeText(value);
 };

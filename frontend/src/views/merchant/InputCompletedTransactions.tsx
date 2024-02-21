@@ -1,7 +1,7 @@
 import {AutomationIcon, BankIcons, TetherIcon} from "../../UI/SVG";
 import React from "react";
 import styled from "styled-components";
-import {useGetMerchantInputTransactionsQuery} from "../../service/transactionsService";
+import {useGetMerchantDepositTransactionsQuery} from "../../service/transactionsService";
 import {formatDate, formatTime} from "../../utils";
 
 
@@ -204,7 +204,7 @@ interface InputCompletedTransactionsViewProps {
 
 const InputCompletedTransactions = ({merchantId}: InputCompletedTransactionsViewProps) => {
   const params = merchantId ? {merchant_id: merchantId} : {};
-  const {data: transactions} = useGetMerchantInputTransactionsQuery(params);
+  const {data: transactions} = useGetMerchantDepositTransactionsQuery(params);
 
   return (
     <StyledTable>
@@ -225,7 +225,7 @@ const InputCompletedTransactions = ({merchantId}: InputCompletedTransactionsView
       </thead>
       <tbody>
       {transactions?.map((t, index) => {
-        const BankIcon = BankIcons[t.requisites.bank.id] || null;
+        const BankIcon = BankIcons[t.trader_bank_details.bank.id] || null;
         return (
           <BodyTr key={index}>
             <StyledRow>
@@ -240,20 +240,20 @@ const InputCompletedTransactions = ({merchantId}: InputCompletedTransactionsView
                   </UAHValue>
                   <Value>
                     <TetherIcon/>
-                    <SecondLine>{(Number(t.actual_amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
+                    <SecondLine>{(Number(t.amount) / Number(t.amount)).toPrecision(4)}₮</SecondLine>
                   </Value>
                 </Values>
               </Bank>
               <TranID><span>{t.id}</span></TranID>
               <MyRate>
                 <RateWrapper>
-                  <FirstLine>{t.trader_usdt_rate}₴</FirstLine>
+                  <FirstLine>{t.amount}₴</FirstLine>
                   <SecondLine>3,75%</SecondLine>
                 </RateWrapper>
               </MyRate>
               <ExchangeRate>
                 <RateWrapper>
-                  <FirstLine>{t.exchange_usdt_rate}₴</FirstLine>
+                  <FirstLine>{t.amount}₴</FirstLine>
                   <SecondLine>BINANCE</SecondLine>
                 </RateWrapper>
               </ExchangeRate>
@@ -265,8 +265,8 @@ const InputCompletedTransactions = ({merchantId}: InputCompletedTransactionsView
               </Client>
               <Reqs>
                 <RateWrapper>
-                  <FirstLine>{t.requisites.title} {t.requisites.card_number}</FirstLine>
-                  <SecondLine>{t.requisites.cardholder_name}</SecondLine>
+                  <FirstLine>{t.trader_bank_details.title} {t.trader_bank_details.card_number}</FirstLine>
+                  <SecondLine>{t.trader_bank_details.cardholder_name}</SecondLine>
                 </RateWrapper>
               </Reqs>
               <Start>
@@ -282,8 +282,8 @@ const InputCompletedTransactions = ({merchantId}: InputCompletedTransactionsView
                 </RateWrapper>
               </End>
               <Status>
-                {t.automation_used && <AutomationIcon size={24} useGradient={true}/>}
-                <StatusText>{t.automation_used ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
+                {t.use_automation && <AutomationIcon size={24} useGradient={true}/>}
+                <StatusText>{t.use_automation ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
               </Status>
             </StyledRow>
           </BodyTr>

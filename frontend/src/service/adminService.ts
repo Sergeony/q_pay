@@ -1,5 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-import {baseQuery, baseQueryWithReauth} from ".";
+import {baseQueryWithReauth} from ".";
 
 interface UserProps {
   id: number;
@@ -39,7 +39,7 @@ export const adminApi = createApi({
   endpoints: (builder) => ({
     createInviteCode: builder.mutation<CreateInviteCodeResponseProps, CreateInviteCodeRequestProps>({
       query: (body) => ({
-        url: `api/v1/admin/invite/`,
+        url: `api/web/admin/invite/`,
         method: 'POST',
         body
       }),
@@ -47,20 +47,20 @@ export const adminApi = createApi({
 
     fetchTraders: builder.query<UserProps[], void>({
       query: () => ({
-        url: 'api/v1/admin/traders/'
+        url: 'api/web/admin/traders/'
       }),
       providesTags: ["Trader"],
     }),
     deleteTrader: builder.mutation<any, DeleteUserRequestProps>({
       query: ({id}: DeleteUserRequestProps) => ({
-        url: `api/v1/admin/traders/${id}/`,
+        url: `api/web/admin/traders/${id}/`,
         method: 'DELETE',
       }),
       invalidatesTags: ["Trader"],
     }),
     updateTrader: builder.mutation<any, UpdateUserRequestProps>({
       query: ({id, ...body}: UpdateUserRequestProps) => ({
-        url: `api/v1/admin/traders/${id}/`,
+        url: `api/web/admin/traders/${id}/`,
         method: 'PATCH',
         body,
       }),
@@ -68,26 +68,26 @@ export const adminApi = createApi({
     }),
     fetchTraderStats: builder.query<UserProps, FetchUserStatsRequestProps>({
       query: ({id}: FetchUserStatsRequestProps)=> ({
-        url: `api/v1/admin/traders/${id}/stats/`,
+        url: `api/web/admin/traders/${id}/stats/`,
       })
     }),
 
     fetchMerchants: builder.query<UserProps[], void>({
       query: () => ({
-        url: 'api/v1/admin/merchants/'
+        url: 'api/web/admin/merchants/'
       }),
       providesTags: ["Merchant"],
     }),
     deleteMerchant: builder.mutation<any, DeleteUserRequestProps>({
       query: ({id}: DeleteUserRequestProps) => ({
-        url: `api/v1/admin/merchants/${id}/`,
+        url: `api/web/admin/merchants/${id}/`,
         method: 'DELETE',
       }),
       invalidatesTags: ["Merchant"],
     }),
     updateMerchant: builder.mutation<any, UpdateUserRequestProps>({
       query: ({id, ...body}: UpdateUserRequestProps) => ({
-        url: `api/v1/admin/merchants/${id}/`,
+        url: `api/web/admin/merchants/${id}/`,
         method: 'PATCH',
         body,
       }),
@@ -95,7 +95,7 @@ export const adminApi = createApi({
     }),
     fetchMerchantStats: builder.query<UserProps, FetchUserStatsRequestProps>({
       query: ({id}: FetchUserStatsRequestProps)=> ({
-        url: `api/v1/admin/merchants/${id}/stats/`,
+        url: `api/web/admin/merchants/${id}/stats/`,
       })
     }),
   }),

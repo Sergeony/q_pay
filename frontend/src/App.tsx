@@ -20,34 +20,37 @@ import TraderStatsPage from "./pages/admin/TraderStatsPage";
 import MerchantsPage from './pages/admin/MerchantsPage';
 import MerchantStatsPage from './pages/admin/MerchantStatsPage';
 import PublicRoute from "./pages/common/PublicRoute";
-import {setUser} from "./store/reducers/authSlice";
-import {useGetInputTransactionsQuery, useGetOutputTransactionsQuery} from "./service/transactionsService";
-import {getUserTypeFromToken} from "./utils";
+import {
+  useGetDepositTransactionsQuery,
+  useGetWithdrawalTransactionsQuery,
+  useLazyGetDepositTransactionsQuery, useLazyGetWithdrawalTransactionsQuery
+} from "./service/transactionsService";
 import {webSocketService} from "./service/webSocketService";
-import {loadTransactions} from "./store/reducers/webSocketSlice";
+import {addTransactions, loadTransactions} from "./store/reducers/webSocketSlice";
 import ClientBuyPage from "./pages/client/ClientBuyPage";
 import MerchantBalancePage from "./pages/merchant/MerchantBalancePage";
 
 function App() {
   const theme = useSelector((state: RootState) => state.theme.value);
+
   const auth = useSelector((state: RootState) => state.auth.auth);
 
+  const {data: deposits} = useGetDepositTransactionsQuery({statusGroup: 'active'});
+  const {data: withdrawals} = useGetWithdrawalTransactionsQuery({statusGroup: 'active'});
   const dispatch = useDispatch();
-  const {data: inputActiveTransactions} = useGetInputTransactionsQuery({statusGroup: 'active'});
-  const {data: outputActiveTransactions} = useGetOutputTransactionsQuery({statusGroup: 'active'});
 
   useEffect(() => {
-    const token = localStorage.getItem('access');
-    dispatch(setUser({ token }));
-    const userType = getUserTypeFromToken();
-
-    if (userType == 1) {
-      dispatch(loadTransactions({transactions: inputActiveTransactions || [], transactionType: 'input'}));
-      dispatch(loadTransactions({transactions: outputActiveTransactions || [], transactionType: 'output'}));
-
-      webSocketService.connect(auth.token);
+    if (auth.userType == 1) {
+      if (deposits && withdrawals) {
+        dispatch(loadTransactions(deposits));
+        dispatch(addTransactions(withdrawals));
+      }
     }
-  }, [inputActiveTransactions]);
+    if (auth.userType) {
+      webSocketService.connect(sessionStorage.getItem('access'));
+    }
+  }, [auth]);
+
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>

@@ -68,7 +68,8 @@ const LoginStep2 = () => {
     onSubmit: async (values) => {
       await verifyUserOtp({
         otp: values.otp,
-        user_id: authState.auth.userId
+        email: authState.auth.email,
+        password: authState.auth.password
       })
         .unwrap()
         .then(() => {

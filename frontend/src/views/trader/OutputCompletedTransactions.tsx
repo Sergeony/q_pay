@@ -3,7 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import {
   GetTransactionsRequestProps,
-  useGetOutputTransactionsQuery
+  useGetWithdrawalTransactionsQuery
 } from "../../service/transactionsService";
 import {formatDate, formatTime} from "../../utils";
 
@@ -207,7 +207,7 @@ interface OutputCompletedTransactionsViewProps {
 
 const OutputCompletedTransactions = ({traderId}: OutputCompletedTransactionsViewProps) => {
   const params: GetTransactionsRequestProps = traderId ? {trader_id: traderId} : {statusGroup: 'completed'};
-  const {data: transactions} = useGetOutputTransactionsQuery(params);
+  const {data: transactions} = useGetWithdrawalTransactionsQuery(params);
 
   return (
     <StyledTable>
@@ -228,7 +228,7 @@ const OutputCompletedTransactions = ({traderId}: OutputCompletedTransactionsView
       </thead>
       <tbody>
       {transactions?.map((t, index) => {
-        const BankIcon = BankIcons[t.requisites.bank.id] || null;
+        const BankIcon = BankIcons[t.trader_bank_details.bank.id] || null;
         return (
           <BodyTr key={index}>
             <StyledRow>
@@ -243,20 +243,20 @@ const OutputCompletedTransactions = ({traderId}: OutputCompletedTransactionsView
                   </UAHValue>
                   <Value>
                     <TetherIcon/>
-                    <SecondLine>{(Number(t.amount) / Number(t.trader_usdt_rate)).toPrecision(4)}₮</SecondLine>
+                    <SecondLine>{(Number(t.amount) / Number(t.amount)).toPrecision(4)}₮</SecondLine>
                   </Value>
                 </Values>
               </Bank>
               <TranID><span>{t.id}</span></TranID>
               <MyRate>
                 <RateWrapper>
-                  <FirstLine>{t.trader_usdt_rate}₴</FirstLine>
+                  <FirstLine>{t.amount}₴</FirstLine>
                   <SecondLine>3,75%</SecondLine>
                 </RateWrapper>
               </MyRate>
               <ExchangeRate>
                 <RateWrapper>
-                  <FirstLine>{t.exchange_usdt_rate}₴</FirstLine>
+                  <FirstLine>{t.amount}₴</FirstLine>
                   <SecondLine>BINANCE</SecondLine>
                 </RateWrapper>
               </ExchangeRate>
@@ -268,7 +268,7 @@ const OutputCompletedTransactions = ({traderId}: OutputCompletedTransactionsView
               </Client>
               <Reqs>
                 <RateWrapper>
-                  <FirstLine>{t.requisites.card_number}</FirstLine>
+                  <FirstLine>{t.trader_bank_details.card_number}</FirstLine>
                 </RateWrapper>
               </Reqs>
               <Start>
@@ -284,8 +284,8 @@ const OutputCompletedTransactions = ({traderId}: OutputCompletedTransactionsView
                 </RateWrapper>
               </End>
               <Status>
-                {t.automation_used && <AutomationIcon size={24} useGradient={true}/>}
-                <StatusText>{t.automation_used ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
+                {t.use_automation && <AutomationIcon size={24} useGradient={true}/>}
+                <StatusText>{t.use_automation ? 'Автозакрытие' : 'Подтверждено'}</StatusText>
               </Status>
             </StyledRow>
           </BodyTr>

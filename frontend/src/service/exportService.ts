@@ -2,12 +2,13 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import {baseQueryWithReauth} from ".";
 
 interface ExportProps {
-  transactionsType: 'input' | 'output';
+  transactionsType: 'deposit' | 'withdrawal';
   bank?: number;
-  requisites?: number;
+  bank_details?: number;
   from?: string;
   to?: string;
 }
+
 
 export const exportApi = createApi({
   reducerPath: 'exportApi',
@@ -17,7 +18,7 @@ export const exportApi = createApi({
     exportTransactions: builder.query<any, ExportProps>({
       queryFn: async ({ transactionsType, ...params}: ExportProps, api, extraOptions, baseQuery) => {
         const result: any = await baseQuery({
-          url: `/api/v1/trader/transactions/export/${transactionsType}/`,
+          url: `/api/web/trader/transactions/export/${transactionsType}/`,
           params: params,
           responseHandler: ((response) => response.blob())
         })

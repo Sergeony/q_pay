@@ -20,7 +20,7 @@ const initialState: stateProps = {
 }
 
 export const banksSlice = createSlice({
-  name: 'advertisements',
+  name: 'banks',
   initialState,
   reducers: {
     setBanks: (state, action) => {
