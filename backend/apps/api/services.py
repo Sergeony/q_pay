@@ -7,7 +7,7 @@ from django.db.models import (
 from django.db.models.functions import Coalesce
 from django.conf import settings
 
-from main.models import User, Transaction, BankDetails, Balance
+from apps.main import User, Transaction, BankDetails, Balance
 
 
 def get_eligible_traders_and_bank_details(client_bank_id: int,

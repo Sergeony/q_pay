@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from django.db import transaction, OperationalError
 from django.utils import timezone
 
-from main.services import (
+from apps.main.services import (
     update_balances_on_successful_transaction,
     release_user_balance_for_transaction,
     update_balance_on_refunded_transaction,
@@ -15,15 +15,15 @@ from main.services import (
     notify_user_on_transaction_update,
     notify_user_on_balance_update,
     notify_client_on_transaction_update, )
-from main.exceptions import InsufficientBalanceError
-from main.models import (
+from apps.main.exceptions import InsufficientBalanceError
+from apps.main.models import (
     User,
     Balance,
     Transaction,
     TransactionStatusHistory,
     BalanceHistory, MerchantIntegrations,
 )
-from api.tasks import notify_merchant_with_new_transaction_status
+from apps.api.tasks import notify_merchant_with_new_transaction_status
 
 
 logger = logging.getLogger(__name__)

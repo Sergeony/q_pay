@@ -10,12 +10,12 @@ from django.db.models import F
 from django.db.transaction import atomic
 from django.utils import timezone
 
-from api.services import (
+from apps.api.services import (
     get_eligible_traders_and_bank_details,
     get_best_trader_and_bank_details
 )
-from main.models import Transaction, MerchantIntegrations, User
-from main.serializers import TransactionSerializer
+from apps.main import Transaction, MerchantIntegrations, User
+from apps.main.serializers import TransactionSerializer
 
 logger = logging.getLogger(__name__)
 

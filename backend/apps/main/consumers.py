@@ -1,7 +1,7 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
-from main.models import User
-from main.services import (
+from apps.main.models import User
+from apps.main.services import (
     update_last_seen,
     handle_transaction,
     get_current_balance,

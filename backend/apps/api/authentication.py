@@ -7,8 +7,8 @@ from django.utils import timezone
 from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 
-from main.models import MerchantIntegrations
-from user_auth.authentication import JWTAuthentication
+from apps.main import MerchantIntegrations
+from apps.user_auth.authentication import JWTAuthentication
 
 
 class SignatureAuthentication(BaseAuthentication):

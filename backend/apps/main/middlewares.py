@@ -11,7 +11,7 @@ from channels.db import database_sync_to_async
 from channels.middleware import BaseMiddleware
 from channels.auth import AuthMiddlewareStack
 
-from main.models import User, MerchantIntegrations
+from apps.main.models import User, MerchantIntegrations
 
 
 class JwtAuthMiddleware(BaseMiddleware):

@@ -13,12 +13,10 @@ from pathlib import Path
 import os
 
 import environ
-import redis
-from celery.schedules import crontab
 from django.utils import timezone
 
 env = environ.Env()
-ENV_DIR = Path(__file__).resolve().parent.parent.parent
+ENV_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(env_file=os.path.join(ENV_DIR, '.env'))
 
 
@@ -66,8 +64,8 @@ INSTALLED_APPS = [
     'django_celery_results',
     'silk',  # TODO: for performance testing
 
-    'user_auth',
-    'main',
+    'apps.user_auth',
+    'apps.main',
 ]
 
 MIDDLEWARE = [
@@ -82,7 +80,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'q_pay.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -100,8 +98,8 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'q_pay.wsgi.application'
-ASGI_APPLICATION = 'q_pay.asgi.application'
+# WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 
 # Database
@@ -180,8 +178,8 @@ EMAIL_PORT = env("EMAIL_PORT")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'api.authentication.SignatureAuthentication',
-        'user_auth.authentication.JWTAuthentication',
+        'apps.api.authentication.SignatureAuthentication',
+        'apps.user_auth.authentication.JWTAuthentication',
     ),
 }
 
