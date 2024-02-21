@@ -22,7 +22,7 @@ from django.urls import path, include, re_path  # TODO: for performance testing
 urlpatterns = [
     re_path(r'^silk/', include('silk.urls', namespace='silk')),  # TODO: for performance testing
     path('admin/', admin.site.urls),
-    path('auth/', include('user_auth.urls')),
-    path('api/v1/', include('api.urls')),
-    path('api/web/', include('main.urls')),
+    path('auth/', include('apps.user_auth.urls')),
+    path('api/v1/', include('apps.api.urls')),
+    path('api/web/', include('apps.main.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # TODO: for performance testing

@@ -4,7 +4,7 @@ from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.tokens import RefreshToken
 import pyotp
 
-from main.models import User
+from apps.main import User
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):

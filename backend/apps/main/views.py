@@ -45,7 +45,7 @@ from .services import (
 )
 from .utils import get_value_by_label, get_user_id
 from .permissions import IsTraderOrAdminReadOnly, IsMerchantOrAdminReadOnly, IsAdmin
-from q_pay.redis_client import get_redis_client
+from config.redis_client import get_redis_client
 
 
 class BankListView(APIView):

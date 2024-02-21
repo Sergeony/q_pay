@@ -4,13 +4,13 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from main.models import Transaction
-from main.serializers import (
+from apps.main import Transaction
+from apps.main.serializers import (
     TransactionSerializer,
     APITransactionSerializer,
     ClientTransactionStatusUpdateSerializer
 )
-from api.services import (
+from apps.api.services import (
     get_eligible_traders_and_bank_details,
     get_best_trader_and_bank_details,
     get_client_ip,

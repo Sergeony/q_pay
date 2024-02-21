@@ -24,7 +24,7 @@ from .serializers import (
     APITransactionSerializer,
     ClientTransactionStatusUpdateSerializer,
 )
-from api.tasks import process_transaction_task
+from apps.api.tasks import process_transaction_task
 
 
 logger = logging.getLogger(__name__)

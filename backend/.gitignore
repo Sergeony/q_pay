@@ -11,9 +11,7 @@ __pycache__/
 
 
 # DB dumps
-q_pay/db_dumps/
-
-q_pay/static/
+db_dumps/
 
 # Static files for silk
 static/

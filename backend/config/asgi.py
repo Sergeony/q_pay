@@ -13,18 +13,18 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'q_pay.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 asgi_application = get_asgi_application()
 
-from main.middlewares import JwtAuthMiddlewareStack
-import q_pay.routing
+from apps.main.middlewares import JwtAuthMiddlewareStack
+import config.routing
 
 application = ProtocolTypeRouter({
     "http": asgi_application,
     "websocket": JwtAuthMiddlewareStack(
         URLRouter(
-            q_pay.routing.websocket_urlpatterns
+            config.routing.websocket_urlpatterns
         )
     ),
 })

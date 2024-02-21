@@ -1,4 +1,4 @@
-from q_pay.redis_client import get_redis_client
+from config.redis_client import get_redis_client
 
 
 def get_user_type_by_invite_code(invite_code: str) -> int | None:

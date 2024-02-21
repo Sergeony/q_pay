@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from main.models import User
+from apps.main.models import User
 
 
 def get_user_id(request: Request) -> int | Response:  # TODO: move response to the view
