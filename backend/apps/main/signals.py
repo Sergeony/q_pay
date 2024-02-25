@@ -49,7 +49,7 @@ def setup_on_user_create(sender, instance: User, created, **kwargs):
                 change_reason=BalanceHistory.ChangeReason.CREATED
             )
         if instance.type == instance.Type.MERCHANT:
-            MerchantIntegrations.objects.create(merchant=instance.id)
+            MerchantIntegrations.objects.create(merchant=instance)
 
 
 @receiver(post_save, sender=Balance)

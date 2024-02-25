@@ -14,7 +14,7 @@ from apps.api.services import (
     get_eligible_traders_and_bank_details,
     get_best_trader_and_bank_details
 )
-from apps.main import Transaction, MerchantIntegrations, User
+from apps.main.models import Transaction, MerchantIntegrations, User
 from apps.main.serializers import TransactionSerializer
 
 logger = logging.getLogger(__name__)

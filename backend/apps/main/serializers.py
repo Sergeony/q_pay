@@ -114,10 +114,17 @@ class MerchantIntegrationsSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'merchant', 'api_key', 'secret_key']
 
 
+class BalanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Balance
+        fields = ['active_balance', 'frozen_balance']
+        read_only_fields = ['active_balance', 'frozen_balance']
+
+
 class UserInfoSerializer(serializers.ModelSerializer):
     is_online = serializers.SerializerMethodField()
     total_transactions = serializers.IntegerField(read_only=True)
-    balance = serializers.SerializerMethodField()
+    balance = BalanceSerializer(read_only=True)
 
     class Meta:
         model = User
@@ -126,14 +133,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_is_online(obj):
         return obj.is_online
-
-    @staticmethod
-    def get_balance(obj: User):  # TODO: optimize SQL queries and move it to separate serializer
-        balance = Balance.objects.get(user=obj)
-        return {
-            "active": balance.active_balance,
-            "frozen": balance.frozen_balance,
-        }
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -232,13 +231,6 @@ class TransactionRedirectSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"Some of the specified transactions were not found.")
 
         return values
-
-
-class BalanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Balance
-        fields = ['active_balance', 'frozen_balance']
-        read_only_fields = ['active_balance', 'frozen_balance']
 
 
 class ClientTransactionStatusUpdateSerializer(serializers.ModelSerializer):
