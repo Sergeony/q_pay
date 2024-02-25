@@ -4,7 +4,7 @@ from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.tokens import RefreshToken
 import pyotp
 
-from apps.main import User
+from apps.main.models import User
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -19,11 +19,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user_info = {
             "email": validated_data.get("email"),
             "type": validated_data.get("type"),
-            "otp_base32": pyotp.random_base32(),
+            "password": validated_data.get("password"),
         }
-        user = User.objects.create(**user_info)
-        user.set_password(validated_data.get("password"))
-        user.save()
+        user = User.objects.create_user(**user_info)
 
         return user
 
@@ -66,6 +64,7 @@ class UserLoginSerializer(serializers.Serializer):
                 return {}
 
         user.last_seen = timezone.now()
+        user.save()
         refresh = RefreshToken.for_user(user)
         refresh['user_type'] = user.type
         return {

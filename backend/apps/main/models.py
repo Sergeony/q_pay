@@ -2,6 +2,7 @@ import uuid
 from datetime import timedelta
 from decimal import Decimal
 
+import pyotp
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.core.validators import MinValueValidator
@@ -16,7 +17,8 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        otp_base32 = pyotp.random_base32()
+        user = self.model(email=email, otp_base32=otp_base32, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -26,8 +28,6 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('type', User.Type.ADMIN)
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
         return self._create_user(email, password, **extra_fields)
 
     def merchants(self):

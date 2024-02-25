@@ -233,10 +233,11 @@ class MerchantIntegrationsView(APIView):
         serializer = MerchantIntegrationsSerializer(merchant_integrations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request):
-        serializer = MerchantIntegrationsSerializer(data=request.data)
+    def patch(self, request):
+        integrations = MerchantIntegrations.objects.get(merchant=request.user)
+        serializer = MerchantIntegrationsSerializer(integrations, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save(merchant=request.user)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -245,13 +246,16 @@ class AdminUsersView(APIView):
 
     def get(self, request, user_type):
         if user_type == 'traders':
-            related_name = 'trader_transactions'
+            users = User.objects.traders().filter(is_deleted=False).annotate(
+                total_transactions=Count('trader_transactions')
+            )
         elif user_type == 'merchants':
-            related_name = 'merchant_transactions'
+            users = User.objects.merchants().filter(is_deleted=False).annotate(
+                total_transactions=Count('merchant_transactions')
+            )
         else:
             return Response(data={'error': 'Invalid user type'}, status=status.HTTP_400_BAD_REQUEST)
 
-        users = User.objects.filter(is_deleted=False).annotate(total_transactions=Count(f'{related_name}'))
         serializer = UserInfoSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
