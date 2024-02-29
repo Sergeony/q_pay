@@ -2,7 +2,13 @@ import React, { FunctionComponent } from "react";
 import Svg, { SvgProps } from "../Svg";
 
 const Icon: FunctionComponent<SvgProps> = (props) => (
-    <Svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <Svg
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
         <defs>
             <linearGradient
                 id="paint0_linear_1366_6581"

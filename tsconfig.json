@@ -35,6 +35,7 @@
     "src",
     "webpack.config.ts",
     ".eslintrc.js",
+    "config/jest/jest.config.ts"
   ],
   "ts-node": {
     "compilerOptions": {

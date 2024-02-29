@@ -2,7 +2,14 @@ import React, { FunctionComponent } from "react";
 import Svg, { SvgProps } from "../Svg";
 
 const MonoIcon: FunctionComponent<SvgProps> = (props) => (
-    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <Svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
         <path
             d="M20.8 0H3.2C1.43269 0 0 1.43269 0 3.2V20.8C0 22.5673 1.43269 24 3.2 24H20.8C22.5673 24 24 22.5673 24 20.8V3.2C24 1.43269 22.5673 0 20.8 0Z"
             fill="url(#paint0_linear_75_1490)"
@@ -24,7 +31,14 @@ const MonoIcon: FunctionComponent<SvgProps> = (props) => (
 );
 
 const PrivateIcon: FunctionComponent<SvgProps> = (props) => (
-    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <Svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
         <g clipPath="url(#clip0_75_1491)">
             <path d="M9.4893 14.835H0.510742V23.8171H9.4893V14.835Z" fill="#231F20" />
             <path
@@ -42,7 +56,14 @@ const PrivateIcon: FunctionComponent<SvgProps> = (props) => (
 );
 
 const RaiffeisenIcon: FunctionComponent<SvgProps> = (props) => (
-    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <Svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
         <g clipPath="url(#clip0_987_25608)">
             <path
                 fillRule="evenodd"
@@ -65,7 +86,14 @@ const RaiffeisenIcon: FunctionComponent<SvgProps> = (props) => (
 );
 
 const OschadIcon: FunctionComponent<SvgProps> = (props) => (
-    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <Svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
         <mask
             id="mask0_987_24332"
             maskUnits="userSpaceOnUse"
@@ -92,7 +120,14 @@ const OschadIcon: FunctionComponent<SvgProps> = (props) => (
 );
 
 const PumbIcon: FunctionComponent<SvgProps> = (props) => (
-    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <Svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
         <path
             d="M12.0241 0.510742C18.3305 0.510742 23.4895 5.68095 23.4895 12.0001C23.4895 18.3673 18.33 23.4895 12.0241 23.4895C5.69372 23.4895 0.510742 18.3433 0.510742 12.0001C0.510742 5.68095 5.69372 0.510742 12.0241 0.510742Z"
             fill="#D13239"

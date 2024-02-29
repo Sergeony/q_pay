@@ -2,7 +2,13 @@ import React, { FunctionComponent } from "react";
 import Svg, { SvgProps } from "../Svg";
 
 const Icon: FunctionComponent<SvgProps> = (props) => (
-    <Svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <Svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
         <g clipPath="url(#clip0_432_20945)">
             <path
                 d="M19.9999 8H17.3333V9.33333H19.9999V10.6667H21.3333V9.33333C21.3333 8.97971 21.1928 8.64057 20.9427 8.39052C20.6927 8.14048 20.3535 8 19.9999 8Z"

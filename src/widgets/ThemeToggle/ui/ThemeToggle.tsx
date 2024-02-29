@@ -15,10 +15,22 @@ export const ThemeToggle: FC = () => {
             className={cls.ThemeToggle}
             onClick={toggleTheme}
         >
-            <div className={classNames(cls.ToggleCircle, { [cls.active]: theme === Theme.LIGHT })}>
+            <div
+                className={classNames(
+                    cls.ToggleCircle,
+                    [],
+                    { [cls.active]: theme === Theme.LIGHT }
+                )}
+            >
                 <SunIcon />
             </div>
-            <div className={classNames(cls.ToggleCircle, { [cls.active]: theme === Theme.DARK })}>
+            <div
+                className={classNames(
+                    cls.ToggleCircle,
+                    [],
+                    { [cls.active]: theme === Theme.DARK }
+                )}
+            >
                 <MoonIcon />
             </div>
         </Button>

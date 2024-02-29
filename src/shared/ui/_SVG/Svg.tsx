@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 
 export interface SvgProps extends SVGAttributes<HTMLOrSVGElement> {
     size?: number;
+    useGradient?: boolean
 }
 
 const defaultProps: SvgProps = {

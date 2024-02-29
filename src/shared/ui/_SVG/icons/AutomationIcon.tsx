@@ -1,11 +1,18 @@
 import React, { FunctionComponent } from "react";
 import Svg, { SvgProps } from "../Svg";
 
-const Icon: FunctionComponent<SvgProps & { useGradient?: boolean }> = (props) => {
+const Icon: FunctionComponent<SvgProps> = (props) => {
     const { useGradient, ...otherProps } = props;
 
     return (
-        <Svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...otherProps}>
+        <Svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            {...otherProps}
+        >
             <defs>
                 <linearGradient
                     id="paint0_linear_1120_14473"

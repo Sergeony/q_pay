@@ -26,7 +26,7 @@ export const Button: FC<ButtonProps> = (props) => {
     return (
         <button
             type="submit"
-            className={classNames(cls.Button, {}, [cls[role], className])}
+            className={classNames(cls.Button, [cls[role], className], {})}
             {...otherProps}
         >
             {children}

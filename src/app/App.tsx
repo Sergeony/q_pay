@@ -13,7 +13,7 @@ const App = () => {
     const { t } = useTranslation();
 
     return (
-        <div className={classNames("app", {}, [theme])}>
+        <div className={classNames("app", [theme], {})}>
             <Suspense>
                 <div style={{ display: "flex" }}>
                     <Link to="/about/">{t("about")}</Link>

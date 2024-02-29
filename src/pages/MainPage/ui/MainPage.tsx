@@ -10,7 +10,7 @@ export const MainPage = ({ className }: MainPageProps) => {
     const { t } = useTranslation();
 
     return (
-        <div className={classNames("", {}, [className])}>
+        <div className={classNames("", [className], {})}>
             <Button role={ButtonRole.PRIMARY}>{t("Hello!")}</Button>
         </div>
     );

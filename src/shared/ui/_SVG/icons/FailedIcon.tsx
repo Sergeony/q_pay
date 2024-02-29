@@ -2,7 +2,14 @@ import React, { FunctionComponent } from "react";
 import Svg, { SvgProps } from "../Svg";
 
 const Icon: FunctionComponent<SvgProps> = (props) => (
-    <Svg width="199" height="199" viewBox="0 0 199 199" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <Svg
+        width="199"
+        height="199"
+        viewBox="0 0 199 199"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
         <path
             fillRule="evenodd"
             clipRule="evenodd"
