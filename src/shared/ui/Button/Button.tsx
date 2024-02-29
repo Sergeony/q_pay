@@ -10,23 +10,26 @@ export enum ButtonRole {
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    role?: ButtonRole;
     children: ReactNode;
+    role?: ButtonRole;
+    width?: string;
     className?: string;
 }
 
 export const Button: FC<ButtonProps> = (props) => {
     const {
-        role,
         children,
+        role,
+        width,
         className,
         ...otherProps
     } = props;
 
     return (
         <button
-            type="submit"
-            className={classNames(cls.Button, [cls[role], className], {})}
+            type="button"
+            style={{ width }}
+            className={classNames(cls.Button, [cls[role], className])}
             {...otherProps}
         >
             {children}

@@ -50,6 +50,7 @@ module.exports = {
         "@typescript-eslint/quotes": ["error", "double"],
         "@typescript-eslint/comma-dangle": "off",
         "comma-dangle": "off",
+        "jsx-a11y/control-has-associated-label": "warn",
     },
     globals: {
         __IS_DEV__: true,

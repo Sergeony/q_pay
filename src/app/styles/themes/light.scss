@@ -1,4 +1,4 @@
-.app.light {
+html.light {
     --black: #0F0021;
     --dark-grey: #312739;
     --grey: #46404B;
@@ -10,4 +10,6 @@
     --pale-accent: #DDC8FF;
     --register-button-text-color: #1B1B1B;
     --theme-toggle-bg: #E3E1E8;
+    --modal-bg: #F8F5FE;
+    --modal-border: 1px solid var(--grey);
 }

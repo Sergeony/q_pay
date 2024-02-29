@@ -1,8 +1,8 @@
-.app.dark {
+html.dark {
     --black: #0E1503;
     --dark-grey: #23271D;
     --grey: #474A40;
-    --light-grey: #AFB4A8;
+    --light-grey: ;
     --extra-light-grey: #E0E4D3;
     --white: #FDFFF9;
     --accent: #B7EF3F;
@@ -10,4 +10,6 @@
     --pale-accent: #E7F9C3;
     --register-button-text-color: #0E1503;
     --theme-toggle-bg: #474A40;
+    --modal-bg: #AFB4A8;
+    --modal-border: 2px solid var(--extra-light-grey);
 }

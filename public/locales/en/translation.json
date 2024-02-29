@@ -3,5 +3,7 @@
   "about": "About",
   "Русский": "Русский",
   "УкраЇнська": "УкраЇнська",
-  "English": "English"
+  "English": "English",
+  "unexpected_error": "Unexpected error occurred. Reload page, please.",
+  "reload_page": "Reload page"
 }
