@@ -30,11 +30,12 @@
       "paths": {
         "*": ["./src/*"]
       },
-//    },
-//    "include": [
-//      "src"
-//    ]
   },
+  "include": [
+    "src",
+    "webpack.config.ts",
+    ".eslintrc.js",
+  ],
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS",

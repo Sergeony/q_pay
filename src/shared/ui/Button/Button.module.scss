@@ -1,0 +1,39 @@
+.Button {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.primary {
+    width: 436px;  // TODO: consider it
+    height: 44px;  // TODO: consider it
+    padding: 12px 0;
+    border-radius: 16px;
+    font: var(--font-main-bold);
+    text-align: center;
+    color: var(--register-button-text-color);
+    background-color: var(--accent);
+}
+
+.back {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;  // TODO: take it out
+    font-family: var(--font-family-secondary);
+    font-size: var(--font-size-l);
+    font-weight: var(--font-weight-regular);
+    text-align: left;
+    color: var(--grey);
+    text-underline-position: under;
+}
+
+.cancel {
+    padding: 11px 7px;
+    border: 1px solid var(--red);
+    border-radius: 16px;
+    font: var(--font-main-bold);
+    color: var(--red);
+}

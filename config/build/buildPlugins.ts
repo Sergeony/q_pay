@@ -4,8 +4,9 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 import { BuildOptions } from "./types/config";
 
+export const buildPlugins = (options: BuildOptions): webpack.WebpackPluginInstance[] => {
+    const { isDev, paths } = options;
 
-export const buildPlugins = ({paths}: BuildOptions): webpack.WebpackPluginInstance[] => {
     return [
         new HtmlWebpackPlugin({
             template: paths.html,
@@ -15,5 +16,8 @@ export const buildPlugins = ({paths}: BuildOptions): webpack.WebpackPluginInstan
             filename: "css/[name].[contenthash:8].css",
             chunkFilename: "css/[name].[contenthash:8].css",
         }),
-    ]
+        new webpack.DefinePlugin({
+            __IS_DEV__: JSON.stringify(isDev)
+        }),
+    ];
 };
