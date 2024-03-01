@@ -13,6 +13,7 @@ export const LangSelect: FC = () => {
 
     return (
         <select
+            data-testid="lang-select"
             value={lang}
             onChange={handleSelect}
         >

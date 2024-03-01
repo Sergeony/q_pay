@@ -1,22 +1,27 @@
 import { classNames } from "./classNames";
 
 describe("classNames", () => {
-    test("only cls arg passed", () => {
+    test("Test only cls param passed", () => {
         expect(classNames("testClass")).toBe("testClass");
     });
 
-    test("only cls and modes args passed", () => {
-        expect(classNames(
-            "testClass",
-            [],
-            { active: true, large: false },
-        )).toBe("testClass active");
+    test("Test cls and modes params passed", () => {
+        expect(
+            classNames(
+                "testClass",
+                [],
+                { active: true, large: false },
+            )
+        ).toBe("testClass active");
     });
-    test("all the args passed", () => {
-        expect(classNames(
-            "testClass",
-            ["role"],
-            { active: true, large: false }
-        )).toBe("testClass role active");
+
+    test("Test all the params passed", () => {
+        expect(
+            classNames(
+                "testClass",
+                ["role"],
+                { active: true, large: false }
+            )
+        ).toBe("testClass role active");
     });
 });

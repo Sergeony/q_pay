@@ -23,9 +23,11 @@ class ErrorBoundary
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         // TODO: implement service for logs
-        console.log(`error: ${error}`);
-        console.log(`errorInfo: ${JSON.stringify(errorInfo)}`);
-        console.log(`componentStack: ${errorInfo.componentStack}`);
+        console.log(
+            `error: ${error}`,
+            `errorInfo: ${JSON.stringify(errorInfo)}`,
+            `componentStack: ${errorInfo.componentStack}`
+        );
     }
 
     render() {

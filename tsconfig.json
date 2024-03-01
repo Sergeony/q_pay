@@ -12,30 +12,15 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
 
-//    "forceConsistentCasingInFileNames": true,
-//    "skipLibCheck": true,
-//    "strict": true,
-//    "resolveJsonModule": true,
-//    "isolatedModules": true,
-
-//    "noEmit": false,  // WARNING: crushes the build!
-
-//      "lib": [
-//        "dom",
-//        "dom.iterable",
-//        "esnext"
-//      ],
-
-      "baseUrl": ".",
-      "paths": {
-        "*": ["./src/*"]
-      },
+    "baseUrl": ".",
+    "paths": {
+      "*": ["./src/*"]
+    },
   },
   "include": [
-    "src",
-    "webpack.config.ts",
-    ".eslintrc.js",
-    "config/jest/jest.config.ts"
+    "config/jest/jest-setup.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
   ],
   "ts-node": {
     "compilerOptions": {

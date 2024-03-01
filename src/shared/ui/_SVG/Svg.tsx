@@ -1,7 +1,7 @@
 import React, { FunctionComponent, SVGAttributes } from "react";
 import PropTypes from "prop-types";
 
-export interface SvgProps extends SVGAttributes<HTMLOrSVGElement> {
+export interface SvgProps extends SVGAttributes<SVGElement> {
     size?: number;
     useGradient?: boolean
 }

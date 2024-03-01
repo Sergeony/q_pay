@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import Svg, { SvgProps } from "../Svg";
 
-const Icon: FunctionComponent<SvgProps> = (props) => (
+const Icon: FunctionComponent<SvgProps> = () => (
     <Svg
         width="12"
         height="16"

@@ -14,7 +14,7 @@ export const PageErrorPopup: FC = () => {
     };
 
     return (
-        <Modal showClose={false}>
+        <Modal hideClose>
             <div className={cls.PageErrorPopup}>
                 <p>{t("unexpected_error")}</p>
                 <Button
