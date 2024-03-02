@@ -26,7 +26,8 @@
     font-size: var(--font-size-l);
     font-weight: var(--font-weight-regular);
     text-align: left;
-    color: var(--grey);
+    color: var(--back-btn-text-color);
+    text-decoration: underline;
     text-underline-position: under;
 }
 

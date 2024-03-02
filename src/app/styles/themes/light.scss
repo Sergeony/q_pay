@@ -1,4 +1,4 @@
-html.light {
+.app.light {
     --black: #0F0021;
     --dark-grey: #312739;
     --grey: #46404B;
@@ -8,8 +8,12 @@ html.light {
     --accent: #9E68F7;
     --dark-accent: #6B48A4;
     --pale-accent: #DDC8FF;
-    --register-button-text-color: #1B1B1B;
-    --theme-toggle-bg: #E3E1E8;
-    --modal-bg: #F8F5FE;
+    --back-btn-text-color: var(--grey);
+    --register-button-text-color: var(--black);
+    --theme-toggle-bg: var(--extra-light-grey);
+    --modal-overlay: rgb(69 69 69 / 60%);
+    --modal-bg: var(--white);
     --modal-border: 1px solid var(--grey);
+    --loader: var(--black);
+    --app-bg: var(--white) no-repeat center / cover;
 }

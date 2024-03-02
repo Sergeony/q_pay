@@ -24,6 +24,7 @@ export const buildWebpackConfig = (
         module: {
             rules: buildLoaders(options),
         },
+        // TODO: add options: optimization, infrastructureLogging, cache, bail, stats, target
         resolve: buildResolvers(options),
         devServer: isDev && buildDevServer(options),
     };

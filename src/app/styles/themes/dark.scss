@@ -1,15 +1,19 @@
-html.dark {
+.app.dark {
     --black: #0E1503;
     --dark-grey: #23271D;
     --grey: #474A40;
-    --light-grey: ;
+    --light-grey: #AFB4A8;
     --extra-light-grey: #E0E4D3;
     --white: #FDFFF9;
     --accent: #B7EF3F;
     --dark-accent: #829F44;
     --pale-accent: #E7F9C3;
-    --register-button-text-color: #0E1503;
-    --theme-toggle-bg: #474A40;
-    --modal-bg: #AFB4A8;
+    --back-btn-text-color: var(--light-grey);
+    --register-button-text-color: var(--black);
+    --theme-toggle-bg: var(--grey);
+    --modal-overlay: rgb(49 49 49 / 60%);
+    --modal-bg: var(--light-grey);
     --modal-border: 2px solid var(--extra-light-grey);
+    --loader: var(--white);
+    --app-bg: #1B1B1B url("shared/ui/img/bg.png") no-repeat center / cover;
 }

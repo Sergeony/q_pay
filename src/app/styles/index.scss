@@ -4,5 +4,7 @@
 @import "themes/dark";
 
 .app {
-    background: #3F9AEF;
+    min-width: 100vw;
+    min-height: 100vh;
+    background: var(--app-bg);
 }
