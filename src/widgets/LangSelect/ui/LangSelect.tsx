@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export const LangSelect: FC = () => {
-    const [lang, setLang] = useState<string>("ru");
+    const [lang, setLang] = useState<string>("en");
     const { t, i18n } = useTranslation();
 
     const handleSelect = async (e: any) => {

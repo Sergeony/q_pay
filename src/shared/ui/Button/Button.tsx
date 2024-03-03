@@ -5,7 +5,6 @@ import cls from "./Button.module.scss";
 
 export enum ButtonRole {
     PRIMARY = "primary",
-    BACK = "back",
     CANCEL = "cancel",
 }
 

@@ -1,5 +1,6 @@
 import { ReactNode, FC } from "react";
 
+import { Button } from "shared/ui/Button/Button";
 import { CrossIcon } from "shared/ui/_SVG";
 import cls from "./Modal.module.scss";
 
@@ -25,14 +26,14 @@ export const Modal: FC<ModalProps> = (props) => {
                 {
                     !hideClose
                     && (
-                        <button
+                        <Button
                             data-testid="close-button"
                             type="button"
                             onClick={onClose}
                             className={cls.CloseButton}
                         >
                             <CrossIcon />
-                        </button>
+                        </Button>
                     )
                 }
                 {children}

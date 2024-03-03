@@ -1,8 +1,12 @@
-import { Theme } from "widgets/ThemeToggle/lib/ThemeContext";
 import { Decorator } from "@storybook/react";
 
-export const ThemeDecorator = (theme: Theme): Decorator => (Story) => (
-    <div className={`app ${theme}`}>
-        <Story />
-    </div>
-);
+export const ThemeDecorator = (): Decorator => (Story, context) => {
+    const { globals } = context;
+    const { theme } = globals;
+
+    return (
+        <div className={`app ${theme}`}>
+            <Story />
+        </div>
+    );
+};

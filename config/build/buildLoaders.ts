@@ -8,26 +8,23 @@ export const buildLoaders = (options: BuildOptions): webpack.RuleSetRule[] => {
 
     const fileLoader = {
         test: /\.(png|jpe?g|gif)$/i,
+        exclude: /node_modules/,
         use: "file-loader",
     };
     const svgLoader = {
         test: /\.svg$/,
+        exclude: /node_modules/,
         use: "@svgr/webpack",
     };
     const babelLoader = {
         test: /\.(js|ts|tsx)$/,
         exclude: /node_modules/,
-        use: {
-            loader: "babel-loader",
-            options: {
-                presets: ["@babel/preset-env"],
-            },
-        },
+        use: "babel-loader",
     };
     const typescriptLoader = {
         test: /\.tsx?$/,
-        use: "ts-loader",
         exclude: /node_modules/,
+        use: "ts-loader",
     };
     const cssLoader = buildCssLoader(isDev);
 

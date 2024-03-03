@@ -5,7 +5,7 @@ import { LangSelect } from "./LangSelect";
 describe("LangSelect", () => {
     test("Test render with the current selected language", () => {
         renderWithTranslations(<LangSelect />);
-        const select = screen.getByTestId("lang-select") as HTMLSelectElement;
-        expect(select.value).toBe("ru");
+        const select = screen.queryByTestId("lang-select") as HTMLSelectElement;
+        expect(select.value).toBe("en");
     });
 });

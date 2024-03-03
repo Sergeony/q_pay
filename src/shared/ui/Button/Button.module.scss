@@ -1,6 +1,9 @@
 .Button {
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: none;
     background: none;
     outline: none;
@@ -18,18 +21,18 @@
     background-color: var(--accent);
 }
 
-.back {
-    display: flex;
-    justify-content: center;
-    margin-top: 16px;  // TODO: take it out
-    font-family: var(--font-family-secondary);
-    font-size: var(--font-size-l);
-    font-weight: var(--font-weight-regular);
-    text-align: left;
-    color: var(--back-btn-text-color);
-    text-decoration: underline;
-    text-underline-position: under;
-}
+// TODO: move styles to Link component
+//  .back {
+//      display: flex;
+//      justify-content: center;
+//      font-family: var(--font-family-secondary);
+//      font-size: var(--font-size-l);
+//      font-weight: var(--font-weight-regular);
+//      text-align: left;
+//      color: var(--back-btn-text-color);
+//      text-decoration: underline;
+//      text-underline-position: under;
+//  }
 
 .cancel {
     padding: 11px 7px;
