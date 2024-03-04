@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ develop ]
 jobs:
-  pipline:
+  pipeline:
     runs-on: ubuntu-latest
     strategy:
       matrix:
