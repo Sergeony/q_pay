@@ -1,9 +1,9 @@
 name: CI
 on:
   push:
-    branches: [ feature/* ]
+    branches: [ feature/** ]
   pull_request:
-    branches: [ feature/* ]
+    branches: [ feature/** ]
 jobs:
   pipeline:
     runs-on: ubuntu-latest
