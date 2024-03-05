@@ -17,6 +17,7 @@ export const Basic: Story = {
                 Empty modal...
             </div>
         ),
+        isOpen: true,
     },
 };
 
@@ -27,6 +28,7 @@ export const WithoutCloseBtn: Story = {
                 Modal without close button...
             </div>
         ),
-        hideClose: true,
+        isOpen: true,
+        hasCloseBtn: false,
     },
 };
