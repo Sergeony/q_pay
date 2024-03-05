@@ -1,22 +1,44 @@
-.ModalOverlay {
+.overlay {
     position: fixed;
     inset: 0;
-    background: var(--modal-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--modal-overlay);
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
 
-    .ModalContainer {
+    .container {
         border-radius: 16px;
         position: relative;
         padding: 40px;
+        max-width: 600px;
         border: var(--modal-border);
         background: var(--modal-bg);
+        transition: 0.3s transform;
+        transform: scale(0.2);
 
-        .CloseButton {
+        .closeButton {
             position: absolute;
             top: 16px;
             right: 16px;
         }
     }
+}
+
+.isOpen {
+    z-index: 1;
+    pointer-events: auto;
+    opacity: 1;
+
+    .container {
+        transform: scale(1);
+    }
+}
+
+.isClosing {
+      .container {
+        transform: scale(0.2);
+      }
 }

@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import "./styles/index.scss";
 import { MainPage } from "pages/MainPage/ui/MainPage";
 import { classNames } from "shared/lib/classNames/classNames";
 import { ThemeToggle, useTheme } from "widgets/ThemeToggle";
