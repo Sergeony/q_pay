@@ -38,7 +38,7 @@ const preview: Preview = {
         },
         theme: {
             description: "Global theme for components",
-            defaultValue: Theme.LIGHT,
+            defaultValue: Theme.DARK,
             toolbar: {
                 dynamicTitle: true,
                 icon: "mirror",
