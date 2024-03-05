@@ -1,18 +1,15 @@
 import { Suspense } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
 import { MainPage } from "pages/MainPage/ui/MainPage";
-import { classNames } from "shared/lib/classNames/classNames";
-import { ThemeToggle, useTheme } from "widgets/ThemeToggle";
+import { ThemeToggle } from "widgets/ThemeToggle";
 import { LangSelect } from "widgets/LangSelect";
 
 const App = () => {
-    const { theme } = useTheme();
     const { t } = useTranslation();
 
     return (
-        <div className={classNames("app", [theme], {})}>
+        <div className="app">
             <Suspense>
                 <div style={{ display: "flex" }}>
                     <Link to="/about/">{t("about")}</Link>

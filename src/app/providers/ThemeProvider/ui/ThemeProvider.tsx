@@ -20,6 +20,8 @@ const ThemeProvider: FC<PropsWithChildren> = ({ children }) => {
         setTheme,
     }), [theme]);
 
+    document.body.className = theme; //  FIXME: take it out
+
     return (
         <ThemeContext.Provider value={defaultProps}>
             {children}

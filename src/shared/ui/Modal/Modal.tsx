@@ -69,28 +69,28 @@ export const Modal: FC<ModalProps> = (props) => {
     };
 
     return (
-        // <Portal>
-        <div
-            data-testid="modal"
-            className={classNames(cls.overlay, [], mods)}
-        >
+        <Portal>
             <div
-                className={cls.container}
-                ref={containerRef}
+                data-testid="modal"
+                className={classNames(cls.overlay, [], mods)}
             >
-                {hasCloseBtn && (
-                    <Button
-                        data-testid="close-button"
-                        className={cls.closeButton}
-                        onClick={handleClose}
-                        aria-label="Close modal"
-                    >
-                        <CrossIcon />
-                    </Button>
-                )}
-                {children}
+                <div
+                    className={cls.container}
+                    ref={containerRef}
+                >
+                    {hasCloseBtn && (
+                        <Button
+                            data-testid="close-button"
+                            className={cls.closeButton}
+                            onClick={handleClose}
+                            aria-label="Close modal"
+                        >
+                            <CrossIcon />
+                        </Button>
+                    )}
+                    {children}
+                </div>
             </div>
-        </div>
-        // </Portal>
+        </Portal>
     );
 };
