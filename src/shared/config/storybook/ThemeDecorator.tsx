@@ -26,7 +26,7 @@ export const ThemeDecorator: Decorator = (Story, context) => {
 
     return (
         <ThemeProvider theme={theme}>
-            <div className="app">
+            <div id="app" className="app">
                 <Story />
             </div>
         </ThemeProvider>

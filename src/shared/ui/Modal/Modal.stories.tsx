@@ -18,6 +18,7 @@ export const Basic: Story = {
             </div>
         ),
         isOpen: true,
+        isLazy: true,
     },
 };
 
@@ -30,5 +31,6 @@ export const WithoutCloseBtn: Story = {
         ),
         isOpen: true,
         hasCloseBtn: false,
+        isLazy: true,
     },
 };
