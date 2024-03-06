@@ -7,7 +7,7 @@ export const buildLoaders = (options: BuildOptions): webpack.RuleSetRule[] => {
     const { isDev } = options;
 
     const fileLoader = {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(jpe?g|gif)$/i,
         exclude: /node_modules/,
         use: "file-loader",
     };
