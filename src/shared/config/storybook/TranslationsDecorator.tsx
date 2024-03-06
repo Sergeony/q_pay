@@ -27,7 +27,7 @@ const TranslationProvider = (props: TranslationProviderProps) => {
     );
 };
 
-export const TranslationsDecorator = (): Decorator => (Story, context) => {
+export const TranslationsDecorator: Decorator = (Story, context) => {
     const { globals } = context;
     const { locale } = globals;
 

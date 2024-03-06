@@ -13,7 +13,7 @@ export const StoreProvider: FC<StoreProviderProps> = (props) => {
         initialState,
     } = props;
 
-    const store = createReactStore(initialState);
+    const store = createReactStore(initialState as StateSchema);
 
     return (
         <Provider store={store}>

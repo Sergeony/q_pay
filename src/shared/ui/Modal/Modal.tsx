@@ -1,5 +1,5 @@
 import {
-    FC, ReactNode, useCallback, useEffect, useRef, useState
+    FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState
 } from "react";
 
 import { Button } from "shared/ui/Button/Button";
@@ -13,19 +13,23 @@ interface ModalProps {
     onClose?: () => void;
     children: ReactNode;
     isOpen: boolean;
+    isLazy?: boolean;
 }
 
 const MODAL_CLOSE_DELAY = 300;
 
+// FIXME: add animation on first open(when modal is being mounted)
 export const Modal: FC<ModalProps> = (props) => {
     const {
         hasCloseBtn = true,
         onClose,
         children,
         isOpen,
+        isLazy = false,
     } = props;
 
     const [isClosing, setIsClosing] = useState(false);
+    const [isMounted, setIsMounted] = useState<boolean>(false);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,6 +55,7 @@ export const Modal: FC<ModalProps> = (props) => {
             }
         };
         if (isOpen) {
+            setIsMounted(true);
             window.addEventListener("keydown", onKeyDown);
             document.addEventListener("mousedown", onClickOutside);
         }
@@ -63,10 +68,14 @@ export const Modal: FC<ModalProps> = (props) => {
         };
     }, [handleClose, isOpen]);
 
-    const mods = {
+    const mods = useMemo(() => ({
         [cls.isOpen]: isOpen,
         [cls.isClosing]: isClosing,
-    };
+    }), [isOpen, isClosing]);
+
+    if (isLazy && !isMounted) {
+        return null;
+    }
 
     return (
         <Portal>

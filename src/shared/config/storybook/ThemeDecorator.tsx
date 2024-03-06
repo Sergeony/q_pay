@@ -20,7 +20,7 @@ const ThemeProvider = (props: ThemeProviderProps) => {
     return children;
 };
 
-export const ThemeDecorator = (): Decorator => (Story, context) => {
+export const ThemeDecorator: Decorator = (Story, context) => {
     const { globals } = context;
     const { theme } = globals;
 

@@ -17,10 +17,10 @@ const preview: Preview = {
         },
     },
     decorators: [
-        StyleDecorator(),
-        RouterDecorator(),
-        ThemeDecorator(),
-        TranslationsDecorator(),
+        StyleDecorator,
+        RouterDecorator,
+        ThemeDecorator,
+        TranslationsDecorator,
     ],
     globalTypes: {
         locale: {

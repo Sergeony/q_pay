@@ -48,6 +48,7 @@ module.exports = {
         "max-len": ["warn", { ignoreComments: true, code: 100 }],
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "error",
+        "no-param-reassign": "off",
 
         quotes: ["error", "double"],
         "@typescript-eslint/quotes": ["error", "double"],

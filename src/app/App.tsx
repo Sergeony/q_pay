@@ -9,7 +9,7 @@ const App = () => {
     const { t } = useTranslation();
 
     return (
-        <div className="app">
+        <div id="app" className="app">
             <Suspense>
                 <div style={{ display: "flex" }}>
                     <Link to="/about/">{t("about")}</Link>
