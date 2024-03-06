@@ -6,5 +6,3 @@ export const StoreDecorator = (state: Partial<StateSchema>): Decorator => (Story
         <Story />
     </StoreProvider>
 );
-
-//  TODO: test webstorm PR
