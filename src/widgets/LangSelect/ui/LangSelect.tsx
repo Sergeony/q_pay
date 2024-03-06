@@ -1,7 +1,7 @@
-import { FC, useState } from "react";
+import { memo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export const LangSelect: FC = () => {
+export const LangSelect = memo(() => {
     const [lang, setLang] = useState<string>("en");
     const { t, i18n } = useTranslation();
 
@@ -22,4 +22,4 @@ export const LangSelect: FC = () => {
             <option value="ru">{t("Русский")}</option>
         </select>
     );
-};
+});

@@ -15,18 +15,12 @@ export const MainPage = () => {
     return (
         <div style={{ height: "560px" }}>
             <Button onClick={handleClick} role={ButtonRole.PRIMARY}>{t("Open!")}</Button>
-            <Modal isLazy isOpen={modalIsOpen} onClose={handleClick}>
-                {/* eslint-disable-next-line */}
-                <div>
-                    {/* eslint-disable-next-line i18next/no-literal-string */}
-                    {/* eslint-disable-next-line i18next/no-literal-string */}
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut,
-                    cupiditate eveniet exercitationem ipsa maiores placeat rem vel?
-                    Aut distinctio eum excepturi labore libero voluptatem?
-                    Amet libero quam saepe ullam voluptatem.
-                </div>
-            </Modal>
-            <SignInForm />
+            {modalIsOpen && (
+                <Modal isLazy isOpen={modalIsOpen} onClose={handleClick}>
+                    {/* eslint-disable-next-line */}
+                    <SignInForm onSuccess={handleClick} />
+                </Modal>
+            )}
         </div>
     );
 };

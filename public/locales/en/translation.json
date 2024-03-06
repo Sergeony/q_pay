@@ -7,5 +7,6 @@
   "unexpected_error": "Unexpected error occurred. Reload page, please.",
   "reload_page": "Reload page",
   "page_not_found": "Page not found 404",
-  "sign_in_btn": "Sign in"
+  "sign_in_btn": "Sign in",
+  "Open!": "Open!"
 }

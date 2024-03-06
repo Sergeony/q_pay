@@ -3,6 +3,50 @@
 @import "themes/light";
 @import "themes/dark";
 
+@font-face {
+    font-family: commit-mono;
+    src: url("shared/ui/fonts/CommitMono-Italic.otf") format('opentype');
+}
+
+@font-face {
+    font-family: akony;
+    src: url("shared/ui/fonts/Akony.ttf") format('truetype');
+}
+
+@font-face {
+    font-family: helvetica;
+    src: url("shared/ui/fonts/Helvetica-Regular.ttf") format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: helvetica;
+    src: url("shared/ui/fonts/Helvetica-Bold.ttf") format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: mulish;
+    src: url("shared/ui/fonts/Mulish-Bold.ttf") format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: mulish;
+    src: url("shared/ui/fonts/Mulish-Regular.ttf") format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+body {
+    font-family: var(--font-family-main);
+    -webkit-font-smoothing: antialiased; // TODO: consider it
+    -moz-osx-font-smoothing: grayscale; // TODO: consider it
+}
+
 .app {
     min-width: 100vw;
     min-height: 100vh;

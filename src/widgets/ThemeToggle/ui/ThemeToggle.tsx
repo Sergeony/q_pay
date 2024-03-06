@@ -1,5 +1,4 @@
-import { FC } from "react";
-
+import { memo } from "react";
 import { MoonIcon, SunIcon } from "shared/ui/_SVG";
 import { classNames } from "shared/lib/classNames/classNames";
 import { Button } from "shared/ui/Button/Button";
@@ -7,7 +6,7 @@ import cls from "./ThemeToggle.module.scss";
 import { useTheme } from "../lib/useTheme";
 import { Theme } from "../lib/ThemeContext";
 
-export const ThemeToggle: FC = () => {
+export const ThemeToggle = memo(() => {
     const { theme, toggleTheme } = useTheme();
 
     return (
@@ -35,4 +34,4 @@ export const ThemeToggle: FC = () => {
             </div>
         </Button>
     );
-};
+});

@@ -1,6 +1,6 @@
-import { ReactNode, FC } from "react";
+import { ReactNode } from "react";
 import { Provider } from "react-redux";
-import { createReactStore } from "../config/store";
+import { createReduxStore } from "../config/store";
 import { StateSchema } from "../config/StateSchema";
 
 interface StoreProviderProps {
@@ -8,13 +8,13 @@ interface StoreProviderProps {
     initialState?: Partial<StateSchema>;
 }
 
-export const StoreProvider: FC<StoreProviderProps> = (props) => {
+export const StoreProvider = (props: StoreProviderProps) => {
     const {
         children,
         initialState,
     } = props;
 
-    const store = createReactStore(initialState as StateSchema);
+    const store = createReduxStore(initialState as StateSchema);
 
     return (
         <Provider store={store}>

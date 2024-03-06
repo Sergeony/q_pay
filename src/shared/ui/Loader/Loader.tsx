@@ -1,5 +1,3 @@
-import { FC } from "react";
-
 import cls from "./Loader.module.scss";
 
 export enum LoaderRole {
@@ -10,7 +8,7 @@ interface LoaderProps {
     role?: LoaderRole;
 }
 
-export const Loader: FC<LoaderProps> = (props) => {
+export const Loader = (props: LoaderProps) => {
     const { role } = props;
 
     return (
