@@ -9,7 +9,7 @@ import { ErrorBoundary } from "app/providers/ErrorBoundary";
 import { StoreProvider } from "app/providers/StoreProvider";
 
 const root = ReactDOM.createRoot(
-    document.getElementById("root")
+    document.getElementById("root")!
 );
 
 root.render(

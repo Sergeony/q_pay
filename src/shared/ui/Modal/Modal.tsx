@@ -4,7 +4,7 @@ import {
 
 import { Button } from "shared/ui/Button/Button";
 import { CrossIcon } from "shared/ui/_SVG";
-import { classNames } from "shared/lib/classNames/classNames";
+import { classNames, Modes } from "shared/lib/classNames/classNames";
 import { Portal } from "shared/ui/Portal/Portal";
 import cls from "./Modal.module.scss";
 
@@ -60,7 +60,7 @@ export const Modal: FC<ModalProps> = (props) => {
             document.addEventListener("mousedown", onClickOutside);
         }
         return () => {
-            if (timerRef.current) {
+            if (timerRef?.current) {
                 clearTimeout(timerRef.current);
             }
             window.removeEventListener("keydown", onKeyDown);
@@ -68,7 +68,7 @@ export const Modal: FC<ModalProps> = (props) => {
         };
     }, [handleClose, isOpen]);
 
-    const mods = useMemo(() => ({
+    const mods: Modes = useMemo(() => ({
         [cls.isOpen]: isOpen,
         [cls.isClosing]: isClosing,
     }), [isOpen, isClosing]);

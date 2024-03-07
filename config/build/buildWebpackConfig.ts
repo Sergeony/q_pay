@@ -1,5 +1,4 @@
 import webpack from "webpack";
-
 import { BuildOptions } from "./types/config";
 import { buildPlugins } from "./buildPlugins";
 import { buildLoaders } from "./buildLoaders";
@@ -26,6 +25,6 @@ export const buildWebpackConfig = (
         },
         // TODO: add options: optimization, infrastructureLogging, cache, bail, stats, target
         resolve: buildResolvers(options),
-        devServer: isDev && buildDevServer(options),
+        devServer: isDev ? buildDevServer(options) : undefined,
     };
 };

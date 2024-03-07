@@ -4,6 +4,7 @@ import { classNames } from "shared/lib/classNames/classNames";
 import cls from "./Button.module.scss";
 
 export enum ButtonRole {
+    CLEAR = "clear",
     PRIMARY = "primary",
     CANCEL = "cancel",
 }
@@ -18,7 +19,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = memo((props: ButtonProps) => {
     const {
         children,
-        role,
+        role = ButtonRole.CLEAR,
         width,
         className,
         ...otherProps

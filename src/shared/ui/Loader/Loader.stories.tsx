@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Loader, LoaderRole } from "./Loader";
+import { Loader } from "./Loader";
 
 const meta: Meta<typeof Loader> = {
     title: "shared/Loader",
@@ -11,9 +11,3 @@ export default meta;
 type Story = StoryObj<typeof Loader>;
 
 export const Basic: Story = {};
-
-export const Page: Story = {
-    args: {
-        role: LoaderRole.PAGE,
-    },
-};

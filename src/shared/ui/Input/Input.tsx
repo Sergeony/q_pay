@@ -8,7 +8,7 @@ type InputAttrs = Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChang
 
 interface InputProps extends InputAttrs {
     value?: string | number,
-    onChange?: (value: string | number) => void;
+    onChange?: (value: string) => void;
 }
 
 export const Input = memo((props: InputProps) => {
