@@ -24,7 +24,7 @@ export function createReducerManager(
                 });
                 keysToRemove = [];
             }
-            return (combinedReducer as Reducer<StateSchema, Action, Partial<StateSchema>>)(
+            return (combinedReducer as Reducer<StateSchema, Action, Partial<StateSchema>>)( // FIXME: consider it
                 state,
                 action
             );

@@ -3,12 +3,14 @@ import {
 } from "@reduxjs/toolkit";
 import { UserSchema } from "entities/User";
 import { SignInFormSchema } from "features/auth";
+import { api } from "shared/api/api";
 
 export interface StateSchema {
-    user: UserSchema,
+    user: UserSchema;
+    [api.reducerPath]: ReturnType<typeof api.reducer>;
 
     // Async reducers
-    signInForm?: SignInFormSchema,
+    signInForm?: SignInFormSchema;
 }
 
 export type StateSchemaKey = keyof StateSchema;
