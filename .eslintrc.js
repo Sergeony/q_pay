@@ -57,7 +57,8 @@ module.exports = {
         "jsx-a11y/control-has-associated-label": "off",
     },
     globals: {
-        __IS_DEV__: true,
+        __IS_DEV__: "readonly",
+        __API_URL__: "readonly",
     },
     overrides: [
         {
