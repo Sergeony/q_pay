@@ -36,7 +36,7 @@ module.exports = {
         ],
         "import/no-unresolved": "off",
         "import/prefer-default-export": "off",
-        "no-unused-vars": "warn",
+        "no-unused-vars": "off",
         "react/require-default-props": "off",
         "react/react-in-jsx-scope": "off",
         "react/jsx-props-no-spreading": "off",
@@ -50,6 +50,8 @@ module.exports = {
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "error",
         "no-param-reassign": "off",
+        // "react/no-array-index-key": "off",
+        "no-undef": "off",
         "sergeony-plugin/path-checker": "error",
 
         quotes: ["error", "double"],
