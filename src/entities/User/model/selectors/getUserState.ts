@@ -1,3 +1,3 @@
 import { StateSchema } from "app/providers/StoreProvider";
 
-export const getUserState = (state: StateSchema) => state?.user;
+export const getUserState = (state: StateSchema) => state.user;

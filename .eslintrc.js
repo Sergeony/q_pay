@@ -23,6 +23,7 @@ module.exports = {
         "@typescript-eslint",
         "i18next",
         "react-hooks",
+        "sergeony-plugin",
     ],
     rules: {
         "react/jsx-indent": ["error", 4],
@@ -49,6 +50,7 @@ module.exports = {
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "error",
         "no-param-reassign": "off",
+        "sergeony-plugin/path-checker": "error",
 
         quotes: ["error", "double"],
         "@typescript-eslint/quotes": ["error", "double"],
