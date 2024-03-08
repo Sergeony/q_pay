@@ -11,3 +11,4 @@ export default meta;
 type Story = StoryObj<typeof ThemeToggle>;
 
 export const Basic: Story = {};
+// FIXME: bg is applied before Button styles what is incorrect

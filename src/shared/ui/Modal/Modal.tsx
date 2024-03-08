@@ -2,6 +2,7 @@ import {
     FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState
 } from "react";
 
+import { VStack } from "../Stack";
 import { Button } from "../Button/Button";
 import { CrossIcon } from "../_SVG";
 import { classNames, Modes } from "../../lib/classNames/classNames";
@@ -79,7 +80,7 @@ export const Modal: FC<ModalProps> = (props) => {
 
     return (
         <Portal>
-            <div
+            <VStack
                 data-testid="modal"
                 className={classNames(cls.overlay, [], mods)}
             >
@@ -99,7 +100,7 @@ export const Modal: FC<ModalProps> = (props) => {
                     )}
                     {children}
                 </div>
-            </div>
+            </VStack>
         </Portal>
     );
 };

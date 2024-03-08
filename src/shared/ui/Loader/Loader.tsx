@@ -1,7 +1,8 @@
+import { HStack } from "../Stack";
 import cls from "./Loader.module.scss";
 
 export const Loader = () => (
-    <div className={cls.Loader}>
+    <HStack className={cls.Loader}>
         <span />
-    </div>
+    </HStack>
 );

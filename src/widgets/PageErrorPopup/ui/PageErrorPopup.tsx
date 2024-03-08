@@ -3,6 +3,7 @@ import { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonRole } from "shared/ui/Button/Button";
 import { Modal } from "shared/ui/Modal/Modal";
+import { VStack } from "shared/ui/Stack";
 import cls from "./PageErrorPopup.module.scss";
 
 export const PageErrorPopup: FC = () => {
@@ -15,7 +16,7 @@ export const PageErrorPopup: FC = () => {
 
     return (
         <Modal isOpen isLazy hasCloseBtn={false}>
-            <div className={cls.PageErrorPopup}>
+            <VStack gap="32" className={cls.PageErrorPopup}>
                 <p>{t("unexpected_error")}</p>
                 <Button
                     onClick={reloadPage}
@@ -24,7 +25,7 @@ export const PageErrorPopup: FC = () => {
                 >
                     {t("reload_page")}
                 </Button>
-            </div>
+            </VStack>
         </Modal>
     );
 };

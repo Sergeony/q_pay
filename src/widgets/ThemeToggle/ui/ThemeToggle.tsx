@@ -2,6 +2,7 @@ import { memo } from "react";
 import { MoonIcon, SunIcon } from "shared/ui/_SVG";
 import { classNames } from "shared/lib/classNames/classNames";
 import { Button } from "shared/ui/Button/Button";
+import { HStack } from "shared/ui/Stack";
 import cls from "./ThemeToggle.module.scss";
 import { useTheme } from "../lib/useTheme";
 import { Theme } from "../lib/ThemeContext";
@@ -14,7 +15,7 @@ export const ThemeToggle = memo(() => {
             className={cls.ThemeToggle}
             onClick={toggleTheme}
         >
-            <div
+            <HStack
                 className={classNames(
                     cls.ToggleCircle,
                     [],
@@ -22,8 +23,8 @@ export const ThemeToggle = memo(() => {
                 )}
             >
                 <SunIcon />
-            </div>
-            <div
+            </HStack>
+            <HStack
                 className={classNames(
                     cls.ToggleCircle,
                     [],
@@ -31,7 +32,7 @@ export const ThemeToggle = memo(() => {
                 )}
             >
                 <MoonIcon />
-            </div>
+            </HStack>
         </Button>
     );
 });

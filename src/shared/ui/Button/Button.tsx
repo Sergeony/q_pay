@@ -1,6 +1,7 @@
 import { ButtonHTMLAttributes, memo, ReactNode } from "react";
 
 import { classNames } from "shared/lib/classNames/classNames";
+import { HStack } from "../Stack";
 import cls from "./Button.module.scss";
 
 export enum ButtonRole {
@@ -26,13 +27,14 @@ export const Button = memo((props: ButtonProps) => {
     } = props;
 
     return (
-        <button
+        <HStack
+            As="button"
             type="button"
             style={{ width }}
             className={classNames(cls.Button, [cls[role], className])}
             {...otherProps}
         >
             {children}
-        </button>
+        </HStack>
     );
 });

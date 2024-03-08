@@ -1,16 +1,11 @@
 .ThemeToggle {
     --circle-size: 30px;
 
-    display: flex;
-    align-items: center;
     width: calc(2 * var(--circle-size));
     border-radius: calc(var(--circle-size) / 2);
     background-color: var(--theme-toggle-bg);
 
     .ToggleCircle {
-        display: flex;
-        justify-content: center;
-        align-items: center;
         width: var(--circle-size);
         height: var(--circle-size);
         border-radius: 50%;

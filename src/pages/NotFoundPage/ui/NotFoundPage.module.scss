@@ -1,8 +1,8 @@
 .NotFoundPage {
-    display: flex;
     min-height: 100vh;
-    justify-content: center;
-    align-items: center;
-    font: var(--font-h1);
-    color: var(--accent);
+
+    p {
+        font: var(--font-h1);
+        color: var(--accent);
+    }
 }

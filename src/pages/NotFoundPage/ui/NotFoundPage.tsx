@@ -1,20 +1,15 @@
-import { FC } from "react";
+import { memo } from "react";
 
-import { classNames } from "shared/lib/classNames/classNames";
 import { useTranslation } from "react-i18next";
+import { VStack } from "shared/ui/Stack";
 import cls from "./NotFoundPage.module.scss";
 
-interface NotFoundPageProps {
-    className?: string;
-}
-
-export const NotFoundPage: FC<NotFoundPageProps> = (props) => {
-    const { className } = props;
+export const NotFoundPage = memo(() => {
     const { t } = useTranslation();
 
     return (
-        <div className={classNames(cls.NotFoundPage, [className])}>
-            {t("page_not_found")}
-        </div>
+        <VStack className={cls.NotFoundPage}>
+            <p>{t("page_not_found")}</p>
+        </VStack>
     );
-};
+});
