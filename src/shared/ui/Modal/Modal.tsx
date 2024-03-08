@@ -2,10 +2,10 @@ import {
     FC, ReactNode, useCallback, useEffect, useMemo, useRef, useState
 } from "react";
 
-import { Button } from "shared/ui/Button/Button";
-import { CrossIcon } from "shared/ui/_SVG";
-import { classNames, Modes } from "shared/lib/classNames/classNames";
-import { Portal } from "shared/ui/Portal/Portal";
+import { Button } from "../Button/Button";
+import { CrossIcon } from "../_SVG";
+import { classNames, Modes } from "../../lib/classNames/classNames";
+import { Portal } from "../Portal/Portal";
 import cls from "./Modal.module.scss";
 
 interface ModalProps {
