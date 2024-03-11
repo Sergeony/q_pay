@@ -18,7 +18,7 @@ export const MainPage = () => {
             {modalIsOpen && (
                 <Modal isLazy isOpen={modalIsOpen} onClose={handleClick}>
                     {/* eslint-disable-next-line */}
-                    <SignInForm onSuccess={handleClick} />
+                    <SignInForm />
                 </Modal>
             )}
         </div>

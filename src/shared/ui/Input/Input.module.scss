@@ -4,19 +4,21 @@
     text-align: left;
     background: none;
     width: 100%;
+     border: none;
 
-    // border: none;
-    // &::placeholder {
-    //     color: var(--grey);
-    // }
-    // &:focus {
-    //     outline: none;
-    // }
-    // &:-webkit-autofill,
-    // &:-webkit-autofill:hover,
-    // &:-webkit-autofill:focus {
-    //     background: none;
-    //     color: var(--input-text-color);
-    //     transition: color 5000s ease-in-out 0s, background 5000s ease-in-out 0s;
-    // }
+     &::placeholder {
+         color: var(--grey);
+     }
+
+     &:focus {
+         outline: none;
+     }
+
+     &:-webkit-autofill,
+     &:-webkit-autofill:hover,
+     &:-webkit-autofill:focus {
+         background: none;
+         color: var(--input-text-color);
+         transition: color 5000s ease-in-out 0s, background 5000s ease-in-out 0s;
+     }
 }

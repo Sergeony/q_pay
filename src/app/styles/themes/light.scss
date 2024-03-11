@@ -17,4 +17,6 @@ body.light {
     --contrast: var(--black);
     --app-bg: var(--white) no-repeat center / cover;
     --input-text-color: var(--grey);
+    --field-border: 1px var(--grey) solid;
+    --field-bg: var(--white);
 }

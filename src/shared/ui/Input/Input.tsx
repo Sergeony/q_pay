@@ -8,7 +8,7 @@ type InputAttrs = Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChang
 
 interface InputProps extends InputAttrs {
     value?: string | number,
-    onChange?: (value: string) => void;
+    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const Input = memo((props: InputProps) => {
@@ -19,15 +19,15 @@ export const Input = memo((props: InputProps) => {
         ...otherProps
     } = props;
 
-    const onChangeHandler = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-        onChange?.(event.target.value);
-    }, [onChange]);
+    // const onChangeHandler = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    //     onChange?.(event.target.value);
+    // }, [onChange]);
 
     return (
         <input
             type={type}
             value={value}
-            onChange={onChangeHandler}
+            onChange={onChange}
             className={classNames(cls.Input)}
             {...otherProps}
         />

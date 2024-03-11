@@ -1,5 +1,16 @@
-export { getUserState } from "./model/selectors/getUserState";
-export { isUserTrader, isUserAdmin, isUserMerchant } from "./model/selectors/userTypeSelectors";
-export { UserSchema } from "./model/types/userSchema";
-export { User, UserType } from "./model/types/user";
-export { userReducer } from "./model/slice/userSlice";
+export { getUserAuthData } from "./model/selectors/getUserAuthData";
+export {
+    isUserTrader,
+    isUserAdmin,
+    isUserMerchant,
+    getUserType
+} from "./model/selectors/userTypeSelectors";
+export {
+    UserSchema,
+    User,
+    UserType
+} from "./model/types/userSchema";
+export {
+    userReducer,
+    userActions
+} from "entities/User/model/slices/userSlice";

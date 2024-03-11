@@ -23,6 +23,7 @@ class ErrorBoundary
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         // TODO: implement service for logs
+        // eslint-disable-next-line
         console.log(
             `error: ${error}`,
             `errorInfo: ${JSON.stringify(errorInfo)}`,

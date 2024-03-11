@@ -2,7 +2,7 @@ import {
     Action, EnhancedStore, Reducer, ReducersMapObject,
 } from "@reduxjs/toolkit";
 import { UserSchema } from "entities/User";
-import { SignInFormSchema } from "features/auth";
+import { AuthSchema } from "features/auth";
 import { api } from "shared/api/api";
 
 export interface StateSchema {
@@ -10,7 +10,7 @@ export interface StateSchema {
     [api.reducerPath]: ReturnType<typeof api.reducer>;
 
     // Async reducers
-    signInForm?: SignInFormSchema;
+    auth?: AuthSchema;
 }
 
 export type StateSchemaKey = keyof StateSchema;

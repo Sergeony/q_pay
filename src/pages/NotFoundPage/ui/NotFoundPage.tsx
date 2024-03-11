@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { VStack } from "shared/ui/Stack";
 import cls from "./NotFoundPage.module.scss";
 
-export const NotFoundPage = memo(() => {
+const NotFoundPage = memo(() => {
     const { t } = useTranslation();
 
     return (
@@ -13,3 +13,5 @@ export const NotFoundPage = memo(() => {
         </VStack>
     );
 });
+
+export default NotFoundPage;

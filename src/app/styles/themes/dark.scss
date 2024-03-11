@@ -17,4 +17,7 @@ body.dark {
     --contrast: var(--white);
     --app-bg: #1B1B1B url("shared/ui/img/bg.png") no-repeat center / cover;
     --input-text-color: var(--white);
+    --field-border: 'none';
+    --field-bg: linear-gradient(180deg, rgb(120 124 113 / 45%) -148.5%, rgb(255 255 255 / 45%) 8.66%, rgb(116 125 97 / 36%) 248.5%);
+
 }
