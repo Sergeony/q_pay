@@ -13,7 +13,6 @@ export const buildWebpackConfig = (
     return {
         mode,
         entry: paths.entry,
-        devtool: isDev && "inline-source-map",
         output: {
             filename: "[name].[contenthash].js",
             path: paths.build,
@@ -26,6 +25,7 @@ export const buildWebpackConfig = (
         },
         // TODO: add options: optimization, infrastructureLogging, cache, bail, stats, target
         resolve: buildResolvers(options),
+        devtool: isDev ? "eval-cheap-module-source-map" : undefined,
         devServer: isDev ? buildDevServer(options) : undefined,
     };
 };

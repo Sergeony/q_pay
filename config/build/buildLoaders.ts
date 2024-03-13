@@ -19,7 +19,12 @@ export const buildLoaders = (options: BuildOptions): webpack.RuleSetRule[] => {
     const babelLoader = {
         test: /\.(js|ts|tsx)$/,
         exclude: /node_modules/,
-        use: "babel-loader",
+        use: {
+            loader: "babel-loader",
+            options: {
+                cacheDirectory: true,
+            },
+        },
     };
     const typescriptLoader = {
         test: /\.tsx?$/,
