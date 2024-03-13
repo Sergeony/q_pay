@@ -52,7 +52,8 @@ module.exports = {
         "no-param-reassign": "off",
         // "react/no-array-index-key": "off",
         "no-undef": "off",
-        "sergeony-plugin/path-checker": "error",
+        "sergeony-plugin/path-checker": ["error", { alias: "@" }],
+        "sergeony-plugin/public-api-imports": ["error", { alias: "@" }],
 
         quotes: ["error", "double"],
         "@typescript-eslint/quotes": ["error", "double"],
