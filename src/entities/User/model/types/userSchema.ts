@@ -10,5 +10,5 @@ export interface User {
 }
 
 export interface UserSchema {
-    user?: User;
+    data?: User,
 }

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { User, UserSchema } from "../types/userSchema";
+import { UserSchema, User } from "../types/userSchema";
 
 const initialState: UserSchema = {};
 
@@ -8,10 +8,10 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         setUser: (state, action: PayloadAction<User>) => {
-            state.user = action.payload;
+            state.data = action.payload;
         },
         clearUser: (state) => {
-            delete state.user;
+            delete state.data;
         },
     },
 });

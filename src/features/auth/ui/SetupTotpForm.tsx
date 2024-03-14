@@ -5,32 +5,33 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "shared/ui/Input/Input";
 import { Button, ButtonRole } from "shared/ui/Button/Button";
 import { CopyIcon } from "shared/ui/_SVG";
-import { RoutePath } from "shared/config/routeConfig/routeConfig";
-import { getTotpBase32 } from "../model/selectors/getSignInFormPassword";
+import { getRouteVerifyTotp } from "shared/const/router";
+import { handleCopyToClipboard } from "shared/lib/utils/utils";
+import { getAuthTotpSecret } from "../model/selectors/getAuthTotpSecret";
 import cls from "./Auth.module.scss";
 
-export const TotpSecretForm = memo(() => {
-    const { t } = useTranslation();
+export const SetupTotpForm = memo(() => {
     const navigate = useNavigate();
-    const totpSecret = useSelector(getTotpBase32);
+    const { t } = useTranslation();
+    const totpSecret = useSelector(getAuthTotpSecret);
 
     const onSubmit = useCallback(() => {
-        navigate(RoutePath.verify_totp);
+        navigate(getRouteVerifyTotp());
     }, [navigate]);
-
-    const copyCode = async () => {
-        await navigator.clipboard.writeText(totpSecret);
-    };
 
     return (
         <>
             <div>
-                <h2>{t("Верификация")}</h2>
+                <h2>{t("setup_totp_page_title")}</h2>
             </div>
             <div>
-                <p>{t("save_totp_secret")}</p>
+                <p>{t("setup_totp_page_description")}</p>
                 <form className={cls.VerifyTotpForm} onSubmit={onSubmit}>
-                    <div className="custom-field" onClick={copyCode}>
+                    <Button
+                        role={ButtonRole.CLEAR}
+                        className="custom-field"
+                        onClick={() => handleCopyToClipboard(totpSecret)}
+                    >
                         <CopyIcon />
                         <Input
                             readOnly
@@ -39,7 +40,7 @@ export const TotpSecretForm = memo(() => {
                             type="text"
                             value={totpSecret}
                         />
-                    </div>
+                    </Button>
                     <Button
                         type="submit"
                         role={ButtonRole.PRIMARY}

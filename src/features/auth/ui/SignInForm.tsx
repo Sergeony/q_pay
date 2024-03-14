@@ -1,14 +1,14 @@
-import { memo, useState } from "react";
+import { memo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "shared/ui/Input/Input";
 import { Button, ButtonRole } from "shared/ui/Button/Button";
 import { DynamicReducersLoader, Reducers } from "shared/lib/components/DynamicReducersLoader";
 import { useAppDispatch } from "shared/lib/hooks/useAppDispatch";
-import { useFormik } from "formik";
+import { FormikHelpers, useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import { RoutePath } from "shared/config/routeConfig/routeConfig";
-import { useSignInMutation } from "../model/services/authService";
+import { getRouteVerifyEmail, getRouteVerifyTotp, getRouteSetupTotp } from "shared/const/router";
+import { useSignInMutation } from "../api/authService";
 import { authActions, authReducer } from "../model/slice/authSlice";
 import cls from "./Auth.module.scss";
 
@@ -16,13 +16,28 @@ const reducers: Reducers = {
     auth: authReducer
 };
 
-const useValidationSchema = () => {
-    const { t } = useTranslation();
+yup.setLocale({
+    mixed: {
+        required: "required",
+    },
+    string: {
+        email: "invalid_email_address",
+    },
+});
 
-    return yup.object({
-        email: yup.string().email(t("invalid_email_address")).required(t("required")),
-        password: yup.string().required(t("required")),
-    });
+const validationSchema = yup.object({
+    email: yup.string().email().required(),
+    password: yup.string().required(),
+});
+
+interface FormSchema {
+    email: string,
+    password: string,
+}
+
+const initialValues: FormSchema = {
+    email: "",
+    password: "",
 };
 
 export const SignInForm = memo(() => {
@@ -30,47 +45,54 @@ export const SignInForm = memo(() => {
     const dispatch = useAppDispatch();
     const [signIn, { isLoading }] = useSignInMutation();
     const navigate = useNavigate();
-    const [submitError, setSubmitError] = useState("");
-    const validationSchema = useValidationSchema();
+
+    const onSubmit = useCallback((
+        values: FormSchema,
+        { setSubmitting, resetForm }: FormikHelpers<FormSchema>
+    ) => {
+        signIn(values).unwrap()
+            .then((response) => {
+                dispatch(authActions.setTt(response.data.tt));
+                navigate(getRouteVerifyTotp());
+            })
+            .catch((error) => {
+                const { data } = error;
+                if (error.status === 404) {
+                    resetForm();
+                } else if (error.status === 403 && data.errors[0] === "email_not_verified") {
+                    dispatch(authActions.setEmail(values.email));
+                    navigate(getRouteVerifyEmail());
+                } else if (error.status === 403 && data.errors[0] === "totp_not_setup") {
+                    dispatch(authActions.setTt(error.data.tt));
+                    dispatch(authActions.setTotpSecret(error.data.totpBase32));
+                    navigate(getRouteSetupTotp());
+                }
+            })
+            .finally(() => {
+                setSubmitting(false);
+            });
+    }, [dispatch, navigate, signIn]);
 
     const formik = useFormik({
-        initialValues: { email: "", password: "" },
         validationSchema,
-        onSubmit: (values, { setSubmitting, setErrors, resetForm }) => {
-            signIn(values).unwrap()
-                .then((response) => {
-                    dispatch(authActions.setTT(response.tt));
-                    navigate(RoutePath.verify_totp);
-                })
-                .catch((error) => {
-                    const { data } = error;
-                    if (error.status === 404) {
-                        resetForm();
-                    } else if (error.status === 403 && data.errors[0] === "totp_not_setup") {
-                        console.log(error);
-                        dispatch(authActions.setTT(error.data.tt));
-                        dispatch(authActions.setTotpBase32(error.data.totpBase32));
-                        navigate(RoutePath.totp_secret);
-                    } else if (error.status === 403 && data.errors[0] === "email_not_verified") {
-                        dispatch(authActions.setEmail(values.email));
-                        navigate(RoutePath.verify_evc);
-                    }
-                    setSubmitError(t("sign_in_error"));
-                })
-                .finally(() => {
-                    setSubmitting(false);
-                });
-        },
+        initialValues,
+        onSubmit,
     });
 
     return (
         <>
             <div>
-                <h2>{t("Вход")}</h2>
+                <h2>{t("sign_in_page_title")}</h2>
             </div>
             <div>
-                <DynamicReducersLoader keepAfterUnmount reducers={reducers}>
-                    <form className={cls.SignInForm} onSubmit={formik.handleSubmit}>
+                <DynamicReducersLoader
+                    keepAfterUnmount
+                    reducers={reducers}
+                >
+                    <form
+                        className={cls.SignInForm}
+                        onSubmit={formik.handleSubmit}
+                    >
                         <Input
                             id="email"
                             name="email"
@@ -79,7 +101,6 @@ export const SignInForm = memo(() => {
                             onBlur={formik.handleBlur}
                             value={formik.values.email}
                             placeholder={t("email_placeholder")}
-
                         />
                         {formik.touched.email && formik.errors.email && (
                             <div>{formik.errors.email}</div>
@@ -92,7 +113,6 @@ export const SignInForm = memo(() => {
                             onBlur={formik.handleBlur}
                             value={formik.values.password}
                             placeholder={t("password_placeholder")}
-
                         />
                         {formik.touched.password && formik.errors.password && (
                             <div>{formik.errors.password}</div>
@@ -104,7 +124,6 @@ export const SignInForm = memo(() => {
                         >
                             {t("sign_in_btn")}
                         </Button>
-                        {submitError && <div className={cls.error}>{submitError}</div>}
                     </form>
                 </DynamicReducersLoader>
             </div>

@@ -1,14 +1,12 @@
-export { getUserAuthData } from "./model/selectors/getUserAuthData";
 export {
     isUserTrader,
     isUserAdmin,
     isUserMerchant,
-    getUserType
+    getUserType,
 } from "./model/selectors/userTypeSelectors";
 export {
-    UserSchema,
-    User,
-    UserType
+    UserType,
+    UserSchema
 } from "./model/types/userSchema";
 export {
     userReducer,

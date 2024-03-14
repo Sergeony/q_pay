@@ -1,54 +1,80 @@
-import { memo } from "react";
-import { useSelector } from "react-redux";
+import { memo, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useFormik } from "formik";
+import { FormikHelpers, useFormik } from "formik";
 import * as yup from "yup";
 import { Input } from "shared/ui/Input/Input";
 import { Button, ButtonRole } from "shared/ui/Button/Button";
-import { getTT } from "../model/selectors/getTT";
-import { useVerifyTotpMutation } from "../model/services/authService";
+import { LOCAL_STORAGE_ACCESS_TOKEN_KEY } from "shared/const/localStorage";
+import { jwtDecode } from "jwt-decode";
+import { userActions } from "entities/User";
+import { useVerifyTotpMutation } from "../api/authService";
+import { getAuthTt } from "../model/selectors/getAuthTt";
 import cls from "./Auth.module.scss";
 
-const useValidationSchema = () => {
-    const { t } = useTranslation();
+const validationSchema = yup.object({
+    totp: yup.string().required(),
+});
 
-    return yup.object({
-        totp: yup.string().required(t("required")),
-    });
+interface FormSchema {
+    totp: string;
+}
+
+const initialValues: FormSchema = {
+    totp: "",
 };
 
+interface TokenPayload {
+    user_type: number;
+    id: number;
+}
+
 export const VerifyTotpForm = memo(() => {
-    const { t } = useTranslation();
-    const tt = useSelector(getTT);
-    const [verifyTotp, { isLoading }] = useVerifyTotpMutation();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const validationSchema = useValidationSchema();
+    const { t } = useTranslation();
+    const tt = useSelector(getAuthTt);
+    const [verifyTotp, { isLoading }] = useVerifyTotpMutation();
+
+    const onSubmit = useCallback((
+        values: FormSchema,
+        { setSubmitting }: FormikHelpers<FormSchema>
+    ) => {
+        verifyTotp({
+            totp: values.totp,
+            tt,
+        }).unwrap()
+            .then((response) => {
+                localStorage.setItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY, response.data.access);
+                const decodedToken: TokenPayload = jwtDecode(response.data.access);
+                dispatch(userActions.setUser({
+                    type: decodedToken.user_type,
+                    id: decodedToken.id,
+                }));
+                navigate("/"); // FIXME: navigate to user's home page
+            })
+            .catch(() => {
+                // FIXME: handle errors properly
+            })
+            .finally(() => {
+                setSubmitting(false);
+            });
+    }, [dispatch, navigate, tt, verifyTotp]);
 
     const formik = useFormik({
-        initialValues: { totp: "" },
         validationSchema,
-        onSubmit: (values, { setSubmitting }) => {
-            verifyTotp({ totp: values.totp, tt }).unwrap()
-                .then(() => {
-                    navigate("/");
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    setSubmitting(false);
-                });
-        },
+        initialValues,
+        onSubmit,
     });
 
     return (
         <>
             <div>
-                <h2>{t("Верификация")}</h2>
+                <h2>{t("verify_totp_page_title")}</h2>
             </div>
             <div>
-                <p>{t("Введите код подтверждения.")}</p>
+                <p>{t("verify_totp_page_description")}</p>
                 <form className={cls.VerifyTotpForm} onSubmit={formik.handleSubmit}>
                     <div className="custom-field">
                         <Input
@@ -64,7 +90,6 @@ export const VerifyTotpForm = memo(() => {
                     {formik.touched.totp && formik.errors.totp && (
                         <div className={cls.error}>{formik.errors.totp}</div>
                     )}
-
                     <Button
                         type="submit"
                         disabled={formik.isSubmitting || isLoading}
