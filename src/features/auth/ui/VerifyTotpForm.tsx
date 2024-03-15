@@ -48,7 +48,7 @@ export const VerifyTotpForm = memo(() => {
             .then((response) => {
                 localStorage.setItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY, response.data.access);
                 const decodedToken: TokenPayload = jwtDecode(response.data.access);
-                dispatch(userActions.setUser({
+                dispatch(userActions.setUserData({
                     type: decodedToken.user_type,
                     id: decodedToken.id,
                 }));

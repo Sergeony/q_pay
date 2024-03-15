@@ -1,9 +1,11 @@
 export {
-    isUserTrader,
-    isUserAdmin,
-    isUserMerchant,
-    getUserType,
+    isTrader,
+    isAdmin,
+    isMerchant,
+
 } from "./model/selectors/userTypeSelectors";
+export { getUserData } from "entities/User/model/selectors/getUserData";
+export { getUserPrefs } from "entities/User/model/selectors/getUserPrefs";
 export {
     UserType,
     UserSchema
@@ -11,4 +13,7 @@ export {
 export {
     userReducer,
     userActions
-} from "entities/User/model/slices/userSlice";
+} from "./model/slices/userSlice";
+export {
+    useLazyGetUserPrefsQuery,
+} from "./api/userService";

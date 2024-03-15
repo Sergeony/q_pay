@@ -1,6 +1,6 @@
 import { ReactNode, useMemo } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { getUserType, UserType } from "entities/User";
+import { getUserData, UserType } from "entities/User";
 import { AppRoutes } from "shared/const/router";
 import { useSelector } from "react-redux";
 
@@ -15,14 +15,14 @@ export function RequireAuth(props: RequireAuthProps) {
         requiredUserType,
     } = props;
     const location = useLocation();
-    const userType = useSelector(getUserType);
+    const userData = useSelector(getUserData);
 
     const isRequiredType = useMemo(() => {
-        if (!userType) {
+        if (!userData) {
             return true;
         }
-        return requiredUserType === userType;
-    }, [requiredUserType, userType]);
+        return requiredUserType === userData.type;
+    }, [requiredUserType, userData]);
 
     // if (!userType) {
     //     // Redirect them to the /login page, but save the current location they were

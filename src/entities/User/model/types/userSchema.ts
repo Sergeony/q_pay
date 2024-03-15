@@ -4,11 +4,19 @@ export enum UserType {
     ADMIN = 3,
 }
 
-export interface User {
+export interface UserData {
     id: number;
     type: UserType;
 }
 
+export interface UserPrefs {
+    theme: "light" | "dark";
+    lang: string;
+    tz: string;
+    isActive: boolean;
+}
+
 export interface UserSchema {
-    data?: User,
+    data?: UserData,
+    prefs?: UserPrefs,
 }
