@@ -19,4 +19,16 @@ body.light {
     --input-text-color: var(--grey);
     --field-border: 1px var(--grey) solid;
     --field-bg: var(--white);
+    --logo-user-type: var(--black);
+    --header-bg: "none";
+    --header-border: 1px solid var(--grey);
+    --switch-bg-color: var(--black);
+    --switch-is-active-bg-color: var(--accent);
+    --switch-span-bg-color: var(--white);
+    --switch-span-active-bg-color: var(--white);
+    --table-row-bg: radial-gradient(101.5% 101.5% at 50% 50%, rgb(254 254 254 / 100%) 0%, rgb(225 227 221 / 95%) 45%, rgb(116 125 97 / 80%) 100%);
+    --table-col-color: var(--grey);
+    --kebab-menu-bg: var(--white);
+    --kebab-menu-svg-stroke: var(--light-grey);
+    --bd-border: 1px solid var(--dark-grey);
 }

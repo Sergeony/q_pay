@@ -19,5 +19,16 @@ body.dark {
     --input-text-color: var(--white);
     --field-border: 'none';
     --field-bg: linear-gradient(180deg, rgb(120 124 113 / 45%) -148.5%, rgb(255 255 255 / 45%) 8.66%, rgb(116 125 97 / 36%) 248.5%);
-
+    --logo-user-type: #454545;
+    --header-bg: rgb(22 25 15 / 50%);
+    --header-border: "none";
+    --switch-bg-color: var(--grey);
+    --switch-is-active-bg-color: var(--accent);
+    --switch-span-bg-color: var(--white);
+    --switch-span-active-bg-color: var(--black);
+    --table-row-bg: linear-gradient(180deg, rgb(116 125 97 / 45%) -148.5%, rgb(255 255 255 / 45%) 8.66%, rgb(116 125 97 / 36%) 248%);
+    --table-col-color: var(--light-grey);
+    --kebab-menu-bg: var(--light-grey);
+    --kebab-menu-svg-stroke: var(--grey);
+    --bd-border: 1px solid var(--dark-grey);
 }

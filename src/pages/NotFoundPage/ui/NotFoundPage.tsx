@@ -9,7 +9,7 @@ const NotFoundPage = memo(() => {
 
     return (
         <VStack className={cls.NotFoundPage}>
-            <p>{t("page_not_found")}</p>
+            <p>{t("page_not_found_text")}</p>
         </VStack>
     );
 });

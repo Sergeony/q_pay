@@ -52,7 +52,7 @@ const App = () => {
                     <LangSelect />
                     <ThemeToggle />
                 </div>
-                <Header />
+                {/* <Header /> */}
                 <AppRouter />
             </Suspense>
         </div>

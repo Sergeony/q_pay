@@ -4,7 +4,7 @@ import { StyleDecorator } from "../../src/shared/config/storybook/StyleDecorator
 import { ThemeDecorator } from "../../src/shared/config/storybook/ThemeDecorator";
 import { RouterDecorator } from "../../src/shared/config/storybook/RouterDecorator";
 import { TranslationsDecorator } from "../../src/shared/config/storybook/TranslationsDecorator";
-import { Theme } from "../../src/widgets/ThemeToggle/lib/ThemeContext";
+import { Theme } from "../../src/features/ThemeToggle/lib/ThemeContext";
 
 const preview: Preview = {
     parameters: {

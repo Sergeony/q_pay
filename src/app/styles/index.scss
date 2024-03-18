@@ -48,8 +48,13 @@ body {
 }
 
 .app {
-    min-width: 100vw;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
+    -webkit-box-align: center;
     min-height: 100vh;
+    width: 100%;
     background: var(--app-bg);
 }
 
@@ -60,4 +65,149 @@ body {
     border-radius: 16px;
     border: var(--field-border);
     background: var(--field-bg);
+}
+
+.table {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    // Rows
+    > div {
+        display: grid;
+
+        // Columns
+        > * {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        // Tbody rows
+        &:not(:first-child) {
+            border-radius: 16px;
+            background: var(--table-row-bg);
+        }
+
+        // Thead rows
+        &:first-child {
+            > span {
+                font: var(--font-col-h);
+                color: var(--table-col-color);
+                white-space: nowrap;
+            }
+        }
+
+        // First column
+        > div:first-child {
+            justify-content: flex-start;
+        }
+
+        // Last column
+        > div:last-child {
+            justify-content: flex-end;
+        }
+
+    }
+}
+
+// Tbody rows for extended table
+.table.extended > div:not(:first-child) {
+    // Block under columns
+    > div:last-child {
+        justify-content: center;
+        grid-column: 1 / -1;
+    }
+
+    // Last column
+    > div:nth-last-child(2) {
+        justify-content: flex-end;
+    }
+}
+
+.table > div > div > .two-line-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+
+    span:first-child {
+        font: var(--font-main-regular);
+        color: var(--black);
+    }
+
+    span:first-child {
+        font: var(--font-secondary);
+        color: var(--light-grey);
+    }
+}
+
+.modal-title {
+    text-align: center;
+    color: #46404B;
+    font: var(--font-h3);
+}
+
+.h-stack {
+    display: flex;
+}
+
+.v-stack {
+    display: flex;
+    flex-direction: column;
+}
+
+.gap-4 {
+    gap: 4px;
+}
+
+.gap-8 {
+    gap: 8px;
+}
+
+.gap-16 {
+    gap: 8px;
+}
+
+.gap-24 {
+    gap: 24px;
+}
+
+.gap-32 {
+    gap: 32px;
+}
+
+.justifyStart {
+    justify-content: flex-start;
+}
+
+.justifyCenter {
+    justify-content: center;
+}
+
+.justifyEnd {
+    justify-content: flex-end;
+}
+
+.justifyBetween {
+    justify-content: space-between;
+}
+
+.justifyAround {
+    justify-content: space-around;
+}
+
+
+.alignStart {
+    align-items: flex-start;
+}
+
+.alignCenter {
+    align-items: center;
+}
+
+.alignEnd {
+    align-items: flex-end;
 }

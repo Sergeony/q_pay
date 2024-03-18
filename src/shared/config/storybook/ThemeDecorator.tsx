@@ -1,6 +1,6 @@
 import { Decorator } from "@storybook/react";
 import { ReactNode, useEffect } from "react";
-import { Theme } from "widgets/ThemeToggle/lib/ThemeContext";
+import { Theme } from "features/ThemeToggle";
 
 interface ThemeProviderProps {
     theme: Theme;

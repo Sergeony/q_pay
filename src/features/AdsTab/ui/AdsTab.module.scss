@@ -1,0 +1,29 @@
+.GridTemplate > div {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+}
+
+.BankDetailsContainer {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+
+    > div {
+        display: flex;
+        gap: 4px;
+        white-space: nowrap;
+        border-radius: 8px;
+        padding: 4.5px 8px;
+        border: var(--bd-border);
+
+        > span:nth-child(3) {
+            width: 60px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+}
+
+.ModalContent {
+    width: 480px;
+}

@@ -1,0 +1,30 @@
+.Logo {
+    display: flex;
+    font-family: 'Akony', serif;
+    align-items: center;
+};
+
+.Q {
+    font-size: 59px;
+    font-weight: 700;
+    line-height: 65px;
+    letter-spacing: 0;
+    text-align: left;
+    color: var(--logo-q);
+};
+
+
+.Pay {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0;
+    text-align: center;
+    color: #474A40;
+};
+
+.UserType {
+    font: italic var(--font-weight-bold) var(--font-size-s) var(--font-family-logo);
+    text-align: center;
+    color: var(--logo-user-type);
+};

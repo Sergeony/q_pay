@@ -1,0 +1,33 @@
+.KebabMenu {
+    position: relative;
+
+    div {
+        position: absolute;
+        right: 24px;
+        top: 0;
+        background: var(--kebab-menu-bg);
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgb(0 0 0 / 20%);
+        overflow: hidden;
+
+        button {
+            padding: 8px 12px;
+            gap: 8px;
+            justify-content: start;
+            width: 100%;
+
+            &:hover {
+                background-color: #f0f0f0;
+
+            }
+
+            .EditIcon {
+                stroke: var(--kebab-menu-svg-stroke);
+            }
+
+            .DeleteIcon {
+                fill: var(--kebab-menu-svg-stroke);
+            }
+        }
+    }
+}

@@ -7,12 +7,17 @@ import cls from "./ThemeToggle.module.scss";
 import { useTheme } from "../lib/useTheme";
 import { Theme } from "../lib/ThemeContext";
 
-export const ThemeToggle = memo(() => {
+interface ThemeToggleProps {
+    className?: string;
+}
+
+export const ThemeToggle = memo((props: ThemeToggleProps) => {
+    const { className } = props;
     const { theme, toggleTheme } = useTheme();
 
     return (
         <Button
-            className={cls.ThemeToggle}
+            className={classNames(cls.ThemeToggle, [className], {})}
             onClick={toggleTheme}
         >
             <HStack

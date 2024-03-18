@@ -1,7 +1,7 @@
 import {
     FC, PropsWithChildren, useMemo, useState
 } from "react";
-import { Theme, ThemeContext } from "widgets/ThemeToggle/lib/ThemeContext";
+import { Theme, ThemeContext } from "features/ThemeToggle";
 import { LOCAL_STORAGE_THEME_KEY } from "shared/const/localStorage";
 
 const storedTheme = localStorage.getItem(LOCAL_STORAGE_THEME_KEY) as Theme;
