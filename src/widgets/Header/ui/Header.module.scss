@@ -1,23 +1,27 @@
-.Header {
-    //  padding: 0 40px;
+.Nav {
+    min-width: 600px;
+}
+
+header {
+    width: 100%;
+    display: flex;
+    padding: 18px 40px;
+    justify-content: center;
     background-color: var(--header-bg);
     border-bottom: var(--header-border);
 
     .Content {
-        width: 1500px;
-        min-width: 1280px;
-        height: 100px;
-        margin: 0 20px;
-        display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        gap: 20px;
-
-        > * {
-            display: f;
-        }
-
-        .ThemeToggle {
-            grid-column: 2 / 3;
-        }
+        width: 100%;
+        max-width: 1500px;
     }
+}
+
+.NavLink {
+    text-decoration: none;
+    font: var(--font-main-regular);
+    color: var(--header-link-fg);
+}
+
+.NavLink.active {
+    font: var(--font-main-bold);
 }

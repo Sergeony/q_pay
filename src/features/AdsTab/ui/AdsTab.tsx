@@ -128,10 +128,3 @@ export const AdsTab = memo((props: AdsProps) => {
         </DynamicReducersLoader>
     );
 });
-
-/*
-                    <div>
-                        <button>Confirm</button>
-                        <span>01:12</span>
-                    </div>
-*/

@@ -1,0 +1,22 @@
+.GridTemplate > div {
+    grid-template-columns: 1fr 1.4fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.completed {
+    color: green;
+}
+
+.completed.auto {
+    color: skyblue;
+}
+
+
+.cancelled,
+.failed {
+    color: red;
+}
+
+.pending,
+.reviewing {
+    color: yellow;
+}

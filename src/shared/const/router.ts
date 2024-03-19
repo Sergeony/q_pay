@@ -6,7 +6,7 @@ export enum AppRoutes {
     SETUP_TOTP = "setup_totp",
 
     TRADER_ADS = "trader_ads",
-    // TRADER_PAY_IN = "trader_pay_in",
+    TRADER_PAY_IN = "trader_pay_in",
     // TRADER_PAY_OUT = "trader_pay_out",
     //
     // MERCHANT_PAY_IN = "merchant_pay_in",
@@ -32,7 +32,8 @@ export const getRouteSetupTotp = () => "/setup-totp";
 
 export const getRouteTraderAds = () => "/ads";
 export const getRouteTraderBankDetails = () => "/bank-details";
-// export const getRouteTraderPayIn = () => "/trader/pay-in";
+
+export const getRouteTraderPayIn = () => "/pay-in";
 // export const getRouteTraderPayOut = () => "/trader/pay-out";
 //
 // export const getRouteMerchantPayIn = () => "/merchant/pay-in";

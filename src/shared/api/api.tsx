@@ -9,36 +9,44 @@ export const baseQuery = fetchBaseQuery({
         if (access) {
             headers.set("Authorization", `Bearer ${access}`);
         }
-
-        // Language header (localization)
-        // const language = sessionStorage.getItem("i18nextLng");
-        // if (language) {
-        //   headers.set("Accept-Language", language);
-        // }
-
         return headers;
     },
 });
+
+export const refreshToken = async () => fetch(`${__API_URL__}/auth/token/refresh/`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+        "Content-Type": "application/json",
+    },
+})
+    .then(async (response) => {
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY, data.access);
+            return data;
+        }
+        return null;
+    })
+    .catch(() => {
+        // TODO: add handling
+    });
 
 const customBaseQuery = async (args: any, api: any, extraOptions: any) => {
     if (args.body) {
         args.body = transformKeyFormat(args.body, "snake");
     }
-
-    const result = await baseQuery(args, api, extraOptions);
-
-    // if (result.error && result.error.status === 401) {
-    //     const token = await refreshToken(api);
-    //     if (token) {
-    //         result = await baseQuery(args, api, extraOptions);
-    //     }
-    // }
-
-    if (result.data) {
-        result.data = transformKeyFormat(result.data, "camel");
+    let response = await baseQuery(args, api, extraOptions);
+    if (response.error?.status === 401) {
+        const refreshTokenResponse = await refreshToken();
+        if (refreshTokenResponse?.ok) {
+            response = await baseQuery(args, api, extraOptions);
+        }
     }
-
-    return result;
+    if (response.data) {
+        response.data = transformKeyFormat(response.data, "camel");
+    }
+    return response;
 };
 
 export const api = createApi({

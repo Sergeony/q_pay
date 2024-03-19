@@ -1,15 +1,11 @@
 import { api } from "shared/api/api";
 
-// =============================================
-
 interface SignUpRequest {
     email: string;
     password: string;
     inviteCode: string;
     tgUsername?: string;
 }
-
-// =============================================
 
 interface VerifyEmailRequest {
     email: string;
@@ -25,8 +21,6 @@ interface ResendEvcRequest {
     email: string;
 }
 
-// =============================================
-
 interface VerifyTotpRequest {
     totp: string;
     tt: string;
@@ -37,8 +31,6 @@ interface VerifyTotpResponse {
     }
 }
 
-// =============================================
-
 interface SignInRequest {
     email: string;
     password: string;
@@ -48,8 +40,6 @@ interface SignInResponse {
         tt: string;
     }
 }
-
-// =============================================
 
 const authApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -72,7 +62,10 @@ const authApi = api.injectEndpoints({
                 url: "/auth/verify-totp/",
                 method: "POST",
                 body: { totp: data.totp },
-                headers: data.tt ? { Authorization: `Bearer ${data.tt}` } : {},
+                credentials: "include",
+                headers: data.tt && {
+                    Authorization: `Bearer ${data.tt}`,
+                },
             }),
         }),
         resendEvc: builder.mutation<void, ResendEvcRequest>({

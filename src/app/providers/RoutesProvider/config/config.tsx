@@ -1,41 +1,32 @@
 import {
     AppRoutes,
-    getRouteVerifyEmail,
-    getRouteVerifyTotp,
-    getRouteSetupTotp,
     getRouteForbidden,
+    getRouteLogin,
     getRouteNotFound,
     getRouteRegister,
-    getRouteLogin,
-    getRouteTraderAds,
-    getRouteTraderBankDetails,
-    // getRouteAdminMerchantDetails,
-    // getRouteAdminMerchants,
-    // getRouteAdminTraderDetails,
-    // getRouteAdminTraders,
-    // getRouteBalance,
-    // getRouteLogin,
-    // getRouteMerchantPayIn,
-    // getRouteMerchantPayOut,
-    // getRouteSettings,
-    // getRouteTraderAds,
-    // getRouteTraderPayIn,
-    // getRouteTraderPayOut,
-
+    getRouteSetupTotp,
+    getRouteTraderPayIn,
+    getRouteVerifyEmail,
+    getRouteVerifyTotp,
 } from "shared/const/router";
 import { NotFoundPage } from "pages/NotFoundPage";
 import { ForbiddenPage } from "pages/ForbiddenPage";
 import { AppRoutesProps } from "shared/config/routeConfig/routeConfig";
 import {
-    SignUpForm,
-    VerifyTotpForm,
-    SignInForm,
     SetupTotpForm,
+    SignInForm,
+    SignUpForm,
     VerifyEmailForm,
+    VerifyTotpForm,
 } from "features/auth";
 import { TraderAdsPage } from "pages/TraderAdsPage";
+import { TraderPayInPage } from "pages/TraderPayInPage";
 
 export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
+    [AppRoutes.TRADER_PAY_IN]: {
+        path: "/pay-in/*",
+        element: <TraderPayInPage />,
+    },
     [AppRoutes.TRADER_ADS]: {
         path: "/*",
         element: <TraderAdsPage />,
@@ -64,12 +55,6 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     // [AppRoutes.CLIENT]: {
     //     path: RoutePath.client,
     //     element: <ClientBuyPage />,
-    // },
-    // [AppRoutes.TRADER_PAY_IN]: {
-    //     path: getRouteTraderPayIn(),
-    //     element: <BuyPage />,
-    //     authOnly: true,
-    //     userType: UserType.TRADER,
     // },
     // [AppRoutes.TRADER_PAY_OUT]: {
     //     path: getRouteTraderPayOut(),

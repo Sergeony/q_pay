@@ -90,8 +90,7 @@ export const BankDetailsTab = memo((props: BankDetailsProps) => {
                         </div>
                         <div>
                             <KebabMenu
-                                onEdit={() => {
-                                }}
+                                // onEdit={() => {}} // TODO: implement
                                 onDelete={() => handleDelete(bd.id)}
                             />
                         </div>

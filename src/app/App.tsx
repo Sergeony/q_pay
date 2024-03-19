@@ -6,38 +6,58 @@ import { LangSelect } from "features/LangSelect";
 import AppRouter from "app/providers/RoutesProvider/ui/RoutesProvider";
 import { AppRoutes } from "shared/const/router";
 import { Header } from "widgets/Header";
-import { getUserData, useLazyGetUserPrefsQuery, userActions } from "entities/User";
+import { useLazyGetUserPrefsQuery, userActions } from "entities/User";
 import { useDispatch, useSelector } from "react-redux";
+import { webSocketService } from "shared/api/ws";
+import { jwtDecode } from "jwt-decode";
+import { LOCAL_STORAGE_ACCESS_TOKEN_KEY } from "shared/const/localStorage";
+import { refreshToken } from "shared/api/api";
+import { BalanceBlock } from "entities/Balance";
+
+interface DecodedToken {
+    id: number;
+    user_type: number;
+}
 
 // TODO: move providers from index.tsx to here
 const App = () => {
     const { t } = useTranslation();
-    const isAuthenticated = useSelector(getUserData);
     const dispatch = useDispatch();
     const [getUserPrefs] = useLazyGetUserPrefsQuery();
 
     useEffect(() => {
         const performGetUserPrefs = async () => getUserPrefs();
-
-        if (isAuthenticated) {
-            performGetUserPrefs()
-                .then(({
-                    data: userPrefs,
-                    isSuccess,
-                }) => {
-                    if (isSuccess) {
-                        dispatch(userActions.setUserPrefs({
-                            isActive: userPrefs.data.isActive,
-                            lang: userPrefs.data.language,
-                            tz: userPrefs.data.timezone,
-                            theme: userPrefs.data.isLightTheme ? "light" : "dark",
+        const performRefresh = async () => refreshToken();
+        const accessToken = localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
+        if (accessToken) {
+            performRefresh()
+                .then((response) => {
+                    if (response) {
+                        const decodedToken: DecodedToken = jwtDecode(response.access);
+                        dispatch(userActions.setUserData({
+                            type: decodedToken.user_type,
+                            id: decodedToken.id,
                         }));
+                        performGetUserPrefs()
+                            .then(({
+                                data: userPrefs,
+                                isSuccess,
+                            }) => {
+                                if (isSuccess) {
+                                    dispatch(userActions.setUserPrefs({
+                                        isActive: userPrefs.data.isActive,
+                                        lang: userPrefs.data.language,
+                                        tz: userPrefs.data.timezone,
+                                        theme: userPrefs.data.isLightTheme ? "light" : "dark",
+                                    }));
+                                }
+                            });
+                        // TODO: initiate WS connection
+                        webSocketService.connect();
                     }
                 });
-            // TODO: initiate WS connection
         }
     }, [
-        isAuthenticated,
         dispatch,
         getUserPrefs
     ]);
@@ -45,14 +65,7 @@ const App = () => {
     return (
         <div id="app" className="app">
             <Suspense>
-                <div style={{ display: "flex", gap: "20px" }}>
-                    <Link to={AppRoutes.REGISTER}>{t("Sign Up")}</Link>
-                    <Link to={AppRoutes.LOGIN}>{t("Sign In")}</Link>
-                    <Link to="/main/">{t("Main Page")}</Link>
-                    <LangSelect />
-                    <ThemeToggle />
-                </div>
-                {/* <Header /> */}
+                <Header />
                 <AppRouter />
             </Suspense>
         </div>

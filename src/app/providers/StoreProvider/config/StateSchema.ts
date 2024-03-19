@@ -6,6 +6,8 @@ import { AuthSchema } from "features/auth";
 import { api } from "shared/api/api";
 import { BankSchema } from "entities/Bank";
 import { BankDetailsSchema } from "entities/BankDetails";
+import { TransactionSchema } from "entities/Transaction";
+import { BalanceSchema } from "entities/Balance";
 
 export interface StateSchema {
     user: UserSchema;
@@ -15,6 +17,8 @@ export interface StateSchema {
     auth?: AuthSchema;
     banks?: BankSchema[];
     bankDetails?: BankDetailsSchema;
+    activeTransactions?: TransactionSchema;
+    balance?: BalanceSchema;
 }
 
 export type StateSchemaKey = keyof StateSchema;

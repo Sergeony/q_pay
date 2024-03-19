@@ -97,6 +97,7 @@ body {
                 font: var(--font-col-h);
                 color: var(--table-col-color);
                 white-space: nowrap;
+                padding: 0 24px;
             }
         }
 
@@ -133,12 +134,12 @@ body {
     gap: 8px;
     align-items: center;
 
-    span:first-child {
+    *:first-child {
         font: var(--font-main-regular);
         color: var(--black);
     }
 
-    span:first-child {
+    *:last-child {
         font: var(--font-secondary);
         color: var(--light-grey);
     }
@@ -177,6 +178,14 @@ body {
 
 .gap-32 {
     gap: 32px;
+}
+
+.gap-64 {
+    gap: 64px;
+}
+
+.gap-96 {
+    gap: 96px;
 }
 
 .justifyStart {
