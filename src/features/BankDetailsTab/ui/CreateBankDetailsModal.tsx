@@ -135,7 +135,7 @@ const CreateBankDetailsModal = ({ onClose }: IProps) => {
                             )}
                     </div>
 
-                    <div className={classNames("", ["h-stack", "gap-8"])}>
+                    <div className={classNames("", ["h-stack", "gap-8", "justifyBetween"])}>
                         <div className={classNames("", ["v-stack gap-8"])}>
                             <label htmlFor="daily-limit">{t("Дневной лимит")}</label>
                             <input
@@ -165,7 +165,7 @@ const CreateBankDetailsModal = ({ onClose }: IProps) => {
                                 )}
                         </div>
                     </div>
-                    <div className={classNames("", ["h-stack", "gap-8"])}>
+                    <div className={classNames("", ["h-stack", "gap-8", "justifyBetween"])}>
                         <div className={classNames("", ["v-stack gap-8"])}>
                             <label htmlFor="weekly-limit">{t("Недельный лимит")}</label>
                             <input
@@ -195,7 +195,7 @@ const CreateBankDetailsModal = ({ onClose }: IProps) => {
                                 )}
                         </div>
                     </div>
-                    <div className={classNames("", ["h-stack", "gap-8"])}>
+                    <div className={classNames("", ["h-stack", "gap-8", "justifyBetween"])}>
                         <div className={classNames("", ["v-stack gap-8"])}>
                             <label htmlFor="monthly-limit">{t("Месячный лимит")}</label>
                             <input
@@ -225,7 +225,7 @@ const CreateBankDetailsModal = ({ onClose }: IProps) => {
                                 <div>{formik.errors.currentMonthlyTurnover}</div>
                             )}
                     </div>
-                    <div className={classNames("", ["h-stack gap-8"])}>
+                    <div className={classNames("", ["h-stack gap-8", "alignCenter"])}>
                         <span>{`${t("Использовать автоматизацию")}:`}</span>
                         <Switch
                             isActive={formik.values.useAutomation}

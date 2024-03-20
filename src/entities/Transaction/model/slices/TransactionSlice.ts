@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TransactionStatus } from "entities/Transaction";
-import { ACTIVE_TRANSACTION_STATUSES } from "entities/Transaction/model/consts/consts";
+import { getTransactionStatusGroup } from "../../model/consts/consts";
 import { Transaction, TransactionSchema } from "../types/Transaction";
 
 const initialState: TransactionSchema = {
@@ -18,7 +17,7 @@ export const TransactionSlice = createSlice({
             const transaction = action.payload;
 
             const transactionExisted = state.items.map((t) => t.id).includes(transaction.id);
-            const isActive = ACTIVE_TRANSACTION_STATUSES.includes(transaction.status);
+            const isActive = getTransactionStatusGroup(transaction.status) === "active";
             if (transactionExisted && !isActive) {
                 state.items = state.items.filter((t) => t.id !== transaction.id);
                 // TODO: add some notification about transaction update

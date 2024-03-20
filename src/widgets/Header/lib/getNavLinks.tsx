@@ -1,42 +1,59 @@
-import { useSelector } from "react-redux";
-import { getUserData, UserType } from "entities/User";
-import { getRouteTraderAds, getRouteTraderPayIn } from "shared/const/router";
+import { UserType } from "entities/User";
+import { getRoutePay, getRouteTraderAds } from "shared/const/router";
+import { TransactionStatusGroup } from "entities/Transaction";
 
 interface NavLinkType {
     path: string;
     text: string;
+    match?: string;
 }
 
-export const useNavLinks = () => {
-    const userData = useSelector(getUserData);
-
-    if (!userData) {
-        return [];
-    }
-
+export const useNavLinks = (userType: UserType | undefined) => {
     const navLinks: NavLinkType[] = [];
 
-    if (userData.type === UserType.TRADER) {
+    if (!userType) return [];
+
+    // Trader only nav links
+    if (userType === UserType.TRADER) {
         navLinks.push(
             {
                 path: getRouteTraderAds(),
                 text: "ads_page_title",
             },
-            {
-                path: getRouteTraderPayIn(),
-                text: "pay_in_page_title",
-            },
         );
-    } else if (userData.type === UserType.MERCHANT) {
-        // navLinks.push();
-    } else if (userData.type === UserType.ADMIN) {
-        // navLinks.push();
     }
 
+    // Common links for traders and merchants
+    if ([UserType.TRADER, UserType.MERCHANT].includes(userType)) {
+        navLinks.push(
+            {
+                path: getRoutePay("in", TransactionStatusGroup.ACTIVE),
+                text: "pay_in_page_title",
+                match: getRoutePay("in"),
+            },
+            {
+                path: getRoutePay("out", TransactionStatusGroup.ACTIVE),
+                text: "pay_out_page_title",
+                match: getRoutePay("out")
+            },
+        );
+    } else if (userType === UserType.ADMIN) {
+        navLinks.push(
+            {
+                path: "traders", // TODO: replace with settings page
+                text: "traders_page_title",
+            },
+            {
+                path: "merchants", // TODO: replace with settings page
+                text: "merchants_page_title",
+            },
+        );
+    }
+
+    // Common links for all the user types
     navLinks.push(
         {
-            // path: getRouteSettings(),
-            path: getRouteTraderAds(), // TODO: replace with settings page
+            path: "settings", // TODO: replace with settings page
             text: "settings_page_title",
         },
     );

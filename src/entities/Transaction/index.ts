@@ -3,7 +3,12 @@ export {
     TransactionType,
     TransactionStatus,
     TransactionStatusGroup,
-    TransactionStatusRepr
+    TransactionStatusRepr,
+    TransactionTypeRepr,
+    getTransactionStatusGroup,
+    getTransactionStatusRepr,
+    getTransactionTypeRepr,
+    getTransactionTypeFromRepr,
 } from "./model/consts/consts";
 export {
     useLazyGetTransactionsQuery

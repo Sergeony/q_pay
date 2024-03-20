@@ -3,6 +3,7 @@ export {
 } from "./model/types/BankDetailsSchema";
 export {
     useFetchBankDetailsQuery,
+    useLazyFetchBankDetailsQuery,
     useCreateBankDetailsMutation,
     usePatchBankDetailsMutation,
     useDeleteBankDetailsMutation,

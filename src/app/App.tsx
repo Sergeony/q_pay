@@ -1,18 +1,12 @@
 import { Suspense, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { ThemeToggle } from "features/ThemeToggle";
-import { LangSelect } from "features/LangSelect";
 import AppRouter from "app/providers/RoutesProvider/ui/RoutesProvider";
-import { AppRoutes } from "shared/const/router";
 import { Header } from "widgets/Header";
-import { useLazyGetUserPrefsQuery, userActions } from "entities/User";
+import { getUserData, useLazyGetUserPrefsQuery, userActions } from "entities/User";
 import { useDispatch, useSelector } from "react-redux";
 import { webSocketService } from "shared/api/ws";
 import { jwtDecode } from "jwt-decode";
 import { LOCAL_STORAGE_ACCESS_TOKEN_KEY } from "shared/const/localStorage";
 import { refreshToken } from "shared/api/api";
-import { BalanceBlock } from "entities/Balance";
 
 interface DecodedToken {
     id: number;
@@ -21,9 +15,9 @@ interface DecodedToken {
 
 // TODO: move providers from index.tsx to here
 const App = () => {
-    const { t } = useTranslation();
     const dispatch = useDispatch();
     const [getUserPrefs] = useLazyGetUserPrefsQuery();
+    const useData = useSelector(getUserData);
 
     useEffect(() => {
         const performGetUserPrefs = async () => getUserPrefs();
@@ -52,8 +46,6 @@ const App = () => {
                                     }));
                                 }
                             });
-                        // TODO: initiate WS connection
-                        webSocketService.connect();
                     }
                 });
         }
@@ -61,6 +53,14 @@ const App = () => {
         dispatch,
         getUserPrefs
     ]);
+
+    useEffect(() => {
+        if (useData) {
+            webSocketService.connect();
+        } else {
+            webSocketService.disconnect();
+        }
+    }, [useData]);
 
     return (
         <div id="app" className="app">

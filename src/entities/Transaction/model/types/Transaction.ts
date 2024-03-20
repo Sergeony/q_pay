@@ -15,7 +15,7 @@ export interface Transaction {
     createdAt: string;
     completedAt: string | null;
     finishedAt: string | null;
-    lifetime: number;
+    lifetime: string;
     traderBankDetails: number;
     clientCardNumber?: string;
     clientBank: number;

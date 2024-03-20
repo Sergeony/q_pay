@@ -20,6 +20,12 @@
     background-color: var(--accent);
 }
 
+
+.primary:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
 // TODO: move styles to Link component
 //  .back {
 //      display: flex;

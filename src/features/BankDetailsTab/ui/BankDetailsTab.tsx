@@ -58,6 +58,9 @@ export const BankDetailsTab = memo((props: BankDetailsProps) => {
                 <span>{t("bank_details_table_bank_column_title")}</span>
                 <span>{t("bank_details_table_title_column_title")}</span>
                 <span>{t("bank_details_table_card_data_column_title")}</span>
+                <span>{t("bank_details_table_daily_column_title")}</span>
+                <span>{t("bank_details_table_weekly_column_title")}</span>
+                <span>{t("bank_details_table_monthly_column_title")}</span>
                 <span>{t("bank_details_table_activity_column_title")}</span>
                 <span />
             </div>
@@ -80,6 +83,24 @@ export const BankDetailsTab = memo((props: BankDetailsProps) => {
                             <div className="two-line-cell">
                                 <span>{bd.cardNumber}</span>
                                 <span>{bd.cardholderName}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="two-line-cell">
+                                <span>{bd.currentDailyTurnover}</span>
+                                <span>{bd.dailyLimit}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="two-line-cell">
+                                <span>{bd.currentWeeklyTurnover}</span>
+                                <span>{bd.weeklyLimit}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="two-line-cell">
+                                <span>{bd.currentMonthlyTurnover}</span>
+                                <span>{bd.monthlyLimit}</span>
                             </div>
                         </div>
                         <div>

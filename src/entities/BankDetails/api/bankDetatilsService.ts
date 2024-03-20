@@ -58,6 +58,7 @@ const bankDetailsApi = api.injectEndpoints({
 
 export const {
     useFetchBankDetailsQuery,
+    useLazyFetchBankDetailsQuery,
     useCreateBankDetailsMutation,
     usePatchBankDetailsMutation,
     useDeleteBankDetailsMutation,

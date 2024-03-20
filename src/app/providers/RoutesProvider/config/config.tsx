@@ -3,9 +3,9 @@ import {
     getRouteForbidden,
     getRouteLogin,
     getRouteNotFound,
+    getRoutePay,
     getRouteRegister,
     getRouteSetupTotp,
-    getRouteTraderPayIn,
     getRouteVerifyEmail,
     getRouteVerifyTotp,
 } from "shared/const/router";
@@ -20,12 +20,12 @@ import {
     VerifyTotpForm,
 } from "features/auth";
 import { TraderAdsPage } from "pages/TraderAdsPage";
-import { TraderPayInPage } from "pages/TraderPayInPage";
+import { PayPage } from "pages/PayPage";
 
 export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
-    [AppRoutes.TRADER_PAY_IN]: {
-        path: "/pay-in/*",
-        element: <TraderPayInPage />,
+    [AppRoutes.PAY]: {
+        path: getRoutePay(":type", ":tab?"),
+        element: <PayPage />,
     },
     [AppRoutes.TRADER_ADS]: {
         path: "/*",

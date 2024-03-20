@@ -15,51 +15,64 @@ import {
     useLazyGetTransactionsQuery
 } from "entities/Transaction";
 import { useSelector } from "react-redux";
-import { getBankDetails } from "entities/BankDetails";
+import { getBankDetails, useLazyFetchBankDetailsQuery } from "entities/BankDetails";
 import { formatDate, formatTime } from "shared/lib/utils/utils";
+import { Button, ButtonRole } from "shared/ui/Button/Button";
+import Timer from "./Timer";
 import cls from "./TransactionTab.module.scss";
 
 interface TransactionsProps {
     userId?: number;
-    type: TransactionType
+    type: TransactionType;
     statusGroup: TransactionStatusGroup;
 }
 
 export const TransactionsTab = memo((props: TransactionsProps) => {
+    const { t } = useTranslation();
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [fetchTransactions] = useLazyGetTransactionsQuery();
+    const [fetchBankDetails] = useLazyFetchBankDetailsQuery();
     const {
         userId,
         type,
         statusGroup,
     } = props;
-
-    const { t } = useTranslation();
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
     const activeTransactions = useSelector(
-        TransactionType.DEPOSIT ? getDepositTransactions : getWithdrawalTransactions
+        type === TransactionType.IN ? getDepositTransactions : getWithdrawalTransactions
     ) || [];
-    const [fetchTransactions] = useLazyGetTransactionsQuery();
-
     useEffect(() => {
         if (statusGroup !== TransactionStatusGroup.ACTIVE) {
-            fetchTransactions(props).unwrap().then((data) => setTransactions(data));
+            fetchTransactions({ userId, statusGroup, type })
+                .unwrap()
+                .then((data) => setTransactions(data));
         }
-    }, [fetchTransactions, props, statusGroup]);
+        fetchBankDetails({})
+            .then(() => {
+            });
+    }, [fetchBankDetails, fetchTransactions, userId, statusGroup, type]);
 
     const bds = useSelector(getBankDetails);
     const findBdById = (id: number) => bds?.find((bd) => bd.id === id);
 
+    if (!type || !statusGroup) return null;
+
     return (
         <div className={classNames(
             "table",
-            [cls.GridTemplate],
+            [type === TransactionType.IN
+                ? cls.DepositGridTemplate
+                : cls.WithdrawalGridTemplate
+            ],
             { extended: statusGroup === TransactionStatusGroup.ACTIVE }
         )}
         >
             <div>
+                <span />
                 <span>{t("ID Сделки")}</span>
                 <span>{t("Мой курс")}</span>
                 <span>{t("Курс биржи")}</span>
                 <span>{t("Клиент")}</span>
+                <span>{t("Карта клиента")}</span>
                 <span>{t("Мои реквизиты")}</span>
                 <span>{t("Создана")}</span>
                 <span>{t("Подтверждена")}</span>
@@ -90,11 +103,16 @@ export const TransactionsTab = memo((props: TransactionsProps) => {
                         <div>
                             <span>{tr.merchant}</span>
                         </div>
+                        {type === TransactionType.OUT && (
+                            <div>
+                                <span>{tr.clientCardNumber}</span>
+                            </div>
+                        )}
                         <div>
                             <div className="two-line-cell">
-                                <div>
+                                <div className="h-stack gap-4 alignCenter">
                                     <span>{bd?.title}</span>
-                                    <span>{bd?.cardholderName}</span>
+                                    <span>{bd?.cardNumber}</span>
                                 </div>
                                 <span>{bd?.cardholderName}</span>
                             </div>
@@ -113,33 +131,42 @@ export const TransactionsTab = memo((props: TransactionsProps) => {
                         </div>
                         <div className={classNames(
                             cls[TransactionStatusRepr[tr.status]],
-                            [],
+                            ["h-stack", "alignCenter", "gap-4"],
                             { [cls.auto]: tr.useAutomation }
                         )}
                         >
                             {tr.status === TransactionStatus.COMPLETED
-                                && tr.useAutomation && <AutomationIcon useGradient />}
+                                && tr.useAutomation && <AutomationIcon size={24} useGradient />}
                             {tr.status === TransactionStatus.COMPLETED
-                                && !tr.useAutomation && <SuccessIcon useGradient />}
+                                && !tr.useAutomation && <SuccessIcon size={24} useGradient />}
                             {[
                                 TransactionStatus.PENDING,
                                 TransactionStatus.REVIEWING
-                            ].includes(tr.status) && <AwaitingIcon useGradient /> }
+                            ].includes(tr.status) && <AwaitingIcon size={24} useGradient />}
                             {[
                                 TransactionStatus.FAILED,
                                 TransactionStatus.CANCELLED,
-                            ].includes(tr.status) && <FailedIcon useGradient />}
+                            ].includes(tr.status) && <FailedIcon size={24} useGradient />}
                             <span>{TransactionStatusRepr[tr.status]}</span>
                         </div>
                         {statusGroup === TransactionStatusGroup.ACTIVE && (
-                            <div>
-                                <button
-                                    type="button"
+                            <div className={classNames(
+                                cls.Extended,
+                                ["h-stack gap-16 alignCenter"]
+                            )}
+                            >
+                                <Button
+                                    role={ButtonRole.PRIMARY}
                                     disabled={tr.status === TransactionStatus.PENDING}
                                 >
                                     {t("confirm")}
-                                </button>
-                                <span>01:12</span>
+                                </Button>
+                                <Timer
+                                    creationTime={tr.createdAt}
+                                    duration={tr.lifetime}
+                                    onExpire={() => {
+                                    }}
+                                />
                             </div>
                         )}
                     </div>

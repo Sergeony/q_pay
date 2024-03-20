@@ -73,22 +73,24 @@ body {
     flex-direction: column;
     gap: 16px;
 
-    // Rows
+    // All Rows
     > div {
         display: grid;
 
-        // Columns
+        // All Columns
         > * {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 0 24px;
+            color: var(--contrast);
         }
 
         // Tbody rows
         &:not(:first-child) {
             border-radius: 16px;
             background: var(--table-row-bg);
+            padding: 24px 0;
         }
 
         // Thead rows
@@ -97,7 +99,6 @@ body {
                 font: var(--font-col-h);
                 color: var(--table-col-color);
                 white-space: nowrap;
-                padding: 0 24px;
             }
         }
 
@@ -110,7 +111,6 @@ body {
         > div:last-child {
             justify-content: flex-end;
         }
-
     }
 }
 
@@ -134,12 +134,17 @@ body {
     gap: 8px;
     align-items: center;
 
-    *:first-child {
-        font: var(--font-main-regular);
-        color: var(--black);
+    span {
+        flex-wrap: nowrap;
+        text-wrap: none;
     }
 
-    *:last-child {
+    > *:first-child {
+        font: var(--font-main-regular);
+        flex-wrap: nowrap;
+    }
+
+    > *:last-child {
         font: var(--font-secondary);
         color: var(--light-grey);
     }
@@ -219,4 +224,137 @@ body {
 
 .alignEnd {
     align-items: flex-end;
+}
+
+.PageTitle {
+    font: var(--font-h1-bold);
+    color: var(--contrast);
+}
+
+// Borders
+
+.br-0 {
+    border-radius: 0;
+}
+
+.br-1 {
+    border-radius: .25rem;
+}
+
+
+.br-2 {
+    border-radius: .5rem;
+}
+
+
+.br-3 {
+    border-radius: .75rem;
+}
+
+.br-4 {
+    border-radius: 1rem;
+}
+
+// Paddings
+
+.py-0 {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.px-0 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.py-1 {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+}
+
+.px-1 {
+    padding-left: .25rem;
+    padding-right: .25rem;
+}
+
+.py-2 {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+}
+
+.px-2 {
+    padding-left: .5rem;
+    padding-right: .5rem;
+}
+
+.py-3 {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+}
+
+.px-3 {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+}
+
+.py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.px-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+// Margins
+
+.my-0 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.mx-0 {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.my-1 {
+    margin-top: .25rem;
+    margin-bottom: .25rem;
+}
+
+.mx-1 {
+    margin-left: .25rem;
+    margin-right: .25rem;
+}
+
+.my-2 {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+
+.mx-2 {
+    margin-left: .5rem;
+    margin-right: .5rem;
+}
+
+.my-3 {
+    margin-top: .75rem;
+    margin-bottom: .75rem;
+}
+
+.mx-3 {
+    margin-top: .75rem;
+    margin-bottom: .75rem;
+}
+
+.my-4 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.mx-4 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }

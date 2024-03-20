@@ -23,5 +23,27 @@ header {
 }
 
 .NavLink.active {
-    font: var(--font-main-bold);
+    color: var(--accent);
+}
+
+.Li {
+    list-style-type: none;
+    position: relative;
+    display: flex;
+
+}
+
+.circle {
+    position: absolute;
+    right: -5px;
+    top: -15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: var(--cicrle-size);
+    height: var(--cicrle-size);
+    font: var(--font-weight-bold) var(--font-size-xs) var(--font-family-main);
+    color: var(--main);
+    background-color: var(--accent);
 }

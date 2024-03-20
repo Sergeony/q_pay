@@ -1,0 +1,22 @@
+.Link {
+    color: var(--accent);
+}
+
+.active {
+    color: var(--contrast);
+}
+
+.main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    -webkit-box-pack: center;
+    justify-content: center;
+    max-width: 1580px;
+    padding: 0 40px;
+
+    > div:first-child {
+        margin-left: 150px;
+    }
+}

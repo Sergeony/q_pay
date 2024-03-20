@@ -15,6 +15,7 @@ body.light {
     --modal-bg: var(--white);
     --modal-border: 1px solid var(--grey);
     --contrast: var(--black);
+    --main: var(--white);
     --app-bg: var(--white) no-repeat center / cover;
     --input-text-color: var(--grey);
     --field-border: 1px var(--grey) solid;
@@ -37,5 +38,4 @@ body.light {
     --frozen-balance-fg: var(--gradient-blue);
     --header-link-fg: var(--grey);
     --logo-pay-fg: var(--black);
-
 }

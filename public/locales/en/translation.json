@@ -100,5 +100,12 @@
   "Подтверждена": "Подтверждена",
   "Статус": "Статус",
   "confirm": "confirm",
-  "pay": "pay"
+  "ads_page_title": "Ads",
+  "settings_page_title": "Settings",
+  "bank_details_table_daily_column_title": "Daily",
+  "bank_details_table_weekly_column_title": "Weekly",
+  "bank_details_table_monthly_column_title": "Monthly",
+  "Карта клиента": "Карта клиента",
+  "pay_in_page_title": "Pay In",
+  "pay_out_page_title": "Pay Out"
 }

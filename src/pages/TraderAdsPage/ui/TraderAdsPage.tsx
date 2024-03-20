@@ -1,5 +1,6 @@
 import { Suspense, useState } from "react";
 import {
+    NavLink,
     Route, Routes, useLocation
 } from "react-router-dom";
 import { AddButton } from "shared/ui/AddButton/AddButton";
@@ -10,7 +11,6 @@ import { AdsTab, CreateAdModal } from "features/AdsTab";
 import { DynamicReducersLoader, Reducers } from "shared/lib/components/DynamicReducersLoader";
 import { bankReducer } from "entities/Bank";
 import { bankDetailsReducer } from "entities/BankDetails";
-import { Link } from "shared/ui/Link/Link";
 import cls from "./TraderAdsPage.module.scss";
 
 const reducers: Reducers = {
@@ -25,23 +25,21 @@ const TraderAdsPage = () => {
 
     return (
         <DynamicReducersLoader reducers={reducers} keepAfterUnmount>
-            <main className="page-wrapper">
+            <main className={cls.main}>
                 <div className="h-stack justifyBetween">
                     <nav className="h-stack gap-24">
-                        <Link
+                        <NavLink
                             to={getRouteTraderAds()}
-                            className={cls.TabLink}
-                            activeClassName={cls.active}
+                            className={({ isActive }) => `${cls.TabLink} ${isActive && cls.active}`}
                         >
                             {t("ads_tab_title")}
-                        </Link>
-                        <Link
+                        </NavLink>
+                        <NavLink
                             to={getRouteTraderBankDetails()}
-                            className={cls.TabLink}
-                            activeClassName={cls.active}
+                            className={({ isActive }) => `${cls.TabLink} ${isActive && cls.active}`}
                         >
                             {t("bank_details_tab_title")}
-                        </Link>
+                        </NavLink>
                     </nav>
                     <AddButton
                         onClick={() => {

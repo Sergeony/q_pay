@@ -102,5 +102,10 @@
   "Подтверждена": "Подтверждена",
   "Статус": "Статус",
   "confirm": "confirm",
-  "pay": "pay"
+  "pay": "pay",
+  "${typeRepr} USDT": "${typeRepr} USDT",
+  "bank_details_table_daily_column_title": "bank_details_table_daily_column_title",
+  "bank_details_table_weekly_column_title": "bank_details_table_weekly_column_title",
+  "bank_details_table_monthly_column_title": "bank_details_table_monthly_column_title",
+  "Карта клиента": "Карта клиента"
 }
