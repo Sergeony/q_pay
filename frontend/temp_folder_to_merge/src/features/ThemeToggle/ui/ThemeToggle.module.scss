@@ -1,0 +1,25 @@
+.ThemeToggle {
+    --circle-size: 30px;
+
+    width: calc(2 * var(--circle-size));
+    border-radius: calc(var(--circle-size) / 2);
+    background-color: var(--theme-toggle-bg);
+
+    .ToggleCircle {
+        width: var(--circle-size);
+        height: var(--circle-size);
+        border-radius: 50%;
+
+        svg {
+            fill: var(--light-grey);
+        }
+    }
+
+    .ToggleCircle.active {
+        background-color: var(--accent);
+
+        svg {
+            fill: var(--white);
+        }
+    }
+}

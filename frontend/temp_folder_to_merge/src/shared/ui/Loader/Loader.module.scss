@@ -1,0 +1,25 @@
+.Loader {
+    width: 68px;
+    height: 68px;
+
+    span {
+        display: inline-block;
+        box-sizing: border-box;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 5px solid var(--accent);
+        border-bottom-color: transparent;
+        animation: rotation 1s linear infinite;
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    }
+}

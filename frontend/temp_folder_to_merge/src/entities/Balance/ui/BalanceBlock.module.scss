@@ -1,0 +1,26 @@
+.BalanceWrapper {
+    padding: 8px;
+    width: 132px;
+    border-radius: 8px;
+    border: var(--balance-block-border);
+    background-color: var(--balance-block-bg);
+    font: var(--font-main-regular);
+
+    div:first-child {
+        color: var(--active-balance-fg);
+
+        > svg {
+            fill: var(--active-balance-fg);
+        }
+    }
+
+    div:last-child {
+        background: var(--frozen-balance-fg);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+
+        > svg {
+            fill: var(--frozen-balance-icon-fill);
+        }
+    }
+}

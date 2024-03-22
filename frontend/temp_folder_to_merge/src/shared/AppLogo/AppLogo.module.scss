@@ -1,0 +1,15 @@
+.Q {
+    font: var(--font-weight-bold) 59px var(--font-family-logo-q);
+    color: var(--accent);
+}
+
+.Pay {
+    font: var(--font-weight-bold) var(--font-size-primary) var(--font-family-logo-q);
+    color: var(--logo-pay-fg);
+}
+
+.UserType {
+    font: var(--font-weight-bold) var(--font-size-s) var(--font-family-logo-ut);
+    color: var(--light-grey);
+    font-style: italic;
+}
