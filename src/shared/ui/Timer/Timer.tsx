@@ -1,12 +1,11 @@
 import React, {
     memo, useCallback, useEffect, useMemo, useState
 } from "react";
-import cls from "./Timer.module.scss";
 
 interface TimerProps {
     creationTime: string;
     duration: string;
-    onExpire: () => void;
+    onExpire?: () => void;
 }
 
 const durationToSeconds = (durationStr: string) => {
@@ -14,7 +13,8 @@ const durationToSeconds = (durationStr: string) => {
     return hours * 3600 + minutes * 60 + seconds;
 };
 
-export const Timer = memo(({ creationTime, duration, onExpire }: TimerProps) => {
+export const Timer = memo((props: TimerProps) => {
+    const { creationTime, duration, onExpire } = props;
     const preparedDuration = useMemo(() => durationToSeconds(duration), [duration]);
     const [remainingTime, setRemainingTime] = useState(preparedDuration);
 
@@ -26,7 +26,7 @@ export const Timer = memo(({ creationTime, duration, onExpire }: TimerProps) => 
 
             if (timeLeft <= 0) {
                 clearInterval(intervalId);
-                onExpire();
+                onExpire?.();
             } else {
                 setRemainingTime(timeLeft);
             }
@@ -42,7 +42,7 @@ export const Timer = memo(({ creationTime, duration, onExpire }: TimerProps) => 
     }, []);
 
     return (
-        <span className={cls.Timer}>
+        <span className="br-2 py-1 px-2 br-color">
             {formatTime(remainingTime)}
         </span>
     );

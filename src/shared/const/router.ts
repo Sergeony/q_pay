@@ -9,6 +9,8 @@ export enum AppRoutes {
 
     TRADER_ADS = "trader_ads",
     PAY = "pay",
+    SETTINGS = "settings",
+
     // TRADER_PAY_OUT = "trader_pay_out",
     //
     // MERCHANT_PAY_IN = "merchant_pay_in",
@@ -19,7 +21,6 @@ export enum AppRoutes {
     // ADMIN_MERCHANTS = "admin_merchants",
     // ADMIN_MERCHANT_DETAILS = "admin_merchants", // + :id
     //
-    // SETTINGS = "settings",
     // BALANCE = "balance",
 
     FORBIDDEN = "forbidden",
@@ -41,6 +42,10 @@ export const getRoutePay = (
     type: TransactionTypeRepr | ":type",
     tab?: PayPageTab | ":tab?",
 ) => `/pay/${type}/${tab || ""}`;
+
+export type SettingsPageTab = "/integration";
+
+export const getRouteSettings = (tab?: SettingsPageTab | ":tab?") => `settings/${tab || ""}`;
 
 // export const getRouteTraderPayOut = () => "/trader/pay-out";
 //

@@ -1,5 +1,5 @@
 import { UserType } from "entities/User";
-import { getRoutePay, getRouteTraderAds } from "shared/const/router";
+import { getRoutePay, getRouteSettings, getRouteTraderAds } from "shared/const/router";
 import { TransactionStatusGroup } from "entities/Transaction";
 
 interface NavLinkType {
@@ -53,7 +53,7 @@ export const useNavLinks = (userType: UserType | undefined) => {
     // Common links for all the user types
     navLinks.push(
         {
-            path: "settings", // TODO: replace with settings page
+            path: getRouteSettings(), // TODO: replace with settings page
             text: "settings_page_title",
         },
     );

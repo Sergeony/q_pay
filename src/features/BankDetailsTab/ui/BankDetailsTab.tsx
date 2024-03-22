@@ -21,9 +21,7 @@ export const BankDetailsTab = memo((props: BankDetailsProps) => {
     const [switchBankDetails] = usePatchBankDetailsMutation();
     const [deleteBankDetails] = useDeleteBankDetailsMutation();
     const { traderId } = props;
-    const {
-        data: bankDetails,
-    } = useFetchBankDetailsQuery({ traderId });
+    const { data: bankDetails } = useFetchBankDetailsQuery({ traderId });
     const {
         data: banks,
     } = useFetchBanksQuery();

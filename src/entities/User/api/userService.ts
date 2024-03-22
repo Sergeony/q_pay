@@ -1,12 +1,10 @@
 import { api } from "shared/api/api";
 
 interface GetUserPrefsResponse {
-    data: {
-        language: string;
-        timezone: string;
-        isLightTheme: string;
-        isActive: boolean;
-    }
+    language: string;
+    timezone: string;
+    isLightTheme: string;
+    isActive: boolean;
 }
 
 const userApi = api.injectEndpoints({

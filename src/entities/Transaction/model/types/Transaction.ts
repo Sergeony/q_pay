@@ -1,5 +1,12 @@
 import { TransactionStatus, TransactionType } from "../consts/consts";
 
+interface TraderBankDetails {
+    title: string;
+    cardholderName: string;
+    cardNumber: string;
+    bank: number;
+}
+
 export interface Transaction {
     id: string;
     orderId: string;
@@ -16,7 +23,7 @@ export interface Transaction {
     completedAt: string | null;
     finishedAt: string | null;
     lifetime: string;
-    traderBankDetails: number;
+    traderBankDetails: TraderBankDetails;
     clientCardNumber?: string;
     clientBank: number;
     clientId: string;

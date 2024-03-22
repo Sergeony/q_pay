@@ -36,6 +36,9 @@ body.dark {
     --balance-block-border: 1px solid var(--light-grey);
     --active-balance-fg: var(--accent);
     --frozen-balance-fg: var(--light-blue);
+    --frozen-balance-icon-fill: var(--frozen-balance-fg);
     --header-link-fg: var(--light-grey);
     --logo-pay-fg: var(--grey);
+    --h3-fg: var(--light-grey);
+    --plus-fill: var(--light-grey);
 }

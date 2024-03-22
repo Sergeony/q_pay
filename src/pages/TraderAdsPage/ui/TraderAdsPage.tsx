@@ -10,12 +10,10 @@ import { BankDetailsTab, CreateBankDetailsModal } from "features/BankDetailsTab"
 import { AdsTab, CreateAdModal } from "features/AdsTab";
 import { DynamicReducersLoader, Reducers } from "shared/lib/components/DynamicReducersLoader";
 import { bankReducer } from "entities/Bank";
-import { bankDetailsReducer } from "entities/BankDetails";
 import cls from "./TraderAdsPage.module.scss";
 
 const reducers: Reducers = {
     banks: bankReducer,
-    bankDetails: bankDetailsReducer,
 };
 
 const TraderAdsPage = () => {

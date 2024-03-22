@@ -16,7 +16,7 @@ export const BalanceBlock = memo(() => {
             </div>
             <div className="h-stack gap-4 alignCenter justifyEnd">
                 <span>{balance?.frozenBalance}</span>
-                <SnowFlakeIcon />
+                <SnowFlakeIcon useGradient />
             </div>
         </div>
     );

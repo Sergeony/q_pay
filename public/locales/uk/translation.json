@@ -107,5 +107,14 @@
   "bank_details_table_daily_column_title": "bank_details_table_daily_column_title",
   "bank_details_table_weekly_column_title": "bank_details_table_weekly_column_title",
   "bank_details_table_monthly_column_title": "bank_details_table_monthly_column_title",
-  "Карта клиента": "Карта клиента"
+  "Карта клиента": "Карта клиента",
+  "Электронная почта": "Электронная почта",
+  "change_email_description": "Для смены электронной почты, обратитесь в поддержку.",
+  "Адрес пополнения баланса": "Адрес пополнения баланса",
+  "Внимание! Перевод средств принимается ТОЛЬКО внутри сети Trom TRC20": {
+    " <br />В противном случае средства будут утеряны, и мы не сможем Вам помочь": {
+      "": "Внимание! Перевод средств принимается ТОЛЬКО внутри сети Trom TRC20. <br />В противном случае средства будут утеряны, и мы не сможем Вам помочь."
+    }
+  },
+  "usdt_deposit_description": "usdt_deposit_description"
 }

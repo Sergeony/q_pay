@@ -52,7 +52,7 @@ export const Header = memo(() => {
 
     return (
         <header>
-            <div className={`${cls.Content} h-stack, justifyBetween gap-32 alignCenter`}>
+            <div className={`${cls.Content} h-stack justifyBetween gap-32 alignCenter`}>
                 <div className="h-stack gap-32 alignCenter">
                     <AppLogo />
                     <ThemeToggle className={cls.ThemeToggle} />

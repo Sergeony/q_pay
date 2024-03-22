@@ -15,10 +15,12 @@
     }
 
     div:last-child {
-        color: var(--frozen-balance-fg);
+        background: var(--frozen-balance-fg);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
 
         > svg {
-            fill: var(--frozen-balance-fg);
+            fill: var(--frozen-balance-icon-fill);
         }
     }
 }

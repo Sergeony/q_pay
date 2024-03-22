@@ -16,10 +16,14 @@ export class WebSocketService {
         this.socket = new WebSocket(`ws://localhost:8000/ws/?token=${accessToken}`);
         this.socket.onopen = () => {
             this.startPing();
-            (store as ReduxStoreWithManager)
-                .reducerManager.add("activeTransactions", transactionReducer);
-            (store as ReduxStoreWithManager)
-                .reducerManager.add("balance", balanceReducer);
+            (store as ReduxStoreWithManager).reducerManager.add(
+                "activeTransactions",
+                transactionReducer
+            );
+            (store as ReduxStoreWithManager).reducerManager.add(
+                "balance",
+                balanceReducer
+            );
         };
         this.socket.onmessage = (event) => {
             const { action, data } = JSON.parse(event.data);
@@ -63,23 +67,7 @@ export class WebSocketService {
         }
     }
 
-    sendMessageChangeTransactionStatus(
-        transactionId: string,
-        newStatus: number,
-        newActualAmount?: number
-    ) {
-        const message: any = {
-            action: "change_transaction_status",
-            transaction_id: transactionId,
-            new_status: newStatus,
-        };
-        if (newActualAmount) {
-            message.actual_amount = newActualAmount;
-        }
-        this.sendMessage(message);
-    }
-
-    sendMessageSettleTransactionStatus(
+    changeTransactionStatus(
         transactionId: string,
         newStatus: number,
         newActualAmount?: number

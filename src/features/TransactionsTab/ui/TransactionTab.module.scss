@@ -7,23 +7,29 @@
 }
 
 .completed {
-    color: green;
+    background: linear-gradient(135deg, #22EF10 0%, #3EC0F8 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .completed.auto {
-    color: skyblue;
+    background: linear-gradient(135.48deg, #3F9AEF 31.21%, #7BFFE7 121.47%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
-
 
 .cancelled,
 .failed {
-    color: red;
+    background: linear-gradient(136.89deg, #000 -5.56%, #F00 101.9%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .pending,
 .reviewing {
-    color: yellow;
-}
+    background: linear-gradient(145.56deg, #FFCB11 -3.53%, #FF7511 100.71%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;}
 
 .Extended {
     justify-self: center;

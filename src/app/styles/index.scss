@@ -293,8 +293,8 @@ body {
 }
 
 .px-3 {
-    padding-top: .75rem;
-    padding-bottom: .75rem;
+    padding-left: .75rem;
+    padding-right: .75rem;
 }
 
 .py-4 {
@@ -303,9 +303,15 @@ body {
 }
 
 .px-4 {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
+
+.px-12 {
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+
 
 // Margins
 
@@ -357,4 +363,96 @@ body {
 .mx-4 {
     margin-top: 1rem;
     margin-bottom: 1rem;
+}
+
+.mx-20r {
+    margin-left: 20rem;
+    margin-right: 20rem;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+// Sizes
+
+
+.h-full {
+    height: 100%;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.h-screen {
+    height: 100vh
+}
+
+.w-screen {
+    width: 100vw
+}
+
+.w-fit {
+    width: fit-content;
+}
+
+.max-w-xl {
+    max-width: 79.75rem;
+}
+
+.h1 {
+    color: var(--contrast);
+    font: var(--font-h1-bold);
+}
+
+.h3 {
+    color: var(--h3-fg);
+    font: var(--font-h3);
+}
+
+.col-h {
+    color: var(--table-col-color);
+    font: var(--font-col-h);
+}
+
+.text-main-bold {
+    font: var(--font-main-bold);
+}
+
+.text-main-reg {
+    font: var(--font-main-regular);
+}
+
+.accent-fg {
+    color: var(--accent);
+}
+
+.danger-bg {
+    color: var(--red);
+}
+
+.line-height-1-5 {
+    line-height: 1.5;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.br-color {
+    border: var(--balance-block-border);
+}
+
+
+.add-icon-stroke {
+    stroke: var(--kebab-menu-svg-stroke);
+
+    > g {
+        > path {
+            fill: var(--plus-fill);
+        }
+    }
 }

@@ -107,5 +107,10 @@
   "bank_details_table_monthly_column_title": "Monthly",
   "Карта клиента": "Карта клиента",
   "pay_in_page_title": "Pay In",
-  "pay_out_page_title": "Pay Out"
+  "pay_out_page_title": "Pay Out",
+  "Электронная почта": "Электронная почта",
+  "change_email_description": "Для смены электронной почты, обратитесь в поддержку.",
+  "Адрес пополнения баланса": "Адрес пополнения баланса",
+  "usdt_deposit_description": "Внимание! Перевод средств принимается ТОЛЬКО внутри сети Trom TRC20.<br/>В противном случае средства будут утеряны, и мы не сможем Вам помочь."
 }
+

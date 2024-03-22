@@ -24,6 +24,8 @@ export const TransactionSlice = createSlice({
             } else if (!transactionExisted) {
                 state.items.push(transaction);
             } else if (transactionExisted && isActive) {
+                const existedTransaction = state.items.filter((t) => t.id === transaction.id);
+                existedTransaction[0].status = transaction.status;
                 // TODO: add some notification when transaction becomes able to review
             } else {
                 console.log("UNKNOWN TRANSACTION UPDATE: ", transaction);

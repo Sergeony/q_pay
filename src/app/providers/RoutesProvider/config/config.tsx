@@ -4,7 +4,7 @@ import {
     getRouteLogin,
     getRouteNotFound,
     getRoutePay,
-    getRouteRegister,
+    getRouteRegister, getRouteSettings,
     getRouteSetupTotp,
     getRouteVerifyEmail,
     getRouteVerifyTotp,
@@ -21,8 +21,13 @@ import {
 } from "features/auth";
 import { TraderAdsPage } from "pages/TraderAdsPage";
 import { PayPage } from "pages/PayPage";
+import { SettingsPage } from "pages/SettingsPage";
 
 export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
+    [AppRoutes.SETTINGS]: {
+        path: getRouteSettings(":tab?"),
+        element: <SettingsPage />,
+    },
     [AppRoutes.PAY]: {
         path: getRoutePay(":type", ":tab?"),
         element: <PayPage />,
@@ -97,11 +102,6 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     //     element: <MerchantStatsPage />,
     //     authOnly: true,
     //     userType: UserType.ADMIN,
-    // },
-    // [AppRoutes.SETTINGS]: {
-    //     path: getRouteSettings(),
-    //     element: <MerchantSettingsPage />,
-    //     authOnly: true,
     // },
     // [AppRoutes.BALANCE]: {
     //     path: getRouteBalance(),

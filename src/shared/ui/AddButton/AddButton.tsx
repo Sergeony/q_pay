@@ -17,7 +17,7 @@ export const AddButton = memo((props: AddButtonProps) => {
             className={classNames(cls.AddButton, [className])}
             onClick={onClick}
         >
-            <PlusIcon />
+            <PlusIcon className="add-icon-stroke" />
         </button>
     );
 });

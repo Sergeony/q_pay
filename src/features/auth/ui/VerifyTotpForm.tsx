@@ -27,7 +27,7 @@ const initialValues: FormSchema = {
 
 interface TokenPayload {
     user_type: number;
-    id: number;
+    user_id: number;
 }
 
 export const VerifyTotpForm = memo(() => {
@@ -50,7 +50,7 @@ export const VerifyTotpForm = memo(() => {
                 const decodedToken: TokenPayload = jwtDecode(response.data.access);
                 dispatch(userActions.setUserData({
                     type: decodedToken.user_type,
-                    id: decodedToken.id,
+                    id: decodedToken.user_id,
                 }));
                 navigate("/"); // FIXME: navigate to user's home page
             })

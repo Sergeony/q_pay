@@ -6,10 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { webSocketService } from "shared/api/ws";
 import { jwtDecode } from "jwt-decode";
 import { LOCAL_STORAGE_ACCESS_TOKEN_KEY } from "shared/const/localStorage";
-import { refreshToken } from "shared/api/api";
 
 interface DecodedToken {
-    id: number;
+    user_id: number;
     user_type: number;
 }
 
@@ -20,32 +19,25 @@ const App = () => {
     const useData = useSelector(getUserData);
 
     useEffect(() => {
-        const performGetUserPrefs = async () => getUserPrefs();
-        const performRefresh = async () => refreshToken();
         const accessToken = localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
         if (accessToken) {
-            performRefresh()
-                .then((response) => {
-                    if (response) {
-                        const decodedToken: DecodedToken = jwtDecode(response.access);
+            getUserPrefs()
+                .then(({
+                    data: userPrefs,
+                    isSuccess,
+                }) => {
+                    if (isSuccess) {
+                        const decodedToken: DecodedToken = jwtDecode(accessToken);
                         dispatch(userActions.setUserData({
                             type: decodedToken.user_type,
-                            id: decodedToken.id,
+                            id: decodedToken.user_id,
                         }));
-                        performGetUserPrefs()
-                            .then(({
-                                data: userPrefs,
-                                isSuccess,
-                            }) => {
-                                if (isSuccess) {
-                                    dispatch(userActions.setUserPrefs({
-                                        isActive: userPrefs.data.isActive,
-                                        lang: userPrefs.data.language,
-                                        tz: userPrefs.data.timezone,
-                                        theme: userPrefs.data.isLightTheme ? "light" : "dark",
-                                    }));
-                                }
-                            });
+                        dispatch(userActions.setUserPrefs({
+                            isActive: userPrefs.isActive,
+                            lang: userPrefs.language,
+                            tz: userPrefs.timezone,
+                            theme: userPrefs.isLightTheme ? "light" : "dark",
+                        }));
                     }
                 });
         }
