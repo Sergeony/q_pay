@@ -1,0 +1,49 @@
+.Nav {
+    min-width: 600px;
+}
+
+header {
+    width: 100%;
+    display: flex;
+    padding: 18px 40px;
+    justify-content: center;
+    background-color: var(--header-bg);
+    border-bottom: var(--header-border);
+
+    .Content {
+        width: 100%;
+        max-width: 1500px;
+    }
+}
+
+.NavLink {
+    text-decoration: none;
+    font: var(--font-main-regular);
+    color: var(--header-link-fg);
+}
+
+.NavLink.active {
+    color: var(--accent);
+}
+
+.Li {
+    list-style-type: none;
+    position: relative;
+    display: flex;
+
+}
+
+.circle {
+    position: absolute;
+    right: -5px;
+    top: -15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: var(--cicrle-size);
+    height: var(--cicrle-size);
+    font: var(--font-weight-bold) var(--font-size-xs) var(--font-family-main);
+    color: var(--main);
+    background-color: var(--accent);
+}

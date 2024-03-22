@@ -1,0 +1,40 @@
+.Switch {
+    width: var(--switch-width);
+    height: var(--switch-height);
+    border-radius: var(--switch-border-radius);
+    padding: var(--switch-padding);
+    background-color: var(--switch-bg-color);
+    justify-content: start;
+    transition: background .15s ease-out 0s;
+
+    span {
+        display: flex;
+        border-radius: 50%;
+        background-color: var(--switch-span-bg-color);
+        width: var(--switch-span-size);
+        height: var(--switch-span-size);
+        transform: translateX(0%);
+        transition: transform .15s ease-out 0s, background .15s ease-out 0s;
+    }
+};
+
+.isLarge {
+    width: var(--switch-large-width);
+    height: var(--switch-large-height);
+    border-radius: var(--switch-large-border-radius);
+    padding: var(--switch-large-padding);
+
+    span {
+        width: var(--switch-large-span-size);
+        height: var(--switch-large-span-size);
+    }
+}
+
+.isActive {
+    background-color: var(--switch-is-active-bg-color);
+
+    span {
+        background-color: var(--switch-span-active-bg-color);
+        transform: translateX(100%);
+    }
+}

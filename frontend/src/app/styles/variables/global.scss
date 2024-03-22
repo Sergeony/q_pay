@@ -1,0 +1,70 @@
+:root {
+    // Font weights
+    --font-weight-bold: 700;
+    --font-weight-regular: 400;
+
+    // Font sizes
+    --font-size-xxxs: 6px;
+    --font-size-xxs: 8px;
+    --font-size-xs: 10px;
+    --font-size-s: 12px;
+    --font-size-secondary: 14px;
+    --font-size-primary: 16px;
+    --font-size-l: 18px;
+    --font-size-x-l: 22px;
+    --font-size-xx-l: 28px;
+    --font-size-xxx-l: 32px;
+
+    // Font families
+    --font-family-main: mulish, serif;
+    --font-family-secondary: helvetica, serif;
+    --font-family-logo-q: akony, serif;
+    --font-family-logo-ut: commit-mono, serif;
+
+    // TODO: possibly, specify line heights & letter spacings
+
+    // Fonts
+    --font-h1-regular: var(--font-weight-regular) var(--font-size-xx-l) var(--font-family-main);
+    --font-h1-bold: var(--font-weight-bold) var(--font-size-xx-l) var(--font-family-main);
+    --font-h2-regular: var(--font-weight-regular) var(--font-size-l) var(--font-family-main);
+    --font-h2-bold: var(--font-weight-bold) var(--font-size-x-l) var(--font-family-main);
+    --font-h3: var(--font-weight-bold) var(--font-size-x-l) var(--font-family-secondary);
+    --font-main-regular: var(--font-weight-regular) var(--font-size-primary) var(--font-family-main);
+    --font-main-bold: var(--font-weight-bold) var(--font-size-primary) var(--font-family-main);
+    --font-secondary: var(--font-weight-regular) var(--font-size-s) var(--font-family-main);
+    --font-col-h: var(--font-weight-regular) var(--font-size-secondary) var(--font-family-main);
+
+    // Sizes
+    // --navbar-height: 50px;
+    // --sidebar-width: 300px;
+    // --sidebar-width-collapsed: 80px;
+
+    // Z - Indices
+    // --modal-z-index: 10;
+
+    // Colors
+    --blue: #3F9AEF;
+    --light-blue: #7FAED9;
+    --gradient-blue: linear-gradient(135deg, rgb(63 154 239 / 100%) 31.21%, rgb(123 255 231 / 100%) 121.47%);
+    --yellow: #F8E643;
+    --red: #F93D3D;
+
+    // Switch props
+    --switch-width: 32px;
+    --switch-height: 18px;
+    --switch-border-radius: calc(var(--switch-height) / 2);
+    --switch-padding: 2px;
+    --switch-large-width: 53px;
+    --switch-large-height: 30px;
+    --switch-large-border-radius: calc(var(--switch-large-height) / 2);
+    --switch-large-padding: 3.5px;
+    --switch-span-size: 14px;
+    --switch-large-span-size: 23px;
+
+    // Circle
+    --cicrle-size: 14px;
+
+    // Borders
+    --rounded-xl: 1rem;
+    --rounded-md: .5rem;
+}

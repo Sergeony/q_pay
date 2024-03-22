@@ -1,0 +1,21 @@
+.TabLink {
+    color: var(--light-grey);
+    font: var(--font-h1-regular);
+}
+
+.TabLink.active {
+    color: var(--contrast);
+    font: var(--font-h1-bold);
+}
+
+// TODO: move it out
+.main {
+    max-width: 1180px;
+    width: 100%;
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    -webkit-box-pack: center;
+    justify-content: center;
+}
