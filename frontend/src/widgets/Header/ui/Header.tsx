@@ -30,7 +30,7 @@ export const Header = memo(() => {
 
     const navLinkElements = useMemo(
         () => navLinks.map((nl) => (
-            <li key={nl.path} className={cls.Li}>
+            <li key={nl.path} className="pos-rel">
                 <NavLink
                     to={nl.path}
                     className={({ isActive }) => `${(nl.match
@@ -58,13 +58,17 @@ export const Header = memo(() => {
                     <ThemeToggle className={cls.ThemeToggle} />
                 </div>
                 <div className={`${cls.RightSide} h-stack gap-32 alignCenter`}>
-                    {navLinks && (
-                        <nav className={`${cls.Nav} h-stack justifyBetween alignCenter`}>
-                            {navLinkElements}
-                            {/* TODO: replace TO path when implemented */}
-                            <NavLink to="balance">
-                                <BalanceBlock />
-                            </NavLink>
+                    {navLinks.length > 0 && (
+                        <nav>
+                            <ul className={`h-stack justifyBetween alignCenter ${cls.NavList}`}>
+                                {navLinkElements}
+                                <li>
+                                    {/* TODO: replace TO path when implemented */}
+                                    <NavLink to="balance">
+                                        <BalanceBlock />
+                                    </NavLink>
+                                </li>
+                            </ul>
                         </nav>
                     )}
                     <LangSelect />

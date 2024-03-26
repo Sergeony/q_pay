@@ -15,11 +15,15 @@ body.dark {
     --modal-bg: var(--light-grey);
     --modal-border: 2px solid var(--extra-light-grey);
     --contrast: var(--white);
+    --grey-contrast: var(--light-grey);
+    --secondary: var(--grey);
+    --field-icon: var(--extra-light-grey);
     --main: var(--black);
-    --app-bg: #1B1B1B url("shared/ui/img/bg.png") no-repeat center / cover;
+    --app-bg: #1B1B1B url("shared/ui/img/bg.png") no-repeat center;
     --input-text-color: var(--white);
     --field-border: 'none';
     --field-bg: linear-gradient(180deg, rgb(120 124 113 / 45%) -148.5%, rgb(255 255 255 / 45%) 8.66%, rgb(116 125 97 / 36%) 248.5%);
+    --field-1-border: 1px solid var(--grey);
     --logo-user-type: #454545;
     --header-bg: rgb(22 25 15 / 50%);
     --header-border: "none";

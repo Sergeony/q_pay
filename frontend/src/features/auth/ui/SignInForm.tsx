@@ -1,13 +1,17 @@
-import { memo, useCallback } from "react";
+import {
+    memo, useCallback, useState
+} from "react";
 import { useTranslation } from "react-i18next";
-import { Input } from "shared/ui/Input/Input";
 import { Button, ButtonRole } from "shared/ui/Button/Button";
 import { DynamicReducersLoader, Reducers } from "shared/lib/components/DynamicReducersLoader";
 import { useAppDispatch } from "shared/lib/hooks/useAppDispatch";
 import { FormikHelpers, useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import { getRouteVerifyEmail, getRouteVerifyTotp, getRouteSetupTotp } from "shared/const/router";
+import { getRouteSetupTotp, getRouteVerifyEmail, getRouteVerifyTotp } from "shared/const/router";
+import { Field, FieldVariant } from "shared/ui/Field/Field";
+import CloseEye from "shared/ui/img/svg/CloseEye.svg";
+import OpenEye from "shared/ui/img/svg/OpenEye.svg";
 import { useSignInMutation } from "../api/authService";
 import { authActions, authReducer } from "../model/slice/authSlice";
 import cls from "./Auth.module.scss";
@@ -77,56 +81,65 @@ export const SignInForm = memo(() => {
         validationSchema,
         initialValues,
         onSubmit,
+        isInitialValid: false,
     });
 
+    const [hidePassword, setHidePassword] = useState<boolean>(true);
+
     return (
-        <>
-            <div>
-                <h2>{t("sign_in_page_title")}</h2>
-            </div>
-            <div>
+        <main className={cls.main}>
+            <section aria-labelledby="sign-in-heading" className="v-stack gap-32">
+                <h1 id="sign-in-heading" className="PageTitle">
+                    {t("sign_in_page_title")}
+                </h1>
                 <DynamicReducersLoader
                     keepAfterUnmount
                     reducers={reducers}
                 >
                     <form
-                        className={cls.SignInForm}
                         onSubmit={formik.handleSubmit}
+                        className="v-stack gap-32 w-full"
                     >
-                        <Input
+                        <Field
+                            variant={FieldVariant.SECURE}
+                            label={t("email_field_label")}
+                            placeholder={t("email_placeholder")}
+                            value={formik.values.email}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.email ? formik.errors.email : undefined}
                             id="email"
                             name="email"
                             type="email"
+                        />
+                        <Field
+                            variant={FieldVariant.SECURE}
+                            label={t("password_field_label")}
+                            placeholder={t("password_placeholder")}
+                            value={formik.values.password}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            value={formik.values.email}
-                            placeholder={t("email_placeholder")}
-                        />
-                        {formik.touched.email && formik.errors.email && (
-                            <div>{formik.errors.email}</div>
-                        )}
-                        <Input
+                            error={formik.touched.password && formik.errors.password}
                             id="password"
                             name="password"
-                            type="password"
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            value={formik.values.password}
-                            placeholder={t("password_placeholder")}
+                            type={hidePassword ? "password" : "text"}
+                            Icon={hidePassword ? CloseEye : OpenEye}
+                            onIconClick={() => setHidePassword((prevState) => !prevState)}
                         />
-                        {formik.touched.password && formik.errors.password && (
-                            <div>{formik.errors.password}</div>
-                        )}
                         <Button
                             type="submit"
-                            disabled={formik.isSubmitting || isLoading}
                             role={ButtonRole.PRIMARY}
+                            disabled={
+                                formik.isSubmitting
+                                || isLoading
+                                || !formik.isValid
+                            }
                         >
                             {t("sign_in_btn")}
                         </Button>
                     </form>
                 </DynamicReducersLoader>
-            </div>
-        </>
+            </section>
+        </main>
     );
 });

@@ -11,6 +11,8 @@ import {
 import { DynamicReducersLoader, Reducers } from "shared/lib/components/DynamicReducersLoader";
 import { classNames } from "shared/lib/classNames/classNames";
 import { bankDetailsReducer } from "entities/BankDetails";
+import { SearchIcon } from "shared/ui/_SVG";
+import { Field } from "shared/ui/Field/Field";
 import cls from "./PayPage.module.scss";
 import { NavBar } from "./NavBar";
 
@@ -29,16 +31,19 @@ const PayPage = () => {
         <DynamicReducersLoader keepAfterUnmount reducers={reducers}>
             <main className={classNames(cls.main, ["v-stack gap-32"])}>
                 <div className="v-stack gap-32">
-                    <div className="h-stack gap-32">
+                    <div className={cls.TitleWrapper}>
                         <h2 className="PageTitle">
                             {type === "in" ? t("pay_in_page_title") : t("pay_out_page_title")}
                         </h2>
                         {tab !== "export" && (
-                            <input
+                            <Field
+                                label="Search Transaction"
+                                hideLabel
+                                Icon={SearchIcon}
+                                type="search"
+                                onClick={() => { console.log("search processed"); }}
                                 placeholder={t("ID Сделки")}
-                                onClick={() => {
-                                    console.log("search precessed");
-                                }}
+                                className={cls.search}
                             />
                         )}
                     </div>

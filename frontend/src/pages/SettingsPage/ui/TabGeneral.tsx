@@ -39,7 +39,7 @@ export const TabGeneral = memo((props: TabGeneralProps) => {
             <section className="v-stack gap-16">
                 <h3 className="h3">{t("Адрес пополнения баланса")}</h3>
                 <div className="v-stack">
-                    <strong className="danger-bg bold line-height-1-5">
+                    <strong className="danger-fg bold line-height-1-5">
                         <Trans i18nKey="usdt_deposit_description" />
                     </strong>
                 </div>

@@ -49,8 +49,8 @@
 
   "sign_up_page_title": "Регистрация",
   "verify_email_page_title": "Подтверждение почты",
-  "setup_totp_page_title": "Настройка 2-Факторной Аутентификации",
-  "verify_totp_page_title": "2-Факторная Аутентификация",
+  "setup_totp_page_title": "Настройка 2ФА",
+  "verify_totp_page_title": "Проверка 2ФА",
   "sign_in_page_title": "Вход",
 
   "setup_totp_page_description": "Вам нужно будет добавить учетную запись QPay в приложение Google Authenticator и вручную ввести 32-значный ключ.",
@@ -111,5 +111,16 @@
   "Электронная почта": "Электронная почта",
   "change_email_description": "Для смены электронной почты, обратитесь в поддержку.",
   "Адрес пополнения баланса": "Адрес пополнения баланса",
-  "usdt_deposit_description": "Внимание! Перевод средств принимается ТОЛЬКО внутри сети Trom TRC20. <br />В противном случае средства будут утеряны, и мы не сможем Вам помочь."
+  "usdt_deposit_description": "Внимание! Перевод средств принимается ТОЛЬКО внутри сети Trom TRC20. <br />В противном случае средства будут утеряны, и мы не сможем Вам помочь.",
+  "email_field_label": "email_field_label",
+  "password_field_label": "password_field_label",
+  "capital(A-Z)": "capital(A-Z)",
+  "capitals(A-Z)": "capitals(A-Z)",
+  "password_req_digits": "password_req_digits",
+  "password_req_uppercase": "password_req_uppercase",
+  "password_req_lowercase": "password_req_lowercase",
+  "password_req_long_enough": "password_req_at_least_chars",
+  "verify_email_btn": "verify_email_btn",
+  "verify_totp_btn": "verify_totp_btn",
+  "totp_secret_label": "totp_secret_label"
 }
