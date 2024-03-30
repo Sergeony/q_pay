@@ -1,12 +1,19 @@
 import { Trans, useTranslation } from "react-i18next";
 import { getUserData } from "entities/User";
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import { CopyIcon } from "shared/ui/_SVG";
 import { useSelector } from "react-redux";
+import { Button, ButtonRole } from "shared/ui/Button/Button";
+import { LOCAL_STORAGE_ACCESS_TOKEN_KEY } from "shared/const/localStorage";
 
 export const TabGeneral = memo(() => {
     const { t } = useTranslation();
     const userData = useSelector(getUserData);
+
+    const logout = useCallback(() => {
+        localStorage.removeItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
+        location.reload();
+    }, []);
 
     if (!userData) return null;
 
@@ -48,6 +55,13 @@ export const TabGeneral = memo(() => {
                     <CopyIcon />
                 </div>
             </section>
+            <Button
+                role={ButtonRole.CANCEL}
+                onClick={logout}
+                className="w-fit"
+            >
+                {t("logout_button")}
+            </Button>
         </div>
     );
 });

@@ -123,5 +123,6 @@
   "totp_secret_label": "totp_secret_label",
   "settings_general_tab_title": "General",
   "settings_integration_tab_title": "Integration",
-  "balance_link_title": "Balance"
+  "balance_link_title": "Balance",
+  "logout_button": "Logout"
 }
