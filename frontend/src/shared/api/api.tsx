@@ -54,6 +54,6 @@ const customBaseQuery = async (args: any, api: any, extraOptions: any) => {
 export const api = createApi({
     reducerPath: "api",
     baseQuery: customBaseQuery,
-    tagTypes: ["Ads", "Trader", "Merchant", "Banks", "BankDetails", "Deposit", "Withdrawal"],
+    tagTypes: ["Ads", "Users", "Banks", "BankDetails", "Deposit", "Withdrawal"],
     endpoints: () => ({}),
 });

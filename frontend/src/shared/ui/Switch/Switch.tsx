@@ -1,5 +1,5 @@
 import React, {
-    InputHTMLAttributes, memo, useCallback, useMemo
+    InputHTMLAttributes, memo, useMemo
 } from "react";
 import { classNames } from "shared/lib/classNames/classNames";
 import { Button, ButtonRole } from "../Button/Button";
@@ -8,7 +8,7 @@ import cls from "./Switch.module.scss";
 interface IProps extends InputHTMLAttributes<HTMLInputElement> {
     isLarge?: boolean;
     isActive: boolean;
-    onSwitch: () => void;
+    onSwitch?: () => void;
 }
 
 const Switch = memo((props: IProps) => {

@@ -2,7 +2,7 @@ import { api } from "shared/api/api";
 import { AdSchema } from "../model/types/AdSchema";
 
 interface FetchAdsRequestProps {
-    traderId?: number;
+    userId?: string;
 }
 
 export interface CreateAdRequest {
@@ -24,10 +24,10 @@ export interface PatchAdRequest {
 const adsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         fetchAds: builder.query<AdSchema[], FetchAdsRequestProps>({
-            query: ({ traderId }) => ({
+            query: ({ userId }) => ({
                 url: "api/web/trader/ads/",
                 params: {
-                    user_id: traderId,
+                    user_id: userId,
                 },
             }),
             providesTags: ["Ads"],
@@ -38,7 +38,7 @@ const adsApi = api.injectEndpoints({
                 method: "POST",
                 body
             }),
-            invalidatesTags: ["Ads", "BankDetails"]
+            invalidatesTags: ["Ads"],
         }),
         deleteAd: builder.mutation<string, DeleteAdRequest>({
             query: ({ id }) => ({
@@ -53,7 +53,7 @@ const adsApi = api.injectEndpoints({
                 method: "PATCH",
                 body,
             }),
-            invalidatesTags: ["Ads", "BankDetails"],
+            invalidatesTags: ["Ads"],
         }),
     }),
     overrideExisting: false,

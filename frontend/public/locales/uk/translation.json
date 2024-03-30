@@ -131,5 +131,15 @@
   "settings_general_tab_title": "settings_general_tab_title",
   "settings_integration_tab_title": "settings_integration_tab_title",
   "balance_link_title": "balance_link_title",
-  "logout_button": "logout_button"
+  "logout_button": "logout_button",
+  "admin_traders_page_title": "admin_traders_page_title",
+  "admin_merchants_page_title": "admin_merchants_page_title",
+  "user_search_placeholder": "user_search_placeholder",
+  "admin_users_table_col_title_email": "admin_users_table_col_title_email",
+  "admin_users_table_col_title_user_id": "admin_users_table_col_title_user_id",
+  "admin_users_table_col_title_transactions": "admin_users_table_col_title_transactions",
+  "admin_users_table_col_title_balance": "admin_users_table_col_title_balance",
+  "admin_users_table_col_title_is_active": "admin_users_table_col_title_is_active",
+  "create_invite_link_btn": "create_invite_link_btn",
+  "invite_link_field": "invite_link_field"
 }

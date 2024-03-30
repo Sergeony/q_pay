@@ -35,12 +35,12 @@ export const Header = memo(() => {
                 </AppNavLink>
                 {
                     dat.length > 0
-                    && nl.path.includes(getRoutePay("in", ":tab").replace(":tab", ""))
+                    && nl.path.includes(getRoutePay("in", ":payTab").replace(":tab", ""))
                     && (<span className={cls.circle}>{dat.length}</span>)
                 }
                 {
                     wat.length > 0
-                    && nl.path.includes(getRoutePay("out", ":tab").replace(":tab", ""))
+                    && nl.path.includes(getRoutePay("out", ":payTab").replace(":tab", ""))
                     && (<span className={cls.circle}>{wat.length}</span>)
                 }
             </li>

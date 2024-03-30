@@ -124,5 +124,15 @@
   "settings_general_tab_title": "General",
   "settings_integration_tab_title": "Integration",
   "balance_link_title": "Balance",
-  "logout_button": "Logout"
+  "logout_button": "Logout",
+  "admin_traders_page_title": "Traders",
+  "admin_merchants_page_title": "Merchants",
+  "user_search_placeholder": "User ID",
+  "admin_users_table_col_title_email": "Email",
+  "admin_users_table_col_title_user_id": "User Id",
+  "admin_users_table_col_title_transactions": "Total transactions",
+  "admin_users_table_col_title_balance": "Balance",
+  "admin_users_table_col_title_is_active": "Activity",
+  "create_invite_link_btn": "Create invite link",
+  "invite_link_field_label": "Invite link"
 }

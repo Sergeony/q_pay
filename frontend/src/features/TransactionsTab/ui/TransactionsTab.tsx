@@ -3,49 +3,67 @@ import { useTranslation } from "react-i18next";
 import { TetherIcon } from "shared/ui/_SVG";
 import { classNames } from "shared/lib/classNames/classNames";
 import {
-    getDepositTransactions,
+    getDepositTransactions, getTransactionTypeFromRepr,
     getWithdrawalTransactions,
     Transaction,
     TransactionStatusGroup,
-    TransactionType,
+    TransactionTypeRepr,
     useLazyGetTransactionsQuery
 } from "entities/Transaction";
 import { useSelector } from "react-redux";
 import { formatDate, formatTime } from "shared/lib/utils/utils";
+import { useParams } from "react-router-dom";
+import { NotFoundPage } from "pages/NotFoundPage";
 import { ActiveTransactionBlock } from "./ActiveTransactionBlock";
 import cls from "./TransactionTab.module.scss";
 import { StatusCell } from "./StatusCell";
 
-interface TransactionsProps {
-    userId?: number;
-    type: TransactionType;
-    statusGroup: TransactionStatusGroup;
-}
-
-export const TransactionsTab = memo((props: TransactionsProps) => {
+export const TransactionsTab = memo(() => {
     const { t } = useTranslation();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [fetchTransactions] = useLazyGetTransactionsQuery();
-    const { userId, type, statusGroup, } = props;
+    const {
+        type,
+        payTab: statusGroup,
+        userId,
+    } = useParams<{ type: TransactionTypeRepr, payTab: TransactionStatusGroup, userId: string }>();
 
     const activeTransactions = useSelector(
-        type === TransactionType.IN ? getDepositTransactions : getWithdrawalTransactions
+        type === "in"
+            ? getDepositTransactions
+            : getWithdrawalTransactions
     ) || [];
 
     useEffect(() => {
         if (statusGroup !== TransactionStatusGroup.ACTIVE) {
-            fetchTransactions({ userId, statusGroup, type })
+            fetchTransactions({ userId, statusGroup, type: getTransactionTypeFromRepr(type) })
                 .unwrap()
                 .then((data) => setTransactions(data));
         }
     }, [fetchTransactions, userId, statusGroup, type]);
 
-    if (!type || !statusGroup) return null;
+    if (!type
+        || ![
+            "in",
+            "out",
+        ].includes(type)
+        || (
+            statusGroup
+            && ![
+                TransactionStatusGroup.ACTIVE,
+                TransactionStatusGroup.DISPUTED,
+                TransactionStatusGroup.COMPLETED,
+                TransactionStatusGroup.CHECKING,
+            ].includes(statusGroup)
+        )
+    ) {
+        return <NotFoundPage />;
+    }
 
     return (
         <div className={classNames(
             "table",
-            [type === TransactionType.IN
+            [type === "in"
                 ? cls.DepositGridTemplate
                 : cls.WithdrawalGridTemplate
             ],
@@ -58,7 +76,7 @@ export const TransactionsTab = memo((props: TransactionsProps) => {
                 <span>{t("Мой курс")}</span>
                 <span>{t("Курс биржи")}</span>
                 <span>{t("Клиент")}</span>
-                <span>{t("Карта клиента")}</span>
+                {type === "out" && <span>{t("Карта клиента")}</span>}
                 <span>{t("Мои реквизиты")}</span>
                 <span>{t("Создана")}</span>
                 <span>{t("Подтверждена")}</span>
@@ -78,7 +96,7 @@ export const TransactionsTab = memo((props: TransactionsProps) => {
                     <div><span>{tr.traderCommission}</span></div>
                     <div><span>{tr.serviceCommission}</span></div>
                     <div><span>{tr.merchant}</span></div>
-                    {type === TransactionType.OUT && (
+                    {type === "out" && (
                         <div><span>{tr.clientCardNumber}</span></div>
                     )}
                     <div>

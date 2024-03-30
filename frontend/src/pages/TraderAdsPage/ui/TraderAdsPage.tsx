@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { AddButton } from "shared/ui/AddButton/AddButton";
 import { useTranslation } from "react-i18next";
 import {
-    getRouteAdsAndBankDetails, getRouteBankDetails,
+    getRouteAds, getRouteBankDetails,
 } from "shared/const/router";
 import { CreateBankDetailsModal } from "features/BankDetailsTab";
 import { CreateAdModal } from "features/AdsTab";
@@ -50,7 +50,7 @@ const TraderAdsPage = () => {
                     />
                 </div>
                 <Outlet />
-                {modalIsOpen && location.pathname.endsWith(getRouteAdsAndBankDetails()) && (
+                {modalIsOpen && location.pathname.endsWith(getRouteAds()) && (
                     <CreateAdModal
                         onClose={() => setModalIsOpen(false)}
                     />

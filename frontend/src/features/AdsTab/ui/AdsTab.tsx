@@ -8,24 +8,24 @@ import {
 } from "entities/Ads";
 import { classNames } from "shared/lib/classNames/classNames";
 import { useFetchBanksQuery } from "entities/Bank";
+import { useParams } from "react-router-dom";
 import cls from "./AdsTab.module.scss";
 import EditAdModal from "./EditAdModal";
 
-interface AdsProps {
-    traderId?: number;
-}
-
-export const AdsTab = memo((props: AdsProps) => {
+export const AdsTab = memo(() => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedAd, setSelectedAd] = useState<AdSchema | null>(null);
     const { t } = useTranslation();
     const [switchActivity] = usePatchAdMutation();
     const [deleteAd] = useDeleteAdMutation();
-    const { traderId } = props;
+    const { userId } = useParams<{ userId: string }>();
     const {
         data: ads,
         isSuccess: adsFetched,
-    } = useFetchAdsQuery({ traderId });
+    } = useFetchAdsQuery(
+        { userId },
+        { refetchOnMountOrArgChange: true }
+    );
     const {
         data: banks,
     } = useFetchBanksQuery();
@@ -55,7 +55,7 @@ export const AdsTab = memo((props: AdsProps) => {
     }, [switchActivity]);
 
     return (
-        <div className={classNames("table", [cls.GridTemplate])}>
+        <div className={`table max-w-xl ${cls.GridTemplate}`}>
             <div>
                 <span>{t("bank_table_column_title")}</span>
                 <span>{t("bank_details_table_column_title")}</span>

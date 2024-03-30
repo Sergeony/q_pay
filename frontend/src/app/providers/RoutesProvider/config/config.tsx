@@ -1,11 +1,13 @@
 import {
     AppRoutes,
-    getRouteAdsAndBankDetails,
+    getRouteAdminUserDetails,
+    getRouteAdminUsers,
+    getRouteAds,
     getRouteBankDetails,
     getRouteForbidden,
     getRouteLogin,
     getRouteNotFound,
-    getRoutePay,
+    getRoutePay, getRoutePayForAdmin,
     getRouteRegister,
     getRouteSettings,
     getRouteSettingsIntegration,
@@ -26,6 +28,9 @@ import { UserType } from "entities/User";
 import { Route } from "react-router-dom";
 import { AdsTab } from "features/AdsTab";
 import { BankDetailsTab } from "features/BankDetailsTab";
+import { AdminUsersPage } from "pages/AdminUsersPage/ui/AdminUsersPage";
+import { AdminUserDetailsPage } from "pages/AdminUsersPage/ui/AdminUserDetailsPage";
+import { TransactionsTab } from "features/TransactionsTab";
 
 export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     [AppRoutes.REGISTER]: {
@@ -38,9 +43,9 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
         element: <VerifyEmailForm />,
         publicOnly: true,
     },
-    [AppRoutes.VERIFY_TOTP]: {
-        path: getRouteVerifyTotp(),
-        element: <VerifyTotpForm />,
+    [AppRoutes.SETUP_TOTP]: {
+        path: getRouteSetupTotp(),
+        element: <SetupTotpForm />,
         publicOnly: true,
     },
     [AppRoutes.LOGIN]: {
@@ -48,14 +53,14 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
         element: <SignInForm />,
         publicOnly: true,
     },
-    [AppRoutes.SETUP_TOTP]: {
-        path: getRouteSetupTotp(),
-        element: <SetupTotpForm />,
+    [AppRoutes.VERIFY_TOTP]: {
+        path: getRouteVerifyTotp(),
+        element: <VerifyTotpForm />,
         publicOnly: true,
     },
 
     [AppRoutes.TRADER_ADS]: {
-        path: getRouteAdsAndBankDetails(),
+        path: getRouteAds(),
         element: <TraderAdsPage />,
         roles: [UserType.TRADER],
         childRoutes: [
@@ -74,10 +79,36 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
         ],
     },
     [AppRoutes.PAY]: {
-        path: getRoutePay(":type", ":tab"),
+        path: getRoutePay(":type", ":payTab"),
         element: <PayPage />,
         roles: [UserType.TRADER, UserType.MERCHANT],
     },
+
+    [AppRoutes.ADMIN_USERS]: {
+        path: getRouteAdminUsers(":tab"),
+        element: <AdminUsersPage />,
+        roles: [UserType.ADMIN],
+    },
+    [AppRoutes.ADMIN_USER_DETAILS]: {
+        path: getRouteAdminUserDetails(":tab", ":userId"),
+        element: <AdminUserDetailsPage />,
+        roles: [UserType.ADMIN],
+        childRoutes: [
+            <Route
+                path={getRoutePayForAdmin(":type")}
+                element={<TransactionsTab />}
+            />,
+            <Route
+                path={getRouteAds().slice(1)}
+                element={<AdsTab />}
+            />,
+            <Route
+                path={getRouteBankDetails()}
+                element={<BankDetailsTab />}
+            />,
+        ]
+    },
+
     [AppRoutes.SETTINGS]: {
         path: getRouteSettings(),
         element: <SettingsPage />,
@@ -97,6 +128,10 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
             />,
         ],
     },
+    // [AppRoutes.BALANCE]: {
+    //     path: getRouteBalance(),
+    //     element: <BalancePage />,
+    // },
 
     [AppRoutes.FORBIDDEN]: {
         path: getRouteForbidden(),
@@ -111,52 +146,4 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     //     path: RoutePath.client,
     //     element: <ClientBuyPage />,
     // },
-    // [AppRoutes.TRADER_PAY_OUT]: {
-    //     path: getRouteTraderPayOut(),
-    //     element: <SellPage />,
-    //     authOnly: true,
-    //     userType: UserType.TRADER,
-    // },
-    // [AppRoutes.MERCHANT_PAY_IN]: {
-    //     path: getRouteMerchantPayIn(),
-    //     element: <DepositPage />,
-    //     authOnly: true,
-    //     userType: UserType.MERCHANT,
-    // },
-    // [AppRoutes.MERCHANT_PAY_OUT]: {
-    //     path: getRouteMerchantPayOut(),
-    //     element: <WithdrawalPage />,
-    //     authOnly: true,
-    //     userType: UserType.MERCHANT,
-    // },
-    // [AppRoutes.ADMIN_TRADERS]: {
-    //     path: getRouteAdminTraders(),
-    //     element: <TradersPage />,
-    //     authOnly: true,
-    //     userType: UserType.ADMIN,
-    // },
-    // [AppRoutes.ADMIN_TRADER_DETAILS]: {
-    //     path: getRouteAdminTraderDetails(":id"),
-    //     element: <TraderStatsPage />,
-    //     authOnly: true,
-    //     userType: UserType.ADMIN,
-    // },
-    // [AppRoutes.ADMIN_MERCHANTS]: {
-    //     path: getRouteAdminMerchants(),
-    //     element: <MerchantsPage />,
-    //     authOnly: true,
-    //     userType: UserType.ADMIN,
-    // },
-    // [AppRoutes.ADMIN_MERCHANT_DETAILS]: {
-    //     path: getRouteAdminMerchantDetails(":id"),
-    //     element: <MerchantStatsPage />,
-    //     authOnly: true,
-    //     userType: UserType.ADMIN,
-    // },
-    // [AppRoutes.BALANCE]: {
-    //     path: getRouteBalance(),
-    //     element: <MerchantBalancePage />,
-    //     authOnly: true,
-    // },
-
 };

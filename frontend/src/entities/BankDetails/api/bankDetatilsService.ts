@@ -3,7 +3,7 @@ import { bankDetailsActions } from "../model/slices/bankDetailsSlice";
 import { BankDetails } from "../model/types/BankDetailsSchema";
 
 interface FetchBankDetailsRequestProps {
-    traderId?: number;
+    userId?: string;
 }
 
 export interface PatchBankDetailsRequest {
@@ -14,12 +14,13 @@ export interface PatchBankDetailsRequest {
 const bankDetailsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         fetchBankDetails: builder.query<BankDetails[], FetchBankDetailsRequestProps>({
-            query: ({ traderId }) => ({
+            query: ({ userId }) => ({
                 url: "api/web/trader/bank_details/",
                 params: {
-                    user_id: traderId,
+                    user_id: userId,
                 },
             }),
+            providesTags: ["BankDetails"],
             onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
                 try {
                     const { data } = await queryFulfilled;
@@ -28,7 +29,6 @@ const bankDetailsApi = api.injectEndpoints({
                     // Обработка ошибок
                 }
             },
-            providesTags: ["BankDetails"],
         }),
         createBankDetails: builder.mutation<BankDetails, any>({
             query: (body) => ({

@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { PayPageTab } from "shared/const/router";
 import { TransactionsTab } from "features/TransactionsTab";
 import {
-    getTransactionTypeFromRepr,
     transactionReducer,
     TransactionStatusGroup,
     TransactionTypeRepr
@@ -24,9 +23,9 @@ const reducers: Reducers = {
 
 const PayPage = () => {
     const { t } = useTranslation();
-    const { type, tab } = useParams<{ type: TransactionTypeRepr, tab: PayPageTab }>();
+    const { type, payTab } = useParams<{ type: TransactionTypeRepr, payTab: PayPageTab }>();
 
-    if (!type || !tab
+    if (!type || !payTab
         || ![
             "in",
             "out",
@@ -37,7 +36,7 @@ const PayPage = () => {
             TransactionStatusGroup.COMPLETED,
             TransactionStatusGroup.CHECKING,
             "export"
-        ].includes(tab)
+        ].includes(payTab)
     ) {
         return <NotFoundPage />;
     }
@@ -50,7 +49,7 @@ const PayPage = () => {
                         <h2 className="PageTitle">
                             {type === "in" ? t("pay_in_page_title") : t("pay_out_page_title")}
                         </h2>
-                        {tab !== "export" && (
+                        {payTab !== "export" && (
                             <Field
                                 label="Search Transaction"
                                 hideLabel
@@ -65,16 +64,10 @@ const PayPage = () => {
                     <NavBar type={type} />
                 </div>
                 {
-                    tab !== "export" ? (
-                        <TransactionsTab
-                            type={getTransactionTypeFromRepr(type)}
-                            statusGroup={tab}
-                        />
+                    payTab !== "export" ? (
+                        <TransactionsTab />
                     ) : ( //  TODO: implement export
-                        <TransactionsTab
-                            type={getTransactionTypeFromRepr(type)}
-                            statusGroup={TransactionStatusGroup.ACTIVE}
-                        />
+                        <TransactionsTab />
                     )
                 }
             </main>

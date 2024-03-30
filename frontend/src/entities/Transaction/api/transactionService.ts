@@ -8,7 +8,7 @@ import {
 export interface GetTransactionsRequestProps {
     type: TransactionType;
     statusGroup?: TransactionStatusGroup;
-    userId?: number;
+    userId?: string;
 }
 
 const transactionsApi = api.injectEndpoints({
@@ -19,7 +19,11 @@ const transactionsApi = api.injectEndpoints({
         >({
             query: (params) => ({
                 url: "api/web/trader/transactions/",
-                params,
+                params: {
+                    type: params.type,
+                    statusGroup: params.statusGroup,
+                    user_id: params.userId,
+                },
             }),
             providesTags: ["Deposit"],
         }),

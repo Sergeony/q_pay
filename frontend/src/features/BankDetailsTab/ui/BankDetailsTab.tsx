@@ -10,18 +10,21 @@ import {
 } from "entities/BankDetails";
 import { classNames } from "shared/lib/classNames/classNames";
 import { useFetchBanksQuery } from "entities/Bank";
+import { useParams } from "react-router-dom";
 import cls from "./BankDetailsTab.module.scss";
 
-interface BankDetailsProps {
-    traderId?: number;
-}
-
-export const BankDetailsTab = memo((props: BankDetailsProps) => {
+export const BankDetailsTab = memo(() => {
     const { t } = useTranslation();
     const [switchBankDetails] = usePatchBankDetailsMutation();
     const [deleteBankDetails] = useDeleteBankDetailsMutation();
-    const { traderId } = props;
-    const { data: bankDetails } = useFetchBankDetailsQuery({ traderId });
+    const { userId } = useParams<{ userId: string }>();
+    const {
+        data: bankDetails,
+        isSuccess: bankDetailsFetched,
+    } = useFetchBankDetailsQuery(
+        { userId },
+        { refetchOnMountOrArgChange: true }
+    );
     const {
         data: banks,
     } = useFetchBanksQuery();
@@ -51,7 +54,7 @@ export const BankDetailsTab = memo((props: BankDetailsProps) => {
     );
 
     return (
-        <div className={classNames("table", [cls.GridTemplate])}>
+        <div className={`table max-w-xl ${cls.GridTemplate}`}>
             <div>
                 <span>{t("bank_details_table_bank_column_title")}</span>
                 <span>{t("bank_details_table_title_column_title")}</span>
@@ -62,7 +65,7 @@ export const BankDetailsTab = memo((props: BankDetailsProps) => {
                 <span>{t("bank_details_table_activity_column_title")}</span>
                 <span />
             </div>
-            {bankDetails?.map((bd) => {
+            {bankDetailsFetched && bankDetails.map((bd) => {
                 const bank = findBankById(bd.bank);
                 return (
                     <div key={bd.id}>

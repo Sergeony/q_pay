@@ -419,6 +419,10 @@ body {
     max-width: 79.75rem;
 }
 
+.max-w-98-75 {
+    max-width: 98.75rem;
+}
+
 .h1 {
     color: var(--contrast);
     font: var(--font-h1-bold);
@@ -491,4 +495,23 @@ body {
 
 .pos-rel {
     position: relative;
+}
+
+.search {
+    width: 27.25rem !important;
+
+    &[type="search"]::-ms-clear,
+    &[type="search"]::-ms-reveal {
+        display: none;
+    }
+    &[type="search"]::-webkit-search-decoration,
+    &[type="search"]::-webkit-search-cancel-button,
+    &[type="search"]::-webkit-search-results-button,
+    &[type="search"]::-webkit-search-results-decoration {
+        display: none;
+    }
+
+    &::placeholder {
+        text-align: end;
+    }
 }

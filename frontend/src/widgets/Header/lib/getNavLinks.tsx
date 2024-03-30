@@ -1,5 +1,7 @@
 import { UserType } from "entities/User";
-import { getRoutePay, getRouteSettings, getRouteAdsAndBankDetails } from "shared/const/router";
+import {
+    getRoutePay, getRouteSettings, getRouteAds, getRouteAdminUsers
+} from "shared/const/router";
 import { TransactionStatusGroup } from "entities/Transaction";
 
 interface NavLinkType {
@@ -17,7 +19,7 @@ export const useNavLinks = (userType: UserType | undefined) => {
     if (userType === UserType.TRADER) {
         navLinks.push(
             {
-                path: getRouteAdsAndBankDetails(),
+                path: getRouteAds(),
                 text: "ads_page_title",
             },
         );
@@ -29,23 +31,23 @@ export const useNavLinks = (userType: UserType | undefined) => {
             {
                 path: getRoutePay("in", TransactionStatusGroup.ACTIVE),
                 text: "pay_in_page_title",
-                match: getRoutePay("in", ":tab").replace(":tab", ""),
+                match: getRoutePay("in", ":payTab").replace(":tab", ""),
             },
             {
                 path: getRoutePay("out", TransactionStatusGroup.ACTIVE),
                 text: "pay_out_page_title",
-                match: getRoutePay("out", ":tab").replace(":tab", "")
+                match: getRoutePay("out", ":payTab").replace(":tab", "")
             },
         );
     } else if (userType === UserType.ADMIN) {
         navLinks.push(
             {
-                path: "traders", // TODO: replace with settings page
-                text: "traders_page_title",
+                path: getRouteAdminUsers("traders"),
+                text: "admin_traders_page_title",
             },
             {
-                path: "merchants", // TODO: replace with settings page
-                text: "merchants_page_title",
+                path: getRouteAdminUsers("merchants"), // TODO: replace with settings page
+                text: "admin_merchants_page_title",
             },
         );
     }
