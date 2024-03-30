@@ -120,5 +120,8 @@
   "password_req_long_enough": "at least 12 characters",
   "verify_email_btn": "Verify Email",
   "verify_totp_btn": "Verify TOTP",
-  "totp_secret_label": "totp_secret_label"
+  "totp_secret_label": "totp_secret_label",
+  "settings_general_tab_title": "General",
+  "settings_integration_tab_title": "Integration",
+  "balance_link_title": "Balance"
 }

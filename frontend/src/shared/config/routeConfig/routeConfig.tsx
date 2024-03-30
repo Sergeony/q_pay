@@ -1,6 +1,7 @@
 import { RouteProps } from "react-router-dom";
 
 import { UserType } from "entities/User";
+import { ReactNode } from "react";
 
 // @ts-ignore
 // const SignUpForm = lazy(() => import("features/auth/ui/SignUpForm.tsx"));
@@ -8,6 +9,8 @@ import { UserType } from "entities/User";
 // const SignInForm = lazy(() => import("features/auth/ui/SignInForm.tsx"));
 
 export type AppRoutesProps = RouteProps & {
-    authOnly?: boolean;
-    userType?: UserType;
+    path: string;
+    publicOnly?: true;
+    roles?: UserType[];
+    childRoutes?: ReactNode[];
 }

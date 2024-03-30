@@ -1,15 +1,15 @@
 import { Trans, useTranslation } from "react-i18next";
-import { UserData } from "entities/User";
+import { getUserData } from "entities/User";
 import { memo } from "react";
 import { CopyIcon } from "shared/ui/_SVG";
+import { useSelector } from "react-redux";
 
-interface TabGeneralProps {
-    userData: UserData;
-}
-
-export const TabGeneral = memo((props: TabGeneralProps) => {
+export const TabGeneral = memo(() => {
     const { t } = useTranslation();
-    const { userData } = props;
+    const userData = useSelector(getUserData);
+
+    if (!userData) return null;
+
     return (
         <div className="v-stack gap-24 w-fit">
             <section className="v-stack gap-16">

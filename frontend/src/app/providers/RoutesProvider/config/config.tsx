@@ -1,10 +1,14 @@
 import {
     AppRoutes,
+    getRouteAdsAndBankDetails,
+    getRouteBankDetails,
     getRouteForbidden,
     getRouteLogin,
     getRouteNotFound,
     getRoutePay,
-    getRouteRegister, getRouteSettings,
+    getRouteRegister,
+    getRouteSettings,
+    getRouteSettingsIntegration,
     getRouteSetupTotp,
     getRouteVerifyEmail,
     getRouteVerifyTotp,
@@ -13,48 +17,94 @@ import { NotFoundPage } from "pages/NotFoundPage";
 import { ForbiddenPage } from "pages/ForbiddenPage";
 import { AppRoutesProps } from "shared/config/routeConfig/routeConfig";
 import {
-    SetupTotpForm,
-    SignInForm,
-    SignUpForm,
-    VerifyEmailForm,
-    VerifyTotpForm,
+    SetupTotpForm, SignInForm, SignUpForm, VerifyEmailForm, VerifyTotpForm,
 } from "features/auth";
 import { TraderAdsPage } from "pages/TraderAdsPage";
 import { PayPage } from "pages/PayPage";
-import { SettingsPage } from "pages/SettingsPage";
+import { SettingsPage, TabGeneral, TabIntegration } from "pages/SettingsPage";
+import { UserType } from "entities/User";
+import { Route } from "react-router-dom";
+import { AdsTab } from "features/AdsTab";
+import { BankDetailsTab } from "features/BankDetailsTab";
 
 export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
-    [AppRoutes.SETTINGS]: {
-        path: getRouteSettings(":tab?"),
-        element: <SettingsPage />,
-    },
-    [AppRoutes.PAY]: {
-        path: getRoutePay(":type", ":tab?"),
-        element: <PayPage />,
-    },
-    [AppRoutes.TRADER_ADS]: {
-        path: "/*",
-        element: <TraderAdsPage />,
-    },
     [AppRoutes.REGISTER]: {
         path: getRouteRegister(),
         element: <SignUpForm />,
+        publicOnly: true,
     },
     [AppRoutes.VERIFY_EMAIL]: {
         path: getRouteVerifyEmail(),
         element: <VerifyEmailForm />,
+        publicOnly: true,
     },
     [AppRoutes.VERIFY_TOTP]: {
         path: getRouteVerifyTotp(),
         element: <VerifyTotpForm />,
+        publicOnly: true,
     },
     [AppRoutes.LOGIN]: {
         path: getRouteLogin(),
         element: <SignInForm />,
+        publicOnly: true,
     },
     [AppRoutes.SETUP_TOTP]: {
         path: getRouteSetupTotp(),
         element: <SetupTotpForm />,
+        publicOnly: true,
+    },
+
+    [AppRoutes.TRADER_ADS]: {
+        path: getRouteAdsAndBankDetails(),
+        element: <TraderAdsPage />,
+        roles: [UserType.TRADER],
+        childRoutes: [
+            <Route
+                index
+                element={<AdsTab />}
+            />,
+            <Route
+                path={getRouteBankDetails()}
+                element={<BankDetailsTab />}
+            />,
+            <Route
+                path={getRouteNotFound()}
+                element={<NotFoundPage />}
+            />,
+        ],
+    },
+    [AppRoutes.PAY]: {
+        path: getRoutePay(":type", ":tab"),
+        element: <PayPage />,
+        roles: [UserType.TRADER, UserType.MERCHANT],
+    },
+    [AppRoutes.SETTINGS]: {
+        path: getRouteSettings(),
+        element: <SettingsPage />,
+        roles: [UserType.TRADER, UserType.MERCHANT, UserType.ADMIN],
+        childRoutes: [
+            <Route
+                index
+                element={<TabGeneral />}
+            />,
+            <Route
+                path={getRouteSettingsIntegration()}
+                element={<TabIntegration />}
+            />,
+            <Route
+                path={getRouteNotFound()}
+                element={<NotFoundPage />}
+            />,
+        ],
+    },
+
+    [AppRoutes.FORBIDDEN]: {
+        path: getRouteForbidden(),
+        element: <ForbiddenPage />,
+    },
+    [AppRoutes.NOT_FOUND]: {
+        path: getRouteNotFound(),
+        element: <NotFoundPage />,
     },
 
     // [AppRoutes.CLIENT]: {
@@ -109,12 +159,4 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     //     authOnly: true,
     // },
 
-    [AppRoutes.FORBIDDEN]: {
-        path: getRouteForbidden(),
-        element: <ForbiddenPage />,
-    },
-    [AppRoutes.NOT_FOUND]: {
-        path: getRouteNotFound(),
-        element: <NotFoundPage />,
-    },
 };

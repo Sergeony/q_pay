@@ -24,7 +24,7 @@ export enum AppRoutes {
     // BALANCE = "balance",
 
     FORBIDDEN = "forbidden",
-    NOT_FOUND = "*",
+    NOT_FOUND = "not_found",
 }
 
 export const getRouteRegister = () => "/register";
@@ -33,19 +33,17 @@ export const getRouteVerifyTotp = () => "/verify-totp";
 export const getRouteLogin = () => "/login";
 export const getRouteSetupTotp = () => "/setup-totp";
 
-export const getRouteTraderAds = () => "/ads";
-export const getRouteTraderBankDetails = () => "/bank-details";
+export const getRouteAdsAndBankDetails = () => "/ads";
+export const getRouteBankDetails = () => "bank-details";
 
 export type PayPageTab = TransactionStatusGroup | "export";
-
 export const getRoutePay = (
     type: TransactionTypeRepr | ":type",
-    tab?: PayPageTab | ":tab?",
-) => `/pay/${type}/${tab || ""}`;
+    tab: PayPageTab | ":tab",
+) => `/pay/${type}/${tab}`;
 
-export type SettingsPageTab = "/integration";
-
-export const getRouteSettings = (tab?: SettingsPageTab | ":tab?") => `settings/${tab || ""}`;
+export const getRouteSettings = () => "/settings";
+export const getRouteSettingsIntegration = () => "integration";
 
 // export const getRouteTraderPayOut = () => "/trader/pay-out";
 //
@@ -61,7 +59,7 @@ export const getRouteSettings = (tab?: SettingsPageTab | ":tab?") => `settings/$
 // export const getRouteBalance = () => "/balance";
 
 export const getRouteForbidden = () => "/forbidden";
-export const getRouteNotFound = () => "/not-found";
+export const getRouteNotFound = () => "*";
 
 export const AppRouteByPathPattern: Record<string, AppRoutes> = {
     [getRouteRegister()]: AppRoutes.REGISTER,

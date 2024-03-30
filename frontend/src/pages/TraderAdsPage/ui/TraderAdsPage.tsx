@@ -1,15 +1,15 @@
-import { Suspense, useState } from "react";
-import {
-    NavLink,
-    Route, Routes, useLocation
-} from "react-router-dom";
+import { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { AddButton } from "shared/ui/AddButton/AddButton";
 import { useTranslation } from "react-i18next";
-import { getRouteTraderAds, getRouteTraderBankDetails } from "shared/const/router";
-import { BankDetailsTab, CreateBankDetailsModal } from "features/BankDetailsTab";
-import { AdsTab, CreateAdModal } from "features/AdsTab";
+import {
+    getRouteAdsAndBankDetails, getRouteBankDetails,
+} from "shared/const/router";
+import { CreateBankDetailsModal } from "features/BankDetailsTab";
+import { CreateAdModal } from "features/AdsTab";
 import { DynamicReducersLoader, Reducers } from "shared/lib/components/DynamicReducersLoader";
 import { bankReducer } from "entities/Bank";
+import { AppNavLink } from "shared/ui/AppNavLink/AppNavLink";
 import cls from "./TraderAdsPage.module.scss";
 
 const reducers: Reducers = {
@@ -17,27 +17,31 @@ const reducers: Reducers = {
 };
 
 const TraderAdsPage = () => {
-    const location = useLocation();
     const { t } = useTranslation();
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const location = useLocation();
 
     return (
         <DynamicReducersLoader reducers={reducers} keepAfterUnmount>
             <main className={cls.main}>
                 <div className="h-stack justifyBetween">
                     <nav className="h-stack gap-24">
-                        <NavLink
-                            to={getRouteTraderAds()}
-                            className={({ isActive }) => `${cls.TabLink} ${isActive && cls.active}`}
+                        <AppNavLink
+                            end
+                            to=""
+                            variant="page"
+                            title={t("ads_tab_title")}
                         >
                             {t("ads_tab_title")}
-                        </NavLink>
-                        <NavLink
-                            to={getRouteTraderBankDetails()}
-                            className={({ isActive }) => `${cls.TabLink} ${isActive && cls.active}`}
+                        </AppNavLink>
+                        <AppNavLink
+                            end
+                            to={getRouteBankDetails()}
+                            variant="page"
+                            title={t("bank_details_tab_title")}
                         >
                             {t("bank_details_tab_title")}
-                        </NavLink>
+                        </AppNavLink>
                     </nav>
                     <AddButton
                         onClick={() => {
@@ -45,22 +49,13 @@ const TraderAdsPage = () => {
                         }}
                     />
                 </div>
-                <Routes>
-                    <Route
-                        element={<Suspense><BankDetailsTab /></Suspense>}
-                        path={getRouteTraderBankDetails()}
-                    />
-                    <Route
-                        element={<Suspense><AdsTab /></Suspense>}
-                        path={getRouteTraderAds()}
-                    />
-                </Routes>
-                {modalIsOpen && location.pathname.endsWith(getRouteTraderAds()) && (
+                <Outlet />
+                {modalIsOpen && location.pathname.endsWith(getRouteAdsAndBankDetails()) && (
                     <CreateAdModal
                         onClose={() => setModalIsOpen(false)}
                     />
                 )}
-                {modalIsOpen && location.pathname.endsWith(getRouteTraderBankDetails()) && (
+                {modalIsOpen && location.pathname.endsWith(getRouteBankDetails()) && (
                     <CreateBankDetailsModal
                         onClose={() => setModalIsOpen(false)}
                     />

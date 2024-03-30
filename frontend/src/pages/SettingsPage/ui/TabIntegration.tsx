@@ -5,6 +5,6 @@ export const TabIntegration = () => {
     const { t } = useTranslation();
 
     return (
-        <div className={classNames("", [], {})} />
+        <div className={classNames("", [], {})}>integration</div>
     );
 };

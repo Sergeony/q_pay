@@ -13,6 +13,7 @@ import { classNames } from "shared/lib/classNames/classNames";
 import { bankDetailsReducer } from "entities/BankDetails";
 import { SearchIcon } from "shared/ui/_SVG";
 import { Field } from "shared/ui/Field/Field";
+import { NotFoundPage } from "pages/NotFoundPage";
 import cls from "./PayPage.module.scss";
 import { NavBar } from "./NavBar";
 
@@ -25,7 +26,21 @@ const PayPage = () => {
     const { t } = useTranslation();
     const { type, tab } = useParams<{ type: TransactionTypeRepr, tab: PayPageTab }>();
 
-    if (!type || !tab) return null;
+    if (!type || !tab
+        || ![
+            "in",
+            "out",
+        ].includes(type)
+        || ![
+            TransactionStatusGroup.ACTIVE,
+            TransactionStatusGroup.DISPUTED,
+            TransactionStatusGroup.COMPLETED,
+            TransactionStatusGroup.CHECKING,
+            "export"
+        ].includes(tab)
+    ) {
+        return <NotFoundPage />;
+    }
 
     return (
         <DynamicReducersLoader keepAfterUnmount reducers={reducers}>

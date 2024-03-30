@@ -122,5 +122,8 @@
   "password_req_long_enough": "password_req_at_least_chars",
   "verify_email_btn": "verify_email_btn",
   "verify_totp_btn": "verify_totp_btn",
-  "totp_secret_label": "totp_secret_label"
+  "totp_secret_label": "totp_secret_label",
+  "settings_general_tab_title": "settings_general_tab_title",
+  "settings_integration_tab_title": "settings_integration_tab_title",
+  "balance_link_title": "balance_link_title"
 }
