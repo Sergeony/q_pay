@@ -14,7 +14,7 @@ from .views import (
     AdminUsersView,
     UserStatsView,
     BankListView,
-    UserSettingsView,
+    UserPrefsView,
     ChangePasswordView,
 )
 
@@ -25,7 +25,7 @@ urlpatterns = [
     path('trader/ads/', AdView.as_view()),
     path('trader/ads/<int:pk>/', AdView.as_view()),
     path('trader/transactions/export/<str:transaction_type_label>/', ExportTransactionsView.as_view()),
-    path('trader/transactions/<str:transaction_type_label>/<str:status_group>/', TraderTransactionListView.as_view()),
+    path('trader/transactions/', TraderTransactionListView.as_view()),
 
     path('merchant/transactions/withdrawal/upload/', FileUploadView.as_view()),
     path('merchant/transactions/<str:transaction_type_label>/', MerchantTransactionsView.as_view()),
@@ -40,6 +40,6 @@ urlpatterns = [
     path('admin/<str:user_type>/<int:pk>/', AdminUsersView.as_view()),
 
     path('banks/', BankListView.as_view()),
-    path('user/settings/', UserSettingsView.as_view()),
+    path('user/prefs/', UserPrefsView.as_view()),
     path('user/change-password/', ChangePasswordView.as_view()),
 ]

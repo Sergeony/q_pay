@@ -19,6 +19,8 @@ def get_user_id(request: Request) -> int | Response:  # TODO: move response to t
     user_id = request.query_params.get('user_id')
     if user_id is None:
         return Response(data={"error": "user id were not provided"}, status=status.HTTP_400_BAD_REQUEST, exception=True)
+    return user_id
+
 
 
 def get_value_by_label(choices_class: ChoicesMeta, label: str) -> int | Response:  # TODO: move response to the view

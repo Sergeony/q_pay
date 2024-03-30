@@ -8,10 +8,15 @@ from rest_framework_simplejwt.utils import get_md5_hash_password
 
 
 class JWTAuthentication(DefaultJWTAuthentication):
-    def get_user(self, validated_token: Token) -> AuthUser:
+    def get_user(self, validated_token: Token) -> AuthUser | None:
         """
         Attempts to find and return a user using the given validated token.
         """
+        token_is_temp = validated_token.get("temp", False)
+
+        if token_is_temp:
+            return None
+
         try:
             user_id = validated_token[api_settings.USER_ID_CLAIM]
         except KeyError:

@@ -1,3 +1,5 @@
+import logging
+
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from apps.main.models import User
@@ -9,6 +11,8 @@ from apps.main.services import (
     settle_transaction,
     client_handle_transaction
 )
+
+logger = logging.getLogger(__name__)
 
 
 class Consumer(AsyncJsonWebsocketConsumer):
@@ -87,7 +91,7 @@ class Consumer(AsyncJsonWebsocketConsumer):
         balance_data = event['balance_data']
         await self.send_json(
             content={
-                'action': 'updated_balance',
+                'action': 'current_balance',
                 'data': balance_data
             }
         )

@@ -17,8 +17,8 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        otp_base32 = pyotp.random_base32()
-        user = self.model(email=email, otp_base32=otp_base32, **extra_fields)
+        totp_base32 = pyotp.random_base32()
+        user = self.model(email=email, totp_base32=totp_base32, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -60,8 +60,10 @@ class User(AbstractBaseUser):
     is_light_theme = models.BooleanField(default=True)
     language = models.PositiveSmallIntegerField(choices=Language.choices, default=Language.ENGLISH)
     is_deleted = models.BooleanField(default=False)  # TODO: move soft delete from views here
-    otp_base32 = models.CharField(max_length=32)
+    totp_base32 = models.CharField(max_length=32)
     last_login = None
+    email_verified = models.BooleanField(default=False)
+    tg_username = models.CharField(max_length=50, default="")
 
     objects = UserManager()
 
@@ -88,6 +90,7 @@ class Ad(models.Model):
 
     class Meta:
         unique_together = ('trader', 'bank')
+        ordering = ['-created_at']
 
 
 class BankDetails(models.Model):
@@ -113,9 +116,12 @@ class BankDetails(models.Model):
     current_daily_turnover = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     current_weekly_turnover = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     current_monthly_turnover = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('trader', 'title')
+        ordering = ['-created_at']
 
 
 class TransactionManager(models.Manager):

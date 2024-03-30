@@ -29,6 +29,7 @@ pyotp = "^2.9.0"
 redis = "^5.0.1"
 uvicorn = "^0.27.1"
 channels-redis = "^4.2.0"
+websockets = "^12.0"
 
 [tool.poetry.group.dev.dependencies]
 django-silk = "^5.1.0"

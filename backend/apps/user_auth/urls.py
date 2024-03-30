@@ -1,13 +1,20 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenVerifyView
 
-from .views import *
-
+from .views import (
+    SignUpView,
+    EVCVerificationView,
+    SignInView,
+    TOTPVerificationView,
+    TokenRefreshView,
+    EVCResendView,
+)
 
 urlpatterns = [
-    path('register/', UserRegisterView.as_view()),
-    path('login/', UserLoginView.as_view()),
-    path('verify-otp/', UserVerifyOTPView.as_view()),
-    path('token/refresh/', UserTokenRefreshView.as_view()),
-    path('token/verify/', TokenVerifyView.as_view()),
+    path('sign-up/', SignUpView.as_view()),
+    path('verify-evc/', EVCVerificationView.as_view()),
+    path('sign-in/', SignInView.as_view()),
+    path('verify-totp/', TOTPVerificationView.as_view()),
+    path('token/refresh/', TokenRefreshView.as_view(), name="token_refresh"),
+    path('resend-evc/', EVCResendView.as_view()),
+
 ]

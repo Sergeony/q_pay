@@ -392,6 +392,7 @@ def handle_transaction(user: User, data):
 
 @database_sync_to_async
 def get_current_balance(user: User):
+    print("GET CURRENT BALANCE: ", Balance.objects.get(user=user))
     user = user if user.type != User.Type.ADMIN else None
     balance = Balance.objects.get(user=user)
     return BalanceSerializer(balance).data
