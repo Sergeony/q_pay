@@ -50,19 +50,19 @@ const Icon: FunctionComponent<SvgProps> = (props) => {
             </defs>
             <path
                 d="M8.00004 5.33366V2.66699H5.33337"
-                stroke={useGradient ? "url(#paint0_linear_1120_14473)" : "#46404B"}
+                stroke={useGradient ? "url(#paint1_linear_1120_14473)" : "var(--secondary)"}
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />
             <path
                 d="M12.0001 5.33398H4.00008C3.2637 5.33398 2.66675 5.93094 2.66675 6.66732V12.0007C2.66675 12.737 3.2637 13.334 4.00008 13.334H12.0001C12.7365 13.334 13.3334 12.737 13.3334 12.0007V6.66732C13.3334 5.93094 12.7365 5.33398 12.0001 5.33398Z"
-                stroke={useGradient ? "url(#paint1_linear_1120_14473)" : "#46404B"}
+                stroke={useGradient ? "url(#paint1_linear_1120_14473)" : "var(--secondary)"}
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />
             <path
                 d="M1.33337 9.33366H2.66671M13.3334 9.33366H14.6667M10 8.66699V10.0003M6.00004 8.66699V10.0003"
-                stroke={useGradient ? "url(#paint2_linear_1120_14473)" : "#46404B"}
+                stroke={useGradient ? "url(#paint1_linear_1120_14473)" : "var(--secondary)"}
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />

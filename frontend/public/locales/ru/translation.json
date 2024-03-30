@@ -136,5 +136,8 @@
   "admin_users_table_col_title_balance": "admin_users_table_col_title_balance",
   "admin_users_table_col_title_is_active": "admin_users_table_col_title_is_active",
   "create_invite_link_btn": "create_invite_link_btn",
-  "invite_link_field": "invite_link_field"
+  "invite_link_field": "invite_link_field",
+  "Профит курс": "Профит курс",
+  "Профит": "Профит",
+  "ID Мерчанта": "ID Мерчанта"
 }

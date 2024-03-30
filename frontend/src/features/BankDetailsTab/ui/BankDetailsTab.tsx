@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { AutomationIcon } from "shared/ui/_SVG";
+import { AutomationIcon, BankIcons } from "shared/ui/_SVG";
 import Switch from "shared/ui/Switch/Switch";
 import KebabMenu from "shared/ui/KebabMenu/KebabMenu";
 import {
@@ -67,12 +67,13 @@ export const BankDetailsTab = memo(() => {
             </div>
             {bankDetailsFetched && bankDetails.map((bd) => {
                 const bank = findBankById(bd.bank);
+                const BankIcon = BankIcons[bd.bank];
                 return (
                     <div key={bd.id}>
                         <div>
-                            <div className="h-stack gap-4">
-                                {bd.useAutomation && <AutomationIcon />}
-                                <div />
+                            <div className="h-stack gap-8 alignCenter">
+                                {bd.useAutomation && <AutomationIcon size={24} />}
+                                <BankIcon />
                                 <span>{bank?.title}</span>
                                 <span>{t("UAH")}</span>
                             </div>
@@ -88,20 +89,20 @@ export const BankDetailsTab = memo(() => {
                         </div>
                         <div>
                             <div className="two-line-cell">
-                                <span>{bd.currentDailyTurnover}</span>
-                                <span>{bd.dailyLimit}</span>
+                                <span>{`${bd.currentDailyTurnover} ₴`}</span>
+                                <span>{`${bd.dailyLimit} ₴`}</span>
                             </div>
                         </div>
                         <div>
                             <div className="two-line-cell">
-                                <span>{bd.currentWeeklyTurnover}</span>
-                                <span>{bd.weeklyLimit}</span>
+                                <span>{`${bd.currentWeeklyTurnover} ₴`}</span>
+                                <span>{`${bd.weeklyLimit} ₴`}</span>
                             </div>
                         </div>
                         <div>
                             <div className="two-line-cell">
-                                <span>{bd.currentMonthlyTurnover}</span>
-                                <span>{bd.monthlyLimit}</span>
+                                <span>{`${bd.currentMonthlyTurnover} ₴`}</span>
+                                <span>{`${bd.monthlyLimit} ₴`}</span>
                             </div>
                         </div>
                         <div>

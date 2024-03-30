@@ -16,8 +16,9 @@ export interface Transaction {
     status: TransactionStatus;
     amount: number;
     actualAmount: number;
-    traderCommission: string;
-    serviceCommission: string;
+    traderCommission: number;
+    serviceCommission: number;
+    // rate: number;
     currency: number;
     createdAt: string;
     completedAt: string | null;

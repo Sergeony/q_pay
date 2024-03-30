@@ -4,6 +4,7 @@ import { AdminUsersTab, getRouteAdminUserDetails, getRoutePayForAdmin } from "sh
 import Switch from "shared/ui/Switch/Switch";
 import KebabMenu from "shared/ui/KebabMenu/KebabMenu";
 import { Link } from "react-router-dom";
+import { TetherIcon } from "shared/ui/_SVG";
 import cls from "./AdminUsersPage.module.scss";
 import { useDeleteUserMutation, useGetUsersQuery, usePatchUserMutation } from "../api/usersService";
 
@@ -64,7 +65,12 @@ export const UsersTab = memo((props: UserTabProps) => {
                     </div>
                     <div><span>{u.id}</span></div>
                     <div><span>{u.totalTransactions}</span></div>
-                    <div><span>{u.balance.activeBalance}</span></div>
+                    <div>
+                        <div className="h-stack gap-4 alignCenter">
+                            <span>{u.balance.activeBalance}</span>
+                            <TetherIcon className="accent-fill" />
+                        </div>
+                    </div>
                     <div>
                         <Switch
                             isActive={u.isActive}

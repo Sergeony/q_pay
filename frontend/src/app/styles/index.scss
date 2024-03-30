@@ -139,7 +139,7 @@ body {
     }
 }
 
-.table > div > div > .two-line-cell {
+.two-line-cell {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -149,6 +149,7 @@ body {
         flex-wrap: nowrap;
         text-wrap: none;
     }
+
 
     > *:first-child {
         font: var(--font-main-regular);
@@ -458,6 +459,10 @@ body {
     stroke: var(--field-icon);
 }
 
+.fill-secondary {
+    fill: var(--secondary);
+}
+
 .danger-fg {
     color: var(--red);
 }
@@ -514,4 +519,8 @@ body {
     &::placeholder {
         text-align: end;
     }
+}
+
+.pointer {
+    cursor: pointer;
 }

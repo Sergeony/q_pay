@@ -22,7 +22,7 @@ export const StatusCell = memo((props: StatusCellProps) => {
         )}
         >
             {status === TransactionStatus.COMPLETED
-                && useAutomation && <AutomationIcon size={24} useGradient />}
+                && useAutomation && <AutomationIcon className="stroke-blue-gradient" size={24} useGradient />}
             {status === TransactionStatus.COMPLETED
                 && !useAutomation && <SuccessIcon size={24} useGradient />}
             {[

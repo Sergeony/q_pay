@@ -1,6 +1,6 @@
 import { memo, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AutomationIcon, CardIcon } from "shared/ui/_SVG";
+import { AutomationIcon, BankIcons, CardIcon } from "shared/ui/_SVG";
 import Switch from "shared/ui/Switch/Switch";
 import KebabMenu from "shared/ui/KebabMenu/KebabMenu";
 import {
@@ -64,11 +64,12 @@ export const AdsTab = memo(() => {
             </div>
             {adsFetched && ads.map((a) => {
                 const bank = findBankById(a.bank);
+                const BankIcon = BankIcons[a.bank];
                 return (
                     <div key={a.id}>
                         <div>
                             <div className={classNames("", ["h-stack", "gap-8"])}>
-                                <div />
+                                <BankIcon />
                                 <span>{bank?.title}</span>
                                 <span>{t("UAH")}</span>
                             </div>
@@ -76,9 +77,13 @@ export const AdsTab = memo(() => {
                         <div>
                             <div className={cls.BankDetailsContainer}>
                                 {a.bankDetails?.map((bd) => (
-                                    <div key={bd.id}>
-                                        {bd.useAutomation && <AutomationIcon />}
-                                        <CardIcon />
+                                    <div
+                                        key={bd.id}
+                                        className="h-stack gap-4 alignCenter pointer"
+                                        title={`${bd.title} ${bd.cardNumber}`}
+                                    >
+                                        {bd.useAutomation && <AutomationIcon className="stroke-secondary" />}
+                                        <CardIcon className="fill-secondary" />
                                         <span>{bd.title}</span>
                                         <span>{bd.cardNumber}</span>
                                     </div>

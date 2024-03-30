@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TetherIcon } from "shared/ui/_SVG";
+import { BankIcons, TetherIcon } from "shared/ui/_SVG";
 import { classNames } from "shared/lib/classNames/classNames";
 import {
     getDepositTransactions, getTransactionTypeFromRepr,
@@ -73,9 +73,8 @@ export const TransactionsTab = memo(() => {
             <div>
                 <span />
                 <span>{t("ID Сделки")}</span>
-                <span>{t("Мой курс")}</span>
-                <span>{t("Курс биржи")}</span>
-                <span>{t("Клиент")}</span>
+                <span>{t("Профит")}</span>
+                <span>{t("ID Мерчанта")}</span>
                 {type === "out" && <span>{t("Карта клиента")}</span>}
                 <span>{t("Мои реквизиты")}</span>
                 <span>{t("Создана")}</span>
@@ -83,52 +82,71 @@ export const TransactionsTab = memo(() => {
                 <span>{t("Статус")}</span>
             </div>
             {(statusGroup === TransactionStatusGroup.ACTIVE ? activeTransactions : transactions
-            )?.map((tr) => (
-                <div key={tr.id}>
-                    <div>
-                        <div className="h-stack gap-4">
-                            <div id={`${tr.traderBankDetails.bank}`} />
-                            <TetherIcon />
-                            <span>{tr.amount}</span>
-                        </div>
-                    </div>
-                    <div><span>{tr.id}</span></div>
-                    <div><span>{tr.traderCommission}</span></div>
-                    <div><span>{tr.serviceCommission}</span></div>
-                    <div><span>{tr.merchant}</span></div>
-                    {type === "out" && (
-                        <div><span>{tr.clientCardNumber}</span></div>
-                    )}
-                    <div>
-                        <div className="two-line-cell">
-                            <div className="h-stack gap-4 alignCenter">
-                                <span>{tr.traderBankDetails.title}</span>
-                                <span>{tr.traderBankDetails.cardNumber}</span>
+            )?.map((tr) => {
+                const BankIcon = BankIcons[tr.traderBankDetails.bank];
+                return (
+                    <div key={tr.id}>
+                        <div>
+                            <div className="h-stack gap-8 alignCenter">
+                                <BankIcon />
+                                <div className="two-line-cell">
+                                    <div className="h-stack gap-4 alignCenter">
+                                        <span>{tr.amount}</span>
+                                        <TetherIcon className="accent-fill" />
+                                    </div>
+                                    <span>{`${(tr.amount * 38).toFixed(2)} ₴`}</span>
+                                </div>
                             </div>
-                            <span>{tr.traderBankDetails.cardholderName}</span>
                         </div>
-                    </div>
-                    <div>
-                        <div className="two-line-cell">
-                            <span>{formatTime(tr.createdAt)}</span>
-                            <span>{formatDate(tr.createdAt)}</span>
+                        <div><span>{tr.id}</span></div>
+                        <div>
+                            <div className="two-line-cell">
+                                <div className="h-stack gap-4 alignCenter">
+                                    <span>
+                                        {(tr.amount * (tr.traderCommission / 100)).toFixed(2)}
+                                    </span>
+                                    <TetherIcon className="accent-fill" />
+                                </div>
+                                <span>
+                                    {`${(tr.amount * 38 * (tr.traderCommission / 100)).toFixed(2)} ₴`}
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <div className="two-line-cell">
-                            <span>{formatTime(tr.completedAt)}</span>
-                            <span>{formatDate(tr.completedAt)}</span>
+                        <div><span>{tr.merchant}</span></div>
+                        {type === "out" && (
+                            <div><span>{tr.clientCardNumber}</span></div>
+                        )}
+                        <div>
+                            <div className="two-line-cell">
+                                <div className="h-stack gap-4 alignCenter">
+                                    <span>{tr.traderBankDetails.title}</span>
+                                    <span>{tr.traderBankDetails.cardNumber}</span>
+                                </div>
+                                <span>{tr.traderBankDetails.cardholderName}</span>
+                            </div>
                         </div>
+                        <div>
+                            <div className="two-line-cell">
+                                <span>{formatTime(tr.createdAt)}</span>
+                                <span>{formatDate(tr.createdAt)}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="two-line-cell">
+                                <span>{formatTime(tr.completedAt)}</span>
+                                <span>{formatDate(tr.completedAt)}</span>
+                            </div>
+                        </div>
+                        <StatusCell
+                            status={tr.status}
+                            useAutomation={tr.useAutomation}
+                        />
+                        {statusGroup === TransactionStatusGroup.ACTIVE && (
+                            <ActiveTransactionBlock transaction={tr} />
+                        )}
                     </div>
-                    <StatusCell
-                        status={tr.status}
-                        useAutomation={tr.useAutomation}
-                    />
-                    {statusGroup === TransactionStatusGroup.ACTIVE && (
-                        <ActiveTransactionBlock transaction={tr} />
-                    )}
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 });
