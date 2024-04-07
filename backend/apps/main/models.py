@@ -4,7 +4,6 @@ from decimal import Decimal
 
 import pyotp
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -64,6 +63,7 @@ class User(AbstractBaseUser):
     last_login = None
     email_verified = models.BooleanField(default=False)
     tg_username = models.CharField(max_length=50, default="")
+    deposit_note = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
 
     objects = UserManager()
 
@@ -214,14 +214,6 @@ class PrevTransactionTraders(models.Model):
         unique_together = ('trader', 'transaction')
 
 
-class TraderDeposit(models.Model):
-    trader = models.ForeignKey(User, on_delete=models.PROTECT, related_name='deposits', null=True, blank=True)
-    blockchain_transaction = models.CharField(max_length=255, unique=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    note = models.TextField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
 class AdminWithdrawal(models.Model):
     admin = models.ForeignKey(User, on_delete=models.PROTECT, related_name='admin_withdrawals')
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -274,6 +266,7 @@ class BalanceHistory(models.Model):
         RETURN_PENALTY = 7, _("Return penalty")
         TAKE_AWAY_FOR_TRANSACTION = 8, _("Take away for transaction")
         GIVE_AWAY_FOR_TRANSACTION = 9, _("Give away for transaction")
+        DEPOSIT = 10, _("Deposit")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='balance_histories', null=True, blank=True)
     change_reason = models.PositiveSmallIntegerField(choices=ChangeReason.choices)

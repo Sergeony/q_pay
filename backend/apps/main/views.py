@@ -293,7 +293,7 @@ class CreateInviteCodeView(APIView):
         redis_client = get_redis_client()
         redis_client.setex(
             name=invite_code,
-            time=settings.INVITE_CODE_LIFETIME,
+            time=settings.QPAY_INVITE_CODE_LIFETIME,
             value=f"{user_type}"
         )
         return Response(data={'invite_code': invite_code}, status=status.HTTP_201_CREATED)

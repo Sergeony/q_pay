@@ -6,11 +6,9 @@ from django.utils.crypto import get_random_string
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
-from rest_framework_simplejwt.tokens import RefreshToken
+from django.conf import settings
 
 from apps.api.services import get_client_ip
-from apps.main.models import User
-from django.conf import settings
 from config.redis_client import get_redis_client
 
 
@@ -20,7 +18,7 @@ def get_user_type_by_invite_code(invite_code: str) -> int | None:
     delete from redis it if it exists.
     """
     user_type = get_redis_client().getdel(invite_code)
-    if user_type:
+    if user_type is not None:
         return int(user_type)
     return None
 
@@ -75,13 +73,12 @@ def get_evc_key(user_id: int):
 
 def generate_and_store_evc(user_id: int) -> str:
     evc = get_random_string(
-        length=settings.EVC_LENGTH,
+        length=settings.QPAY_EVC_LENGTH,
         allowed_chars="0123456789"
     )
-    redis_client = get_redis_client()
-    redis_client.setex(
+    get_redis_client().setex(
         name=get_evc_key(user_id),
-        time=settings.EVC_LIFETIME,
+        time=settings.QPAY_EVC_LIFETIME,
         value=evc
     )
     return evc

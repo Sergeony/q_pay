@@ -209,8 +209,8 @@ class EVCResendView(APIView):
                 status=status.HTTP_409_CONFLICT
             )
 
-        redis_client = get_redis_client()
         evc_key = get_evc_key(user.id)
+        redis_client = get_redis_client()
         ttl = redis_client.ttl(evc_key)
 
         if ttl > 0:
@@ -226,12 +226,12 @@ class EVCResendView(APIView):
             )
 
         evc = get_random_string(
-            length=settings.EVC_LENGTH,
+            length=settings.QPAY_EVC_LENGTH,
             allowed_chars="0123456789"
         )
         redis_client.setex(
             name=evc_key,
-            time=settings.EVC_LIFETIME,
+            time=settings.QPAY_EVC_LIFETIME,
             value=evc
         )
         send_evc_email.delay(email, evc)
@@ -287,7 +287,7 @@ class TOTPVerificationView(APIView):
             value=str(token),
             httponly=True,
             samesite="Strict",
-            secure=settings.REFRESH_SECURE_SSL_REDIRECT,
+            secure=settings.QPAY_REFRESH_SECURE_SSL_REDIRECT,
             path=reverse("token_refresh"),
             max_age=settings.REFRESH_TOKEN_LIFETIME,
         )

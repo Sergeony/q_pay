@@ -37,7 +37,7 @@ def get_eligible_traders_and_bank_details(client_bank_id: int,
             eligible_bank_details.filter(trader_id=OuterRef('pk')).values('id')[:1]
         )
     ).filter(
-        total_active_transactions__lt=settings.MAX_TRADER_ACTIVE_DEPOSIT_TRANSACTIONS,
+        total_active_transactions__lt=settings.QPAY_MAX_TRADER_ACTIVE_DEPOSIT_TRANSACTIONS,
         eligible_bank_details_id__isnull=False
     ).distinct()
 

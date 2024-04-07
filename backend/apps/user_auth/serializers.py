@@ -40,14 +40,14 @@ class SignUpSerializer(serializers.ModelSerializer):
             type=user_type
         )
         evc = generate_and_store_evc(user.id)
-        send_evc_email.delay(user.email, evc)
+        send_evc_email.delay_on_commit(user.email, evc)
 
         return user
 
 
 class EVCVerificationSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
-    evc = serializers.CharField(write_only=True, max_length=settings.EVC_LENGTH)
+    evc = serializers.CharField(write_only=True, max_length=settings.QPAY_EVC_LENGTH)
 
     def validate(self, data: dict):
         email = data.get("email")
@@ -57,8 +57,7 @@ class EVCVerificationSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError(code="not_found")
 
-        redis_client = get_redis_client()
-        stored_evc = redis_client.getdel(get_evc_key(user.id))
+        stored_evc = get_redis_client().getdel(get_evc_key(user.id))
 
         if stored_evc is None or stored_evc.decode("utf-8") != evc:
             raise serializers.ValidationError(code="invalid_evc")
