@@ -1,25 +1,24 @@
-import { memo, useState } from "react";
+import { memo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import DropDown from "shared/ui/DropDown/DropDown";
 
 export const LangSelect = memo(() => {
-    const [lang, setLang] = useState<string>("en");
     const { t, i18n } = useTranslation();
 
-    const handleSelect = async (e: any) => {
-        const newLang = e.target.value;
-        setLang(newLang);
+    const handleSelect = useCallback(async (newLang: string) => {
         await i18n.changeLanguage(newLang);
-    };
+    }, [i18n]);
 
     return (
-        <select
-            data-testid="lang-select"
-            value={lang}
+        <DropDown
+            value={i18n.language}
             onChange={handleSelect}
-        >
-            <option value="en">{t("English")}</option>
-            <option value="uk">{t("УкраЇнська")}</option>
-            <option value="ru">{t("Русский")}</option>
-        </select>
+            data-testid="lang-select"
+            options={[
+                { value: "en", label: t("Eng") },
+                { value: "uk", label: t("Укр") },
+                { value: "ru", label: t("Рус") },
+            ]}
+        />
     );
 });

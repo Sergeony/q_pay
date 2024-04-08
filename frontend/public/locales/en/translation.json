@@ -1,9 +1,9 @@
 {
   "Main Page": "Main Page",
   "about": "Про нас",
-  "Русский": "Русский",
-  "УкраЇнська": "УкраЇнська",
-  "English": "English",
+  "Рус": "Рус",
+  "Укр": "Укр",
+  "Eng": "Eng",
   "unexpected_error": "Unexpected error occurred. Reload page, please.",
   "reload_page_btn": "Перезагрузить страницу",
   "page_not_found_text": "Page not found 404",

@@ -45,4 +45,11 @@ body.dark {
     --logo-pay-fg: var(--grey);
     --h3-fg: var(--light-grey);
     --plus-fill: var(--light-grey);
+
+    --select-border: 2px solid var(--grey);
+    --select-open-border: 2px solid var(--white);
+    --opt-fg: var(--grey);
+    --opt-on-hover-fg: var(--grey);
+    --selected-opt-fg: var(--white);
+    --selected-opt-on-hover-fg: var(--grey);
 }
