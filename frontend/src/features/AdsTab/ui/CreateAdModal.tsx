@@ -3,12 +3,14 @@ import * as Yup from "yup";
 import { Modal } from "shared/ui/Modal/Modal";
 import { Button, ButtonRole } from "shared/ui/Button/Button";
 import { getBankDetails } from "entities/BankDetails";
-import { getBanks } from "entities/Bank";
+import { useFetchBanksQuery } from "entities/Bank";
 import { useTranslation } from "react-i18next";
 import { classNames } from "shared/lib/classNames/classNames";
 import { useCreateAdMutation } from "entities/Ads";
 import { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
+import DropDown from "shared/ui/DropDown/DropDown";
+import { BankIcons } from "shared/ui/_SVG";
 import cls from "./AdsTab.module.scss";
 
 interface IProps {
@@ -41,7 +43,7 @@ const CreateAdModal = ({ onClose }: IProps) => {
         },
     });
 
-    const banks = useSelector(getBanks);
+    const { data: banks, isSuccess: banksFetched } = useFetchBanksQuery();
     const bankDetails = useSelector(getBankDetails);
 
     const filteredBankDetails = useMemo(
@@ -49,11 +51,11 @@ const CreateAdModal = ({ onClose }: IProps) => {
         [bankDetails, formik.values.bank]
     );
 
-    const handleBankChange = useCallback((event: any) => {
-        if (event.target.value !== formik.values.bank) {
+    const handleBankChange = useCallback((value: number) => {
+        if (value !== formik.values.bank) {
             formik.values.attachIds = [];
         }
-        formik.setFieldValue("bank", event.target.value);
+        formik.setFieldValue("bank", value);
     }, [formik]);
 
     return (
@@ -62,26 +64,33 @@ const CreateAdModal = ({ onClose }: IProps) => {
             isOpen
             onClose={onClose}
         >
-            <div className={classNames(cls.ModalContent, ["v-stack", "gap-32"])}>
+            <div className={`${cls.ModalContent} v-stack gap-32`}>
                 <h2 className="modal-title">
                     {t("Создание объявления")}
                 </h2>
                 <form className={classNames("", ["v-stack gap-32"])} onSubmit={formik.handleSubmit}>
-                    <div className={classNames("", ["v-stack gap-8"])}>
+                    <div className="v-stack gap-8">
                         <label htmlFor="bank">{t("Выберите банк")}</label>
-                        <select
+                        <DropDown
                             name="bank"
                             id="bank"
-                            value={formik.values.bank}
                             onChange={handleBankChange}
-                        >
-                            <option value="" label="Выберите банк" />
-                            {banks?.map((b) => (
-                                <option key={b.id} value={b.id} label={b.title} />
-                            ))}
-                        </select>
+                            value={formik.values.bank}
+                            options={banksFetched ? banks.map((b) => {
+                                const BankIcon = BankIcons[b.id];
+                                return {
+                                    value: b.id,
+                                    content: {
+                                        text: b.title,
+                                        icon: <BankIcon size={16} />,
+                                    },
+                                };
+                            }) : []}
+                            placeholder={t("Выберите банк")}
+                            className="br-width-1"
+                        />
                     </div>
-                    <div className={classNames("", ["v-stack gap-8"])}>
+                    <div className="v-stack gap-8">
                         <label htmlFor="bank-details">{t("Выберите Реквизиты")}</label>
                         <select
                             name="attachIds"
@@ -99,7 +108,7 @@ const CreateAdModal = ({ onClose }: IProps) => {
                             ))}
                         </select>
                     </div>
-                    <div className={classNames("", ["v-stack", "gap-8"])}>
+                    <div className="v-stack gap-8">
                         <Button
                             role={ButtonRole.PRIMARY}
                             type="submit"

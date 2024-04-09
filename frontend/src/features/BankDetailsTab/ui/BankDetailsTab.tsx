@@ -8,7 +8,6 @@ import {
     useFetchBankDetailsQuery,
     usePatchBankDetailsMutation,
 } from "entities/BankDetails";
-import { classNames } from "shared/lib/classNames/classNames";
 import { useFetchBanksQuery } from "entities/Bank";
 import { useParams } from "react-router-dom";
 import cls from "./BankDetailsTab.module.scss";

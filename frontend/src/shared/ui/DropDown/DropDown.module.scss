@@ -4,17 +4,17 @@
     user-select: none;
 
     .Header {
-        padding: .5rem 1rem;
+        padding: .375rem 1rem;
         border: var(--select-border);
         border-radius: .5rem;
         background: transparent;
         cursor: pointer;
         display: flex;
-        gap: 1rem;
-        justify-content: space-between;
+        gap: .5rem;
         align-items: center;
 
         > span {
+            flex-grow: 1;
             font: var(--font-main-regular);
             color: var(--input-text-color);
         }
@@ -23,7 +23,7 @@
             color: var(--secondary);
         }
 
-        > svg {
+        > .ChevronIcon {
             stroke: var(--secondary);
             transition: transform 0.3s ease;
         }
@@ -33,18 +33,18 @@
             border-radius: .5rem .5rem 0 0;
             border: var(--select-open-border);
             border-bottom: none;
-            padding-bottom: .625rem;
+            padding-bottom: .4375rem;
 
             > &:not(.Placeholder) > span {
                 color: var(--selected-opt-fg);
             }
 
-            > svg {
+            > .ChevronIcon {
                 transform: rotate(180deg);
 
             }
 
-            &:not(.Placeholder) > svg {
+            &:not(.Placeholder) > .ChevronIcon {
                 stroke: var(--selected-opt-fg);
             }
         }
@@ -56,7 +56,7 @@
                 color: var(--selected-opt-on-hover-fg);
             }
 
-            > svg {
+            > .ChevronIcon {
                 stroke: var(--selected-opt-on-hover-fg);
             }
         }
@@ -82,6 +82,9 @@
             padding: .5rem 1rem;
             cursor: pointer;
             color: var(--opt-fg);
+            display: flex;
+            align-items: center;
+            gap: .5rem;
 
             &:hover, &[aria-selected="true"] {
                 color: var(--opt-on-hover-fg);

@@ -10,14 +10,14 @@ export const LangSelect = memo(() => {
     }, [i18n]);
 
     return (
-        <DropDown
+        <DropDown<string>
             value={i18n.language}
             onChange={handleSelect}
             data-testid="lang-select"
             options={[
-                { value: "en", label: t("Eng") },
-                { value: "uk", label: t("Укр") },
-                { value: "ru", label: t("Рус") },
+                { value: "en", content: t("Eng") },
+                { value: "uk", content: t("Укр") },
+                { value: "ru", content: t("Рус") },
             ]}
         />
     );

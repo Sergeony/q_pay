@@ -1,34 +1,45 @@
 import {
-    KeyboardEvent, memo, useCallback, useEffect, useRef, useState
+    HTMLAttributes, KeyboardEvent, memo, ReactNode, useCallback, useEffect, useRef, useState
 } from "react";
 import { ChevronIcon } from "../../ui/_SVG";
 import cls from "./DropDown.module.scss";
 
-interface OptionProps {
-    value: string;
-    label: string;
+interface WithIconProps {
+    text: string;
+    icon: ReactNode;
 }
 
-interface DropDownProps {
-    options: OptionProps[];
-    value?: string;
+interface OptionProps<T> {
+    value: T;
+    content: string | WithIconProps;
+}
+
+type InputAttrs = Omit<HTMLAttributes<HTMLDivElement>, "value" | "onChange">;
+
+interface DropDownProps<T> extends InputAttrs {
+    options: OptionProps<T>[];
+    value?: T;
     placeholder?: string;
-    onChange: (value: string) => void;
+    onChange: (value: T) => void;
+    name?: string;
 }
 
-const DropDown = memo((props: DropDownProps) => {
+const genericMemo: <T>(component: T) => T = memo;
+
+const DropDown = genericMemo(<T extends string | number>(props: DropDownProps<T>) => {
     const {
         options,
         value,
         placeholder = "Select an option",
         onChange,
+        className,
         ...otherProps
     } = props;
     const [isOpen, setIsOpen] = useState(false);
     const selectedOption = options.find((option) => option.value === value);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
-    const handleOptionSelect = (value: string) => {
+    const handleOptionSelect = (value: T) => {
         onChange(value);
         setIsOpen(false);
     };
@@ -77,7 +88,7 @@ const DropDown = memo((props: DropDownProps) => {
 
     return (
         <div
-            className={cls.DropdownContainer}
+            className={`${cls.DropdownContainer} ${className}`}
             tabIndex={0}
             role="button"
             aria-haspopup="true"
@@ -88,8 +99,15 @@ const DropDown = memo((props: DropDownProps) => {
             {...otherProps}
         >
             <div className={`${cls.Header} ${isOpen && cls.Open} ${!value && cls.Placeholder}`}>
-                <span>{selectedOption?.label || placeholder}</span>
-                <ChevronIcon width="24px" height="24px" />
+                {typeof selectedOption?.content !== "string" && selectedOption?.content?.icon}
+                <span>
+                    {
+                        typeof selectedOption?.content === "string"
+                            ? selectedOption?.content
+                            : selectedOption?.content?.text || placeholder
+                    }
+                </span>
+                <ChevronIcon className={cls.ChevronIcon} width="16px" height="16px" />
             </div>
             {isOpen && (
                 <ul className={cls.Options}>
@@ -102,7 +120,10 @@ const DropDown = memo((props: DropDownProps) => {
                             aria-selected={value === option.value}
                             onClick={() => handleOptionSelect(option.value)}
                         >
-                            {option.label}
+                            {typeof option.content !== "string" && option.content.icon}
+                            {typeof option.content === "string"
+                                ? option.content
+                                : option.content.text}
                         </li>
                     ))}
                 </ul>

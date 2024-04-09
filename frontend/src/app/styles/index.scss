@@ -524,3 +524,7 @@ body {
 .pointer {
     cursor: pointer;
 }
+
+.br-width-1 > * {
+    border-width: 1px !important;
+}
