@@ -4,13 +4,19 @@ from ..env import env
 
 
 __all__ = [
+    "ACCESS_TOKEN_LIFETIME",
+    "REFRESH_TOKEN_LIFETIME",
     "SIMPLE_JWT",
 ]
 
 
+ACCESS_TOKEN_LIFETIME = timezone.timedelta(minutes=180)
+REFRESH_TOKEN_LIFETIME = timezone.timedelta(days=1)
+
+
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timezone.timedelta(minutes=180),
-    "REFRESH_TOKEN_LIFETIME": timezone.timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": ACCESS_TOKEN_LIFETIME,
+    "REFRESH_TOKEN_LIFETIME": REFRESH_TOKEN_LIFETIME,
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
@@ -37,8 +43,8 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timezone.timedelta(minutes=180),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timezone.timedelta(days=1),
+    "SLIDING_TOKEN_LIFETIME": ACCESS_TOKEN_LIFETIME,
+    "SLIDING_TOKEN_REFRESH_LIFETIME": REFRESH_TOKEN_LIFETIME,
 
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
