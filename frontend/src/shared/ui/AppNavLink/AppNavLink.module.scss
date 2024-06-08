@@ -1,0 +1,38 @@
+.tab {
+    font: var(--font-h2-regular);
+    color: var(--dark-accent);
+}
+
+.tab.isActive {
+    font-weight: var(--font-weight-bold);
+    color: var(--contrast);
+}
+
+.page {
+    font: var(--font-h1-regular);
+    color: var(--light-grey);
+}
+
+.page.isActive {
+    font-weight: var(--font-weight-bold);
+    color: var(--contrast);
+}
+
+.header {
+    font: var(--font-main-regular);
+    color: var(--header-link-fg);
+}
+
+.header.isActive {
+    font-weight: var(--font-weight-bold);
+    color: var(--accent);
+}
+
+a::after {
+    display: block;
+    content: attr(title);
+    font-weight: bold;
+    height: 0;
+    visibility: hidden;
+    overflow: hidden;
+}

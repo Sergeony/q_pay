@@ -1,15 +1,22 @@
 import { Trans, useTranslation } from "react-i18next";
-import { UserData } from "entities/User";
-import { memo } from "react";
+import { getUserData } from "entities/User";
+import { memo, useCallback } from "react";
 import { CopyIcon } from "shared/ui/_SVG";
+import { useSelector } from "react-redux";
+import { Button, ButtonRole } from "shared/ui/Button/Button";
+import { LOCAL_STORAGE_ACCESS_TOKEN_KEY } from "shared/const/localStorage";
 
-interface TabGeneralProps {
-    userData: UserData;
-}
-
-export const TabGeneral = memo((props: TabGeneralProps) => {
+export const TabGeneral = memo(() => {
     const { t } = useTranslation();
-    const { userData } = props;
+    const userData = useSelector(getUserData);
+
+    const logout = useCallback(() => {
+        localStorage.removeItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
+        location.reload();
+    }, []);
+
+    if (!userData) return null;
+
     return (
         <div className="v-stack gap-24 w-fit">
             <section className="v-stack gap-16">
@@ -39,7 +46,7 @@ export const TabGeneral = memo((props: TabGeneralProps) => {
             <section className="v-stack gap-16">
                 <h3 className="h3">{t("Адрес пополнения баланса")}</h3>
                 <div className="v-stack">
-                    <strong className="danger-bg bold line-height-1-5">
+                    <strong className="danger-fg bold line-height-1-5">
                         <Trans i18nKey="usdt_deposit_description" />
                     </strong>
                 </div>
@@ -48,6 +55,13 @@ export const TabGeneral = memo((props: TabGeneralProps) => {
                     <CopyIcon />
                 </div>
             </section>
+            <Button
+                role={ButtonRole.CANCEL}
+                onClick={logout}
+                className="w-fit"
+            >
+                {t("logout_button")}
+            </Button>
         </div>
     );
 });

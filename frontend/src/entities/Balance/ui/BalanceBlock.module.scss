@@ -7,10 +7,10 @@
     font: var(--font-main-regular);
 
     div:first-child {
-        color: var(--active-balance-fg);
+        color: var(--accent);
 
         > svg {
-            fill: var(--active-balance-fg);
+            fill: var(--accent);
         }
     }
 

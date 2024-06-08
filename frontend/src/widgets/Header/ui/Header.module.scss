@@ -1,11 +1,7 @@
-.Nav {
-    min-width: 600px;
-}
-
 header {
     width: 100%;
     display: flex;
-    padding: 18px 40px;
+    padding: 1rem 2rem;
     justify-content: center;
     background-color: var(--header-bg);
     border-bottom: var(--header-border);
@@ -16,6 +12,10 @@ header {
     }
 }
 
+.NavList {
+    min-width: 37.5rem;
+}
+
 .NavLink {
     text-decoration: none;
     font: var(--font-main-regular);
@@ -24,13 +24,6 @@ header {
 
 .NavLink.active {
     color: var(--accent);
-}
-
-.Li {
-    list-style-type: none;
-    position: relative;
-    display: flex;
-
 }
 
 .circle {
@@ -46,4 +39,11 @@ header {
     font: var(--font-weight-bold) var(--font-size-xs) var(--font-family-main);
     color: var(--main);
     background-color: var(--accent);
+}
+
+@media (max-width: 27.25rem) {
+    .RightSide,
+    .ThemeToggle {
+        display: none;
+    }
 }

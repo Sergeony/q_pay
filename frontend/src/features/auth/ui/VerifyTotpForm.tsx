@@ -1,14 +1,15 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { FormikHelpers, useFormik } from "formik";
 import * as yup from "yup";
-import { Input } from "shared/ui/Input/Input";
 import { Button, ButtonRole } from "shared/ui/Button/Button";
 import { LOCAL_STORAGE_ACCESS_TOKEN_KEY } from "shared/const/localStorage";
 import { jwtDecode } from "jwt-decode";
 import { userActions } from "entities/User";
+import { Field, FieldVariant } from "shared/ui/Field/Field";
+import { getRouteNotFound } from "shared/const/router";
 import { useVerifyTotpMutation } from "../api/authService";
 import { getAuthTt } from "../model/selectors/getAuthTt";
 import cls from "./Auth.module.scss";
@@ -66,39 +67,50 @@ export const VerifyTotpForm = memo(() => {
         validationSchema,
         initialValues,
         onSubmit,
+        isInitialValid: false,
     });
 
+    useEffect(() => {
+        if (!tt) {
+            navigate(getRouteNotFound());
+        }
+    }, [navigate, tt]);
+
     return (
-        <>
-            <div>
-                <h2>{t("verify_totp_page_title")}</h2>
-            </div>
-            <div>
-                <p>{t("verify_totp_page_description")}</p>
-                <form className={cls.VerifyTotpForm} onSubmit={formik.handleSubmit}>
-                    <div className="custom-field">
-                        <Input
-                            id="totp"
-                            name="totp"
-                            type="text"
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            value={formik.values.totp}
-                            placeholder={t("totp_placeholder")}
-                        />
-                    </div>
-                    {formik.touched.totp && formik.errors.totp && (
-                        <div className={cls.error}>{formik.errors.totp}</div>
-                    )}
+        <main className={cls.main}>
+            <section aria-labelledby="verify-totp-heading" className="v-stack gap-32">
+                <h2 id="verify-totp-heading" className="PageTitle">
+                    {t("verify_totp_page_title")}
+                </h2>
+                <form
+                    onSubmit={formik.handleSubmit}
+                    className="v-stack gap-32 w-full"
+                >
+                    <Field
+                        variant={FieldVariant.SECURE}
+                        label={t("totp_label")}
+                        placeholder={t("totp_placeholder")}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.totp}
+                        error={formik.touched.totp && formik.errors.totp}
+                        id="totp"
+                        name="totp"
+                        type="text"
+                    />
                     <Button
                         type="submit"
-                        disabled={formik.isSubmitting || isLoading}
                         role={ButtonRole.PRIMARY}
+                        disabled={
+                            formik.isSubmitting
+                            || isLoading
+                            || !formik.isValid
+                        }
                     >
                         {t("verify_totp_btn")}
                     </Button>
                 </form>
-            </div>
-        </>
+            </section>
+        </main>
     );
 });

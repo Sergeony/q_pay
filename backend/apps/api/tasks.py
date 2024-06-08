@@ -96,4 +96,4 @@ def process_transaction_task(self, transaction_data, merchant_id: int):
             except Exception as e:
                 print("ERROR IN CREATE TRANSACTION TASK: ", e)
         else:
-            raise self.retry(countdown=settings.PROCESS_TRANSACTION_TASK_DELAY)
+            raise self.retry(countdown=settings.QPAY_PROCESS_TRANSACTION_TASK_DELAY)

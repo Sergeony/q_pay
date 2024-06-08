@@ -1,6 +1,6 @@
 import { memo, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AutomationIcon, CardIcon } from "shared/ui/_SVG";
+import { AutomationIcon, BankIcons, CardIcon } from "shared/ui/_SVG";
 import Switch from "shared/ui/Switch/Switch";
 import KebabMenu from "shared/ui/KebabMenu/KebabMenu";
 import {
@@ -8,24 +8,24 @@ import {
 } from "entities/Ads";
 import { classNames } from "shared/lib/classNames/classNames";
 import { useFetchBanksQuery } from "entities/Bank";
+import { useParams } from "react-router-dom";
 import cls from "./AdsTab.module.scss";
 import EditAdModal from "./EditAdModal";
 
-interface AdsProps {
-    traderId?: number;
-}
-
-export const AdsTab = memo((props: AdsProps) => {
+export const AdsTab = memo(() => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedAd, setSelectedAd] = useState<AdSchema | null>(null);
     const { t } = useTranslation();
     const [switchActivity] = usePatchAdMutation();
     const [deleteAd] = useDeleteAdMutation();
-    const { traderId } = props;
+    const { userId } = useParams<{ userId: string }>();
     const {
         data: ads,
         isSuccess: adsFetched,
-    } = useFetchAdsQuery({ traderId });
+    } = useFetchAdsQuery(
+        { userId },
+        { refetchOnMountOrArgChange: true }
+    );
     const {
         data: banks,
     } = useFetchBanksQuery();
@@ -55,7 +55,7 @@ export const AdsTab = memo((props: AdsProps) => {
     }, [switchActivity]);
 
     return (
-        <div className={classNames("table", [cls.GridTemplate])}>
+        <div className={`table max-w-xl ${cls.GridTemplate}`}>
             <div>
                 <span>{t("bank_table_column_title")}</span>
                 <span>{t("bank_details_table_column_title")}</span>
@@ -64,11 +64,12 @@ export const AdsTab = memo((props: AdsProps) => {
             </div>
             {adsFetched && ads.map((a) => {
                 const bank = findBankById(a.bank);
+                const BankIcon = BankIcons[a.bank];
                 return (
                     <div key={a.id}>
                         <div>
                             <div className={classNames("", ["h-stack", "gap-8"])}>
-                                <div />
+                                <BankIcon />
                                 <span>{bank?.title}</span>
                                 <span>{t("UAH")}</span>
                             </div>
@@ -76,9 +77,13 @@ export const AdsTab = memo((props: AdsProps) => {
                         <div>
                             <div className={cls.BankDetailsContainer}>
                                 {a.bankDetails?.map((bd) => (
-                                    <div key={bd.id}>
-                                        {bd.useAutomation && <AutomationIcon />}
-                                        <CardIcon />
+                                    <div
+                                        key={bd.id}
+                                        className="h-stack gap-4 alignCenter pointer"
+                                        title={`${bd.title} ${bd.cardNumber}`}
+                                    >
+                                        {bd.useAutomation && <AutomationIcon className="stroke-secondary" />}
+                                        <CardIcon className="fill-secondary" />
                                         <span>{bd.title}</span>
                                         <span>{bd.cardNumber}</span>
                                     </div>

@@ -144,18 +144,23 @@ class TraderTransactionListView(APIView):
         ]
     }
 
-    def get(self, request, transaction_type_label, status_group):
-        if status_group not in self.valid_statuses:
+    def get(self, request):
+        status_group = request.query_params.get('statusGroup')
+        transaction_type = request.query_params.get('type')
+
+        if status_group and status_group not in self.valid_statuses:
             return Response(data={"error": "Invalid status group"}, status=status.HTTP_400_BAD_REQUEST, exception=True)
 
         trader_id = get_user_id(request)
-        transaction_type = get_value_by_label(Transaction.Type, transaction_type_label)
-
+        
         transactions = Transaction.objects.filter(
             trader_id=trader_id,
             type=transaction_type,
-            status__in=self.valid_statuses[status_group]
+
         )
+        
+        if status_group:
+            transactions = Transaction.objects.filter(status__in=self.valid_statuses[status_group])
 
         serializer = TransactionSerializer(transactions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -259,7 +264,7 @@ class AdminUsersView(APIView):
         serializer = UserInfoSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, pk):
+    def delete(self, request, user_type, pk):
         user = get_object_or_404(User, pk=pk)
         if user.is_deleted:
             return Response(data={'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -267,7 +272,7 @@ class AdminUsersView(APIView):
         user.save()
         return Response(data={"detail": f"user successfully deleted."}, status=status.HTTP_204_NO_CONTENT)
 
-    def patch(self, request, pk):
+    def patch(self, request, user_type, pk):
         user = get_object_or_404(User, pk=pk)
         serializer = UserUpdateSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -288,7 +293,7 @@ class CreateInviteCodeView(APIView):
         redis_client = get_redis_client()
         redis_client.setex(
             name=invite_code,
-            time=settings.INVITE_CODE_LIFETIME,
+            time=settings.QPAY_INVITE_CODE_LIFETIME,
             value=f"{user_type}"
         )
         return Response(data={'invite_code': invite_code}, status=status.HTTP_201_CREATED)
@@ -415,7 +420,7 @@ class ChangePasswordView(APIView):
         return Response(data={"detail": "Password updated successfully"}, status=status.HTTP_200_OK)
 
 
-class UserSettingsView(APIView):
+class UserPrefsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def patch(self, request):

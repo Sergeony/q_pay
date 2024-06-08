@@ -4,8 +4,7 @@ import {
 } from "entities/Transaction";
 import { getRoutePay } from "shared/const/router";
 import { useTranslation } from "react-i18next";
-import { NavLink } from "react-router-dom";
-import cls from "./PayPage.module.scss";
+import { AppNavLink } from "shared/ui/AppNavLink/AppNavLink";
 
 interface NavBarProps {
     type: TransactionTypeRepr;
@@ -17,30 +16,34 @@ export const NavBar = (props: NavBarProps) => {
 
     return (
         <nav className="h-stack gap-32">
-            <NavLink
+            <AppNavLink
+                variant="tab"
                 to={getRoutePay(type, TransactionStatusGroup.ACTIVE)}
-                className={({ isActive }) => `${cls.Link} ${isActive && cls.active}`}
+                title={t("Активные")}
             >
                 {t("Активные")}
-            </NavLink>
-            <NavLink
+            </AppNavLink>
+            <AppNavLink
+                variant="tab"
                 to={getRoutePay(type!, TransactionStatusGroup.COMPLETED)}
-                className={({ isActive }) => `${cls.Link} ${isActive && cls.active}`}
+                title={t("Завершенные")}
             >
                 {t("Завершенные")}
-            </NavLink>
-            <NavLink
+            </AppNavLink>
+            <AppNavLink
+                variant="tab"
                 to={getRoutePay(type!, TransactionStatusGroup.DISPUTED)}
-                className={({ isActive }) => `${cls.Link} ${isActive && cls.active}`}
+                title={t("Споры")}
             >
                 {t("Споры")}
-            </NavLink>
-            <NavLink
+            </AppNavLink>
+            <AppNavLink
+                variant="tab"
                 to={getRoutePay(type!, "export")}
-                className={({ isActive }) => `${cls.Link} ${isActive && cls.active}`}
+                title={t("Экспорт")}
             >
                 {t("Экспорт")}
-            </NavLink>
+            </AppNavLink>
         </nav>
     );
 };

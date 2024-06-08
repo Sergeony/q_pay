@@ -6,6 +6,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Coalesce
 from django.conf import settings
+from rest_framework.request import Request
 
 from apps.main.models import User, Transaction, BankDetails, Balance
 
@@ -36,7 +37,7 @@ def get_eligible_traders_and_bank_details(client_bank_id: int,
             eligible_bank_details.filter(trader_id=OuterRef('pk')).values('id')[:1]
         )
     ).filter(
-        total_active_transactions__lt=settings.MAX_TRADER_ACTIVE_DEPOSIT_TRANSACTIONS,
+        total_active_transactions__lt=settings.QPAY_MAX_TRADER_ACTIVE_DEPOSIT_TRANSACTIONS,
         eligible_bank_details_id__isnull=False
     ).distinct()
 
@@ -92,7 +93,7 @@ def get_best_trader_and_bank_details(eligible_traders: QuerySet[User]):
     return trader
 
 
-def get_client_ip(request):
+def get_client_ip(request: Request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]

@@ -1,10 +1,10 @@
 from redis import StrictRedis
-from django.conf import settings
+from config.settings.env import env
 
 
 def get_redis_client():
     return StrictRedis(
-        host=settings.REDIS_HOST,
-        port=settings.REDIS_PORT,
-        db=settings.REDIS_DB
+        host=env('REDIS_HOST'),
+        port=env('REDIS_PORT'),
+        db=env('REDIS_DB')
     )

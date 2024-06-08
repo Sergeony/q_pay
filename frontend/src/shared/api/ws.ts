@@ -56,7 +56,7 @@ export class WebSocketService {
         try {
             const newToken = await refreshToken();
 
-            if (newToken) {
+            if (newToken?.ok) {
                 this.connect();
             } else {
                 // TODO: add handling

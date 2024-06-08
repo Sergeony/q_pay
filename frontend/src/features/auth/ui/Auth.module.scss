@@ -1,9 +1,10 @@
 .SignUpForm,
 .VerifyTotpForm,
 .VerifyEvcForm,
-.SignInForm {
-    max-width: 600px;
-    margin: 0 auto;
+.main {
+    max-width: 27.25rem;
+    width: 100%;
+    padding: 0 1rem 4rem;
     gap: 20px;
     display: flex;
     flex-direction: column;
@@ -11,4 +12,40 @@
 
 .error {
     color: var(--red);
+}
+
+.agreement {
+    font: var(--font-secondary);
+    color: var(--contrast);
+
+    > a {
+        color: var(--accent);
+    }
+}
+
+.PageDescription {
+    text-align: center;
+    font: var(--font-main-bold);
+    color: var(--contrast);
+}
+
+.QRContainer {
+    display: flex;
+    justify-content: center;
+    position: relative;
+
+    > svg {
+        border-radius: .5rem;
+    }
+
+    > span {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--app-bg);
+        padding: .125rem;
+        font: var(--font-weight-bold) 1.5rem var(--font-family-logo-q);
+        color: var(--accent);
+    }
 }

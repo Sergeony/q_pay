@@ -24,16 +24,18 @@ class BanksSerializer(serializers.ModelSerializer):
 
 
 class BankDetailsSerializer(serializers.ModelSerializer):
-    bank = BanksSerializer(read_only=True)
-    bank_id = serializers.IntegerField(write_only=True)
-
     class Meta:
         model = BankDetails
-        fields = ['id', 'title', 'card_number', 'cardholder_name', 'bank', 'bank_id',
+        fields = ['id', 'title', 'card_number', 'cardholder_name', 'bank', 'ad',
                   'is_active', 'use_automation',
                   'daily_limit', 'weekly_limit', 'monthly_limit',
                   'current_daily_turnover', 'current_weekly_turnover', 'current_monthly_turnover',
                   ]
+
+    def to_representation(self, instance):
+        ret = super(BankDetailsSerializer, self).to_representation(instance)
+        ret["card_number"] = ret["card_number"][-4:]
+        return ret
 
     def update(self, instance, validated_data):
         is_active = validated_data.get('is_active')
@@ -43,31 +45,21 @@ class BankDetailsSerializer(serializers.ModelSerializer):
         return instance
 
 
-class BankDetailsForAdSerializer(serializers.ModelSerializer):
-    last_four_card_number = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_last_four_card_number(obj):
-        return obj.card_number[-4:]
-
-    class Meta:
-        model = BankDetails
-        fields = ['id', 'title', 'last_four_card_number', 'use_automation']
-        read_only_fields = ['id', 'title', 'last_four_card_number', 'use_automation']
+class BankDetailsForAdsSerializer(BankDetailsSerializer):
+    class Meta(BankDetailsSerializer.Meta):
+        fields = ["id", 'title', 'cardholder_name', 'card_number', 'use_automation']
 
 
 class AdSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    bank = BanksSerializer(read_only=True)
-    bank_id = serializers.IntegerField(write_only=True)
     is_active = serializers.BooleanField(required=False)
-    bank_details = BankDetailsForAdSerializer(many=True, read_only=True)
+    bank_details = BankDetailsForAdsSerializer(many=True, read_only=True)
     attach_ids = serializers.ListField(write_only=True, child=serializers.IntegerField(), required=False)
     detach_ids = serializers.ListField(write_only=True, child=serializers.IntegerField(), required=False)
 
     class Meta:
         model = Ad
-        fields = ['id', 'bank', 'bank_id', 'is_active', 'bank_details', 'attach_ids', 'detach_ids']
+        fields = ['id', 'bank', 'is_active', 'attach_ids', 'detach_ids', "created_at", "updated_at", "bank_details"]
 
     def create(self, validated_data):
         attach_ids = validated_data.pop('attach_ids', None)
@@ -161,14 +153,18 @@ class UserSettingsSerializer(serializers.ModelSerializer):
         fields = ['language', 'timezone', 'is_light_theme', 'is_active']
 
 
+class BankDetailsForTransactionsSerializer(BankDetailsSerializer):
+    class Meta(BankDetailsSerializer.Meta):
+        fields = ['title', 'cardholder_name', 'card_number', "bank"]
+
+
 class TransactionSerializer(serializers.ModelSerializer):
-    trader_bank_details = BankDetailsForAdSerializer(read_only=True)
+    trader_bank_details = BankDetailsForTransactionsSerializer(read_only=True)
 
     class Meta:
         model = Transaction
         fields = "__all__"
-        read_only_fields = ['trader_bank_details', 'actual_amount', 'completed_at',
-                            'finished_at', 'created_at']
+        read_only_fields = ['trader_bank_details', 'amount', 'completed_at', 'finished_at', 'created_at']
 
 
 class APITransactionSerializer(serializers.ModelSerializer):

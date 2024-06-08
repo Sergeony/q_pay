@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { PayPageTab } from "shared/const/router";
 import { TransactionsTab } from "features/TransactionsTab";
 import {
-    getTransactionTypeFromRepr,
     transactionReducer,
     TransactionStatusGroup,
     TransactionTypeRepr
@@ -11,6 +10,9 @@ import {
 import { DynamicReducersLoader, Reducers } from "shared/lib/components/DynamicReducersLoader";
 import { classNames } from "shared/lib/classNames/classNames";
 import { bankDetailsReducer } from "entities/BankDetails";
+import { SearchIcon } from "shared/ui/_SVG";
+import { Field } from "shared/ui/Field/Field";
+import { NotFoundPage } from "pages/NotFoundPage";
 import cls from "./PayPage.module.scss";
 import { NavBar } from "./NavBar";
 
@@ -21,40 +23,51 @@ const reducers: Reducers = {
 
 const PayPage = () => {
     const { t } = useTranslation();
-    const { type, tab } = useParams<{ type: TransactionTypeRepr, tab: PayPageTab }>();
+    const { type, payTab } = useParams<{ type: TransactionTypeRepr, payTab: PayPageTab }>();
 
-    if (!type || !tab) return null;
+    if (!type || !payTab
+        || ![
+            "in",
+            "out",
+        ].includes(type)
+        || ![
+            TransactionStatusGroup.ACTIVE,
+            TransactionStatusGroup.DISPUTED,
+            TransactionStatusGroup.COMPLETED,
+            TransactionStatusGroup.CHECKING,
+            "export"
+        ].includes(payTab)
+    ) {
+        return <NotFoundPage />;
+    }
 
     return (
         <DynamicReducersLoader keepAfterUnmount reducers={reducers}>
             <main className={classNames(cls.main, ["v-stack gap-32"])}>
                 <div className="v-stack gap-32">
-                    <div className="h-stack gap-32">
+                    <div className={cls.TitleWrapper}>
                         <h2 className="PageTitle">
                             {type === "in" ? t("pay_in_page_title") : t("pay_out_page_title")}
                         </h2>
-                        {tab !== "export" && (
-                            <input
+                        {payTab !== "export" && (
+                            <Field
+                                label="Search Transaction"
+                                hideLabel
+                                Icon={SearchIcon}
+                                type="search"
+                                onClick={() => { console.log("search processed"); }}
                                 placeholder={t("ID Сделки")}
-                                onClick={() => {
-                                    console.log("search precessed");
-                                }}
+                                className={cls.search}
                             />
                         )}
                     </div>
                     <NavBar type={type} />
                 </div>
                 {
-                    tab !== "export" ? (
-                        <TransactionsTab
-                            type={getTransactionTypeFromRepr(type)}
-                            statusGroup={tab}
-                        />
+                    payTab !== "export" ? (
+                        <TransactionsTab />
                     ) : ( //  TODO: implement export
-                        <TransactionsTab
-                            type={getTransactionTypeFromRepr(type)}
-                            statusGroup={TransactionStatusGroup.ACTIVE}
-                        />
+                        <TransactionsTab />
                     )
                 }
             </main>

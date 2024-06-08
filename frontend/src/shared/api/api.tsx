@@ -24,8 +24,10 @@ export const refreshToken = async () => fetch(`${__API_URL__}/auth/token/refresh
         if (response.ok) {
             const data = await response.json();
             localStorage.setItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY, data.access);
-            return data;
+            return response;
         }
+        localStorage.removeItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
+        location.reload();
         return null;
     })
     .catch(() => {
@@ -52,6 +54,6 @@ const customBaseQuery = async (args: any, api: any, extraOptions: any) => {
 export const api = createApi({
     reducerPath: "api",
     baseQuery: customBaseQuery,
-    tagTypes: ["Ads", "Trader", "Merchant", "Banks", "BankDetails", "Deposit", "Withdrawal"],
+    tagTypes: ["Ads", "Users", "Banks", "BankDetails", "Deposit", "Withdrawal"],
     endpoints: () => ({}),
 });

@@ -1,15 +1,17 @@
 import { FormikHelpers, useFormik } from "formik";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "shared/lib/hooks/useAppDispatch";
-import { Input } from "shared/ui/Input/Input";
 import { Button, ButtonRole } from "shared/ui/Button/Button";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import * as yup from "yup";
 import { DynamicReducersLoader, Reducers } from "shared/lib/components/DynamicReducersLoader";
 import {
     memo, useCallback, useEffect, useMemo, useState
 } from "react";
 import { getRouteLogin, getRouteNotFound, getRouteVerifyEmail } from "shared/const/router";
+import { Field, FieldVariant } from "shared/ui/Field/Field";
+import CloseEye from "shared/ui/img/svg/CloseEye.svg";
+import OpenEye from "shared/ui/img/svg/OpenEye.svg";
 import { useSignUpMutation } from "../api/authService";
 import { authActions, authReducer } from "../model/slice/authSlice";
 import cls from "./Auth.module.scss";
@@ -30,7 +32,7 @@ const reducers: Reducers = {
 
 const validationSchema = yup.object({
     email: yup.string().email().required(),
-    password: yup.string().min(8).required(),
+    password: yup.string().required(),
     confirmPassword: yup.string().oneOf([yup.ref("password")]).required(),
     tgUsername: yup.string(),
 });
@@ -102,73 +104,123 @@ export const SignUpForm = memo(() => {
         onSubmit,
     });
 
+    const passwordRequirements = useMemo(() => (
+        {
+            [t("password_req_uppercase")]: /[A-Z]/.test(formik.values.password),
+            [t("password_req_lowercase")]: /[a-z]/.test(formik.values.password),
+            [t("password_req_digits")]: /[0-9]/.test(formik.values.password),
+            [t("password_req_long_enough")]: formik.values.password.length >= 12,
+        }
+    ), [formik.values.password, t]);
+
+    const allPasswordRequirementsMet = useMemo(
+        () => Object.values(passwordRequirements).every(Boolean),
+        [passwordRequirements]
+    );
+
+    const [hidePassword, setHidePassword] = useState<boolean>(true);
+    const [hideRePassword, setHideRePassword] = useState<boolean>(true);
+
     return (
-        <DynamicReducersLoader
-            keepAfterUnmount
-            reducers={reducers}
-        >
-            <form
-                className={cls.SignInForm}
-                onSubmit={formik.handleSubmit}
-            >
-                <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.email}
-                    placeholder={t("email_placeholder")}
-                />
-                {formik.touched.email && formik.errors.email && (
-                    <div className={cls.error}>{formik.errors.email}</div>
-                )}
-                <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.password}
-                    placeholder={t("password_placeholder")}
-                />
-                {formik.touched.password && formik.errors.password && (
-                    <div className={cls.error}>{formik.errors.password}</div>
-                )}
-                <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.confirmPassword}
-                    placeholder={t("confirm_password_placeholder")}
-                />
-                {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-                    <div className={cls.error}>{formik.errors.confirmPassword}</div>
-                )}
-                <Input
-                    id="tgUsername"
-                    name="tgUsername"
-                    type="text"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.tgUsername}
-                    placeholder={t("tg_username_placeholder")}
-                />
-                {formik.touched.tgUsername && formik.errors.tgUsername && (
-                    <div className={cls.error}>{formik.errors.tgUsername}</div>
-                )}
-                <Button
-                    type="submit"
-                    disabled={formik.isSubmitting || isSignUpPerforming}
-                    role={ButtonRole.PRIMARY}
+        <main className={cls.main}>
+            <section aria-labelledby="sign-up-heading" className="v-stack gap-32">
+                <h1 id="sign-up-heading" className="PageTitle">
+                    {t("sign_up_page_title")}
+                </h1>
+                <DynamicReducersLoader
+                    keepAfterUnmount
+                    reducers={reducers}
                 >
-                    {t("sign_up_btn")}
-                </Button>
-            </form>
-            {submitError && <div className={cls.error}>{submitError}</div>}
-            <p>{t("confirm_policy")}</p>
-        </DynamicReducersLoader>
+                    <form
+                        onSubmit={formik.handleSubmit}
+                        className="v-stack gap-32 w-full"
+                    >
+                        <Field
+                            variant={FieldVariant.SECURE}
+                            label={t("email_field_label")}
+                            placeholder={t("email_placeholder")}
+                            value={formik.values.email}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.email ? formik.errors.email : undefined}
+                            id="email"
+                            name="email"
+                            type="email"
+                        />
+                        <Field
+                            variant={FieldVariant.SECURE}
+                            label={t("password_field_label")}
+                            placeholder={t("password_placeholder")}
+                            value={formik.values.password}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.password && formik.errors.password}
+                            id="password"
+                            name="password"
+                            type={hidePassword ? "password" : "text"}
+                            Icon={hidePassword ? CloseEye : OpenEye}
+                            onIconClick={() => setHidePassword((prevState) => !prevState)}
+                            requirements={passwordRequirements}
+                        />
+                        <Field
+                            variant={FieldVariant.SECURE}
+                            label={t("confirm_password_label")}
+                            placeholder={t("confirm_password_placeholder")}
+                            value={formik.values.confirmPassword}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            type={hideRePassword ? "password" : "text"}
+                            Icon={hideRePassword ? CloseEye : OpenEye}
+                            onIconClick={() => setHideRePassword((prevState) => !prevState)}
+                        />
+                        <Field
+                            variant={FieldVariant.SECURE}
+                            label={t("tg_username_label")}
+                            placeholder={t("tg_username_placeholder")}
+                            value={formik.values.tgUsername}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.tgUsername && formik.errors.tgUsername}
+                            id="tgUsername"
+                            name="tgUsername"
+                            type="text"
+                        />
+                        <p className={cls.agreement}>
+                            <Trans
+                                i18nKey="confirm_policy"
+                                components={{
+                                    link1: <a
+                                        target="_blank"
+                                        href="/terms-of-service"
+                                        title="Terms of Service"
+                                    />,
+                                    link2: <a
+                                        target="_blank"
+                                        href="/privacy-policy"
+                                        title="Privacy Policy"
+                                    />,
+                                }}
+                            />
+                        </p>
+                        <Button
+                            type="submit"
+                            role={ButtonRole.PRIMARY}
+                            disabled={
+                                formik.isSubmitting
+                                || isSignUpPerforming
+                                || !formik.isValid
+                                || !allPasswordRequirementsMet
+                            }
+                        >
+                            {t("sign_up_btn")}
+                        </Button>
+                    </form>
+                    {submitError && <div className={cls.error}>{submitError}</div>}
+                </DynamicReducersLoader>
+            </section>
+        </main>
     );
 });

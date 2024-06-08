@@ -3,65 +3,53 @@ import { TransactionStatusGroup, TransactionTypeRepr } from "entities/Transactio
 export enum AppRoutes {
     REGISTER = "register",
     VERIFY_EMAIL = "verify_email",
-    VERIFY_TOTP = "verify_totp",
-    LOGIN = "login",
     SETUP_TOTP = "setup_totp",
+    LOGIN = "login",
+    VERIFY_TOTP = "verify_totp",
 
     TRADER_ADS = "trader_ads",
-    PAY = "pay",
-    SETTINGS = "settings",
 
-    // TRADER_PAY_OUT = "trader_pay_out",
-    //
-    // MERCHANT_PAY_IN = "merchant_pay_in",
-    // MERCHANT_PAY_OUT = "merchant_pay_out",
-    //
-    // ADMIN_TRADERS = "admin_traders",
-    // ADMIN_TRADER_DETAILS = "admin_traders", // + :id
-    // ADMIN_MERCHANTS = "admin_merchants",
-    // ADMIN_MERCHANT_DETAILS = "admin_merchants", // + :id
-    //
-    // BALANCE = "balance",
+    PAY = "pay",
+
+    ADMIN_USERS = "admin_users",
+    ADMIN_USER_DETAILS = "admin_user_details",
+
+    SETTINGS = "settings",
+    BALANCE = "balance",
 
     FORBIDDEN = "forbidden",
-    NOT_FOUND = "*",
+    NOT_FOUND = "not_found",
 }
 
 export const getRouteRegister = () => "/register";
 export const getRouteVerifyEmail = () => "/verify-email";
-export const getRouteVerifyTotp = () => "/verify-totp";
-export const getRouteLogin = () => "/login";
 export const getRouteSetupTotp = () => "/setup-totp";
+export const getRouteLogin = () => "/login";
+export const getRouteVerifyTotp = () => "/verify-totp";
 
-export const getRouteTraderAds = () => "/ads";
-export const getRouteTraderBankDetails = () => "/bank-details";
+export const getRouteAds = () => "/ads";
+export const getRouteBankDetails = () => "bank-details";
 
 export type PayPageTab = TransactionStatusGroup | "export";
-
 export const getRoutePay = (
     type: TransactionTypeRepr | ":type",
-    tab?: PayPageTab | ":tab?",
-) => `/pay/${type}/${tab || ""}`;
+    payTab: PayPageTab | ":payTab",
+) => `/pay/${type}/${payTab}`;
 
-export type SettingsPageTab = "/integration";
+export const getRoutePayForAdmin = (type: TransactionTypeRepr | ":type") => `pay/${type}`;
+export type AdminUsersTab = "traders" | "merchants";
+export const getRouteAdminUsers = (tab: AdminUsersTab | ":tab") => `/${tab}`;
+export const getRouteAdminUserDetails = (
+    tab: AdminUsersTab | ":tab",
+    userId: string | ":userId",
+) => `/${tab}/${userId}`;
 
-export const getRouteSettings = (tab?: SettingsPageTab | ":tab?") => `settings/${tab || ""}`;
-
-// export const getRouteTraderPayOut = () => "/trader/pay-out";
-//
-// export const getRouteMerchantPayIn = () => "/merchant/pay-in";
-// export const getRouteMerchantPayOut = () => "/merchant/pay-out";
-//
-// export const getRouteAdminTraders = () => "/admin/traders";
-// export const getRouteAdminTraderDetails = (id: string) => `/admin/traders/${id}`;
-// export const getRouteAdminMerchants = () => "/admin/merchants";
-// export const getRouteAdminMerchantDetails = (id: string) => `/admin/merchants/${id}`;
-//
-// export const getRouteSettings = () => "/settings";
-// export const getRouteBalance = () => "/balance";
+export const getRouteSettings = () => "/settings";
+export const getRouteSettingsIntegration = () => "integration";
+export const getRouteBalance = () => "/balance";
 
 export const getRouteForbidden = () => "/forbidden";
-export const getRouteNotFound = () => "/not-found";
+export const getRouteNotFound = () => "*";
 
 export const AppRouteByPathPattern: Record<string, AppRoutes> = {
     [getRouteRegister()]: AppRoutes.REGISTER,

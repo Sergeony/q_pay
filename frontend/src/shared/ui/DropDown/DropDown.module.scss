@@ -1,0 +1,100 @@
+.DropdownContainer {
+    display: inline-block;
+    position: relative;
+    user-select: none;
+
+    .Header {
+        padding: .375rem 1rem;
+        border: var(--select-border);
+        border-radius: .5rem;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        gap: .5rem;
+        align-items: center;
+
+        > span {
+            flex-grow: 1;
+            font: var(--font-main-regular);
+            color: var(--input-text-color);
+        }
+
+        &.Placeholder > span {
+            color: var(--secondary);
+        }
+
+        > .ChevronIcon {
+            stroke: var(--secondary);
+            transition: transform 0.3s ease;
+        }
+
+        &.Open {
+            background: var(--modal-bg);
+            border-radius: .5rem .5rem 0 0;
+            border: var(--select-open-border);
+            border-bottom: none;
+            padding-bottom: .4375rem;
+
+            > &:not(.Placeholder) > span {
+                color: var(--selected-opt-fg);
+            }
+
+            > .ChevronIcon {
+                transform: rotate(180deg);
+
+            }
+
+            &:not(.Placeholder) > .ChevronIcon {
+                stroke: var(--selected-opt-fg);
+            }
+        }
+
+        &.Open:hover {
+            background-color: var(--extra-light-grey);
+
+            > span {
+                color: var(--selected-opt-on-hover-fg);
+            }
+
+            > .ChevronIcon {
+                stroke: var(--selected-opt-on-hover-fg);
+            }
+        }
+    }
+
+    .Options {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--modal-bg);
+        z-index: 1;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        overflow: hidden;
+
+        border: var(--select-open-border);
+        border-top: none;
+        border-radius: 0 0 .5rem .5rem;
+
+        .Option {
+            padding: .5rem 1rem;
+            cursor: pointer;
+            color: var(--opt-fg);
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+
+            &:hover, &[aria-selected="true"] {
+                color: var(--opt-on-hover-fg);
+                background-color: var(--extra-light-grey);
+            }
+        }
+    }
+}
+
+.label {
+    font: var(--font-main-regular);
+    color: var(--grey-contrast);
+}

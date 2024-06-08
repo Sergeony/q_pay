@@ -63,7 +63,7 @@ class SignatureAuthentication(BaseAuthentication):
 
         server_time = timezone.now()
 
-        return server_time - request_time < settings.API_REQUEST_TIME_TIMEOUT
+        return server_time - request_time < settings.QPAY_API_REQUEST_TIME_TIMEOUT
 
     @staticmethod
     def validate_signature(request, timestamp, signature, secret_key):

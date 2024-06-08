@@ -5,7 +5,7 @@ export enum TransactionType {
 
 export type TransactionTypeRepr = "in" | "out";
 
-export const getTransactionTypeFromRepr = (repr: TransactionTypeRepr) => {
+export const getTransactionTypeFromRepr = (repr?: TransactionTypeRepr) => {
     if (repr === "in") return TransactionType.IN;
     if (repr === "out") return TransactionType.OUT;
     throw new Error(`Unknown TransactionTypeRepr provided: ${repr}`);

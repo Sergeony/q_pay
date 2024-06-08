@@ -1,9 +1,14 @@
-import React, { memo, Suspense, useCallback } from "react";
-import { Route, Routes } from "react-router-dom";
+import React, {
+    memo, Suspense, useCallback
+} from "react";
+import {
+    Route, Routes
+} from "react-router-dom";
 import { AppRoutesProps } from "shared/config/routeConfig/routeConfig";
 import { Loader } from "shared/ui/Loader/Loader";
-import { RequireAuth } from "./requireAuth";
 import { routeConfig } from "../config/config";
+import { PrivateRoute } from "./PrivateRoute";
+import { PublicRoute } from "./PublicRoute";
 
 const AppRouter = memo(() => {
     const renderWithWrapper = useCallback((route: AppRoutesProps) => {
@@ -12,18 +17,25 @@ const AppRouter = memo(() => {
                 {route.element}
             </Suspense>
         );
+        // console.log("ROUTE PATH: ", route.path);
         return (
             <Route
                 key={route.path}
                 path={route.path}
-                element={route.authOnly
-                    ? (
-                        <RequireAuth>
+                element={
+                    route.roles ? (
+                        <PrivateRoute roles={route.roles}>
                             {element}
-                        </RequireAuth>
+                        </PrivateRoute>
+                    ) : (
+                        <PublicRoute publicOnly={route.publicOnly}>
+                            {element}
+                        </PublicRoute>
                     )
-                    : element}
-            />
+                }
+            >
+                {route.childRoutes}
+            </Route>
         );
     }, []);
 
