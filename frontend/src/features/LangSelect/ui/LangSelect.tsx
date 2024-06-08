@@ -19,6 +19,8 @@ export const LangSelect = memo(() => {
                 { value: "uk", content: t("Укр") },
                 { value: "ru", content: t("Рус") },
             ]}
+            label={t("lang_select_label")}
+            hideLabel
         />
     );
 });

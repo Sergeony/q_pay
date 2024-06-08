@@ -2,7 +2,7 @@ import {
     AppRoutes,
     getRouteAdminUserDetails,
     getRouteAdminUsers,
-    getRouteAds,
+    getRouteAds, getRouteBalance,
     getRouteBankDetails,
     getRouteForbidden,
     getRouteLogin,
@@ -31,6 +31,7 @@ import { BankDetailsTab } from "features/BankDetailsTab";
 import { AdminUsersPage } from "pages/AdminUsersPage/ui/AdminUsersPage";
 import { AdminUserDetailsPage } from "pages/AdminUsersPage/ui/AdminUserDetailsPage";
 import { TransactionsTab } from "features/TransactionsTab";
+import { BalancePage } from "pages/BalancePage";
 
 export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
     [AppRoutes.REGISTER]: {
@@ -128,10 +129,11 @@ export const routeConfig: Record<AppRoutes, AppRoutesProps> = {
             />,
         ],
     },
-    // [AppRoutes.BALANCE]: {
-    //     path: getRouteBalance(),
-    //     element: <BalancePage />,
-    // },
+    [AppRoutes.BALANCE]: {
+        path: getRouteBalance(),
+        element: <BalancePage />,
+        roles: [UserType.TRADER, UserType.MERCHANT, UserType.ADMIN],
+    },
 
     [AppRoutes.FORBIDDEN]: {
         path: getRouteForbidden(),

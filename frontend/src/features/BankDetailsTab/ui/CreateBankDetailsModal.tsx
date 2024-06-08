@@ -79,27 +79,25 @@ const CreateBankDetailsModal = ({ onClose }: IProps) => {
                     {t("Создание Реквизитов")}
                 </h2>
                 <form className="v-stack gap-32" onSubmit={formik.handleSubmit}>
-                    <div className="v-stack gap-8">
-                        <label htmlFor="bank">{t("Выберите банк")}</label>
-                        <DropDown
-                            name="bank"
-                            id="bank"
-                            onChange={handleBankChange}
-                            value={formik.values.bank}
-                            options={banksFetched ? banks.map((b) => {
-                                const BankIcon = BankIcons[b.id];
-                                return {
-                                    value: b.id,
-                                    content: {
-                                        text: b.title,
-                                        icon: <BankIcon size={16} />,
-                                    },
-                                };
-                            }) : []}
-                            placeholder={t("Выберите банк")}
-                            className="br-width-1"
-                        />
-                    </div>
+                    <DropDown
+                        name="bank"
+                        id="bank"
+                        onChange={handleBankChange}
+                        value={formik.values.bank}
+                        options={banksFetched ? banks.map((b) => {
+                            const BankIcon = BankIcons[b.id];
+                            return {
+                                value: b.id,
+                                content: {
+                                    text: b.title,
+                                    icon: <BankIcon size={16} />,
+                                },
+                            };
+                        }) : []}
+                        placeholder={t("Выберите банк")}
+                        className="br-width-1"
+                        label={t("Выберите банк")}
+                    />
                     <Field
                         name="cardNumber"
                         id="card-number"

@@ -22,6 +22,8 @@ interface DropDownProps<T> extends InputAttrs {
     placeholder?: string;
     onChange: (value: T) => void;
     name?: string;
+    hideLabel?: true;
+    label: string;
 }
 
 const genericMemo: <T>(component: T) => T = memo;
@@ -33,6 +35,9 @@ const DropDown = genericMemo(<T extends string | number>(props: DropDownProps<T>
         placeholder = "Select an option",
         onChange,
         className,
+        id,
+        hideLabel,
+        label,
         ...otherProps
     } = props;
     const [isOpen, setIsOpen] = useState(false);
@@ -87,47 +92,55 @@ const DropDown = genericMemo(<T extends string | number>(props: DropDownProps<T>
     });
 
     return (
-        <div
-            className={`${cls.DropdownContainer} ${className}`}
-            tabIndex={0}
-            role="button"
-            aria-haspopup="true"
-            aria-expanded={isOpen}
-            onClick={() => setIsOpen(!isOpen)}
-            onKeyDown={handleKeyDown}
-            ref={containerRef}
-            {...otherProps}
-        >
-            <div className={`${cls.Header} ${isOpen && cls.Open} ${!value && cls.Placeholder}`}>
-                {typeof selectedOption?.content !== "string" && selectedOption?.content?.icon}
-                <span>
-                    {
-                        typeof selectedOption?.content === "string"
-                            ? selectedOption?.content
-                            : selectedOption?.content?.text || placeholder
-                    }
-                </span>
-                <ChevronIcon className={cls.ChevronIcon} width="16px" height="16px" />
+        <div className="v-stack gap-8">
+            <label
+                htmlFor={id}
+                className={`${cls.label} ${hideLabel && "hidden"}`}
+            >
+                {label}
+            </label>
+            <div
+                className={`${cls.DropdownContainer} ${className}`}
+                tabIndex={0}
+                role="button"
+                aria-haspopup="true"
+                aria-expanded={isOpen}
+                onClick={() => setIsOpen(!isOpen)}
+                onKeyDown={handleKeyDown}
+                ref={containerRef}
+                {...otherProps}
+            >
+                <div className={`${cls.Header} ${isOpen && cls.Open} ${!value && cls.Placeholder}`}>
+                    {typeof selectedOption?.content !== "string" && selectedOption?.content?.icon}
+                    <span>
+                        {
+                            typeof selectedOption?.content === "string"
+                                ? selectedOption?.content
+                                : selectedOption?.content?.text || placeholder
+                        }
+                    </span>
+                    <ChevronIcon className={cls.ChevronIcon} width="16px" height="16px" />
+                </div>
+                {isOpen && (
+                    <ul className={cls.Options}>
+                        {options.filter((option) => option.value !== value).map((option) => (
+                            <li
+                                key={option.value}
+                                className={cls.Option}
+                                tabIndex={0}
+                                role="option"
+                                aria-selected={value === option.value}
+                                onClick={() => handleOptionSelect(option.value)}
+                            >
+                                {typeof option.content !== "string" && option.content.icon}
+                                {typeof option.content === "string"
+                                    ? option.content
+                                    : option.content.text}
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
-            {isOpen && (
-                <ul className={cls.Options}>
-                    {options.filter((option) => option.value !== value).map((option) => (
-                        <li
-                            key={option.value}
-                            className={cls.Option}
-                            tabIndex={0}
-                            role="option"
-                            aria-selected={value === option.value}
-                            onClick={() => handleOptionSelect(option.value)}
-                        >
-                            {typeof option.content !== "string" && option.content.icon}
-                            {typeof option.content === "string"
-                                ? option.content
-                                : option.content.text}
-                        </li>
-                    ))}
-                </ul>
-            )}
         </div>
     );
 });

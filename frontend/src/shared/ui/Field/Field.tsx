@@ -46,10 +46,10 @@ export const Field = memo((props: ExtendedFieldProps) => {
     } = props;
 
     return (
-        <div className="v-stack gap-8">
+        <div className="v-stack gap-8 w-full">
             <label
                 htmlFor={id}
-                className={hideLabel && cls.hidden}
+                className={`${cls.label} ${hideLabel && "hidden"}`}
             >
                 {label}
             </label>

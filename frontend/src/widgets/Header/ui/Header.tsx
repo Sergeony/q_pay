@@ -11,7 +11,7 @@ import {
 import { useSelector } from "react-redux";
 import { getUserData } from "entities/User";
 import { AppNavLink } from "shared/ui/AppNavLink/AppNavLink";
-import { getRoutePay } from "shared/const/router";
+import { getRouteBalance, getRoutePay } from "shared/const/router";
 import { useNavLinks } from "../lib/getNavLinks";
 import cls from "./Header.module.scss";
 
@@ -61,10 +61,9 @@ export const Header = memo(() => {
                             <ul className={`h-stack justifyBetween alignCenter ${cls.NavList}`}>
                                 {navLinkElements}
                                 <li>
-                                    {/* TODO: replace TO path when implemented */}
                                     <AppNavLink
-                                        to="balance"
-                                        title={t("balance_link_title")}
+                                        to={getRouteBalance()}
+                                        title={t("balance_page_title")}
                                     >
                                         <BalanceBlock />
                                     </AppNavLink>

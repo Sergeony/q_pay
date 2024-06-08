@@ -98,7 +98,7 @@ export const TransactionsTab = memo(() => {
                                 </div>
                             </div>
                         </div>
-                        <div><span>{tr.id}</span></div>
+                        <div><span className="ellipsis">{tr.id}</span></div>
                         <div>
                             <div className="two-line-cell">
                                 <div className="h-stack gap-4 alignCenter">

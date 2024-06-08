@@ -15,7 +15,7 @@ export enum AppRoutes {
     ADMIN_USER_DETAILS = "admin_user_details",
 
     SETTINGS = "settings",
-    // BALANCE = "balance",
+    BALANCE = "balance",
 
     FORBIDDEN = "forbidden",
     NOT_FOUND = "not_found",
@@ -46,7 +46,7 @@ export const getRouteAdminUserDetails = (
 
 export const getRouteSettings = () => "/settings";
 export const getRouteSettingsIntegration = () => "integration";
-// export const getRouteBalance = () => "/balance";
+export const getRouteBalance = () => "/balance";
 
 export const getRouteForbidden = () => "/forbidden";
 export const getRouteNotFound = () => "*";

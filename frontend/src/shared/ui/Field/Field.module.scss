@@ -1,9 +1,9 @@
-label {
+.label {
     font: var(--font-main-regular);
     color: var(--grey-contrast);
 }
 
-label.hidden {
+.label.hidden {
     display: none;
 }
 

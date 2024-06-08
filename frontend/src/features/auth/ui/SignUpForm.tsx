@@ -188,7 +188,6 @@ export const SignUpForm = memo(() => {
                             name="tgUsername"
                             type="text"
                         />
-                        {/* <p>{t("confirm_policy")}</p> */}
                         <p className={cls.agreement}>
                             <Trans
                                 i18nKey="confirm_policy"

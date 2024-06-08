@@ -95,6 +95,7 @@ body {
             justify-content: center;
             padding: 0 24px;
             color: var(--contrast);
+            overflow: hidden;
         }
 
         // Tbody rows
@@ -186,7 +187,7 @@ body {
 }
 
 .gap-16 {
-    gap: 8px;
+    gap: 16px;
 }
 
 .gap-24 {
@@ -527,4 +528,14 @@ body {
 
 .br-width-1 > * {
     border-width: 1px !important;
+}
+
+.hidden {
+    display: none;
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

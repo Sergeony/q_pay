@@ -1,0 +1,61 @@
+.ActiveBalanceBlock {
+    > span {
+        font: var(--font-weight-bold) var(--font-size-xxx-l) var(--font-family-main);
+        color: var(--accent);
+    }
+
+    > svg {
+        fill: var(--accent);
+    }
+}
+
+.FrozenBalanceBlock {
+    > span {
+        font: var(--font-weight-regular) var(--font-size-x-l) var(--font-family-main);
+        background: var(--frozen-balance-fg);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    > svg {
+        fill: var(--frozen-balance-icon-fill);
+    }
+}
+
+.WithdrawalButton {
+    width: 17.75rem;
+}
+
+.WithdrawalForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border-radius: .5rem;
+    padding: 2rem 1.5rem;
+    max-width: 436px;
+    background: var(--table-row-bg);
+}
+
+.CurrencySelect {
+    width: 8.25rem;
+
+    > * {
+        border-width: .0625rem !important;
+    }
+}
+
+.WithdrawalDescription {
+    display: flex;
+    gap: .25rem;
+
+    > span {
+        font: var(--font-h1-bold);
+        line-height: 30px;
+        color: var(--accent);
+    }
+
+    > p {
+        font: var(--font-main-regular);
+        color: var(--global-grey);
+    }
+}
