@@ -49,6 +49,7 @@ class SignUpView(APIView):
 
         try:
             user = serializer.save()
+
             log_info(
                 message=f"Sign up successful.",
                 request=request,

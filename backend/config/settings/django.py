@@ -89,6 +89,7 @@ INSTALLED_APPS = [
     "apps.main",
     "apps.balance",
     "apps.api",
+    "apps.tron",
 ]
 
 MIDDLEWARE = [
